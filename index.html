@@ -75,38 +75,74 @@
             color: #fff;
         }
     </style>
+
 </head>
 <body>
+    
     <!-- 顶部标题框 -->
     <div class="header-box">
         <h1 class="header-title">计算数据</h1>
         <p class="header-subtitle">羽化哲 更新至6.7版本V3 日期：2026.6.1</p>
         <p class="header-note">所涉及的主C及副c均为30词条<br>最终数据请以正式服为准！！！</p>
-        <p class="header-note">更新日志：6.2<br>添加了资料库板块/v1~v3数据</p>
-    </div>
+        
 
+
+        
+<div align="center" style="margin:8px 0;">
+<button class="log-btn" onclick="toggleLog()">展开更新日志</button>
+
+</div>
+
+
+
+<!-- 仅把最后两行日志包进隐藏容器，原文字不变 -->
+<div id="logBox" style="display:none;">
+<p>v1.0版添加了桑多涅板块</p>
+<p>v1.1版添加了数据库板块，添加了木偶v1-v3数据</p>
+<p>v1.2优化了整体布局，新增更新日志说明</p>
+<p>v1.3添加了洛恩，尼可及武器相关数据，添加了个人表格使用模块，优化了布局</p>
+</div>
+
+<script>
+function toggleLog(){
+    let box=document.getElementById('logBox')
+    box.style.display = box.style.display==='none'?'block':'none'
+}
+</script>
+
+
+
+
+
+
+
+</div>
     <!-- sangdunie -->
    <div class="card-container">
-
-
-    
-    <a href="detail.html" class="char-card">
-
-
-
-        <img src="sangduonie/木偶.png" alt="桑多涅">
-        <div class="char-name">桑多涅</div>
+        
     </a>
+<a href="detail.html" style="display:inline-block;padding:0;background:#222;border:2px solid #ffbbbb;border-radius:12px;overflow:hidden;text-decoration:none;color:#fff;">
+<img src="sangduonie/头像2.png" style="width:180px;display:block;">
+<div style="text-align:center;padding:6px;font-size:20px;">桑多涅</div>
+</a>
 
-
+   
 
 
 
 <a href="library.html" style="display:inline-block;padding:0;background:#222;border:2px solid #fff;border-radius:12px;overflow:hidden;text-decoration:none;color:#fff;">
-<img src="资料库.png" style="width:180px;display:block;">
+<img src="资料.png" style="width:180px;display:block;">
 <div style="text-align:center;padding:6px;font-size:20px;">资料库</div>
 </a>
 
+<a href="luoen.html" style="display:inline-block;padding:0;background:#222;border:2px solid #fff;border-radius:12px;overflow:hidden;text-decoration:none;color:#fff;">
+<img src="洛恩/头像.png" style="width:180px;display:block;">
+<div style="text-align:center;padding:6px;font-size:20px;">洛恩
+</div>
+</a>
 
-
-
+<a href="nike.html" style="display:inline-block;padding:0;background:#222;border:2px solid #fff;border-radius:12px;overflow:hidden;text-decoration:none;color:#fff;">
+<img src="尼可/头像.png" style="width:180px;display:block;">
+<div style="text-align:center;padding:6px;font-size:20px;">尼可
+</div>
+</a>
