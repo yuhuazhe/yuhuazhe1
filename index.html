@@ -102,7 +102,7 @@
 <p>v1.2优化了整体布局，新增更新日志说明</p>
 <p>v1.3添加了洛恩，尼可及武器相关数据，添加了个人表格使用模块，优化了布局</p>
 <p>1.4添加了由b站up主鲷鱼烧烧xxx自主开发的木偶计算程序，资料库寻找</p>
-<p></p>
+<p>1.5添加了公式板块，自主计算器该up主已完成全面完善</p>
 <p></p>
 
 </div>
@@ -150,3 +150,21 @@ function toggleLog(){
 <div style="text-align:center;padding:6px;font-size:20px;">尼可
 </div>
 </a>
+
+<a href="gongshi.html" style="display:inline-block;padding:0;background:#222;border:2px solid #fff;border-radius:12px;overflow:hidden;text-decoration:none;color:#fff;">
+<img src="资料.png" style="width:180px;display:block;">
+<div style="text-align:center;padding:6px;font-size:20px;">公式
+</div>
+</a>
+
+
+<script>
+fetch("https://xxx.vercel.app/api/getData")
+.then(res=>res.json())
+.then(ret=>{
+    console.log(ret)
+})
+</script>
+</html>
+
+
