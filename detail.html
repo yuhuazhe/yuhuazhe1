@@ -98,7 +98,7 @@
 <h6>木偶v1.5计算数据</h6>
     <div class="item">
         <img src="dps库/v3.1.png">
-        <button class="fold-btn" onclick="toggle1()">展开v3介绍</button>
+        <button class="fold-btn" onclick="toggle1()">展开v1.5介绍</button>
         <div class="fold-content" id="txt1">
             <p>计算队伍：桑多涅，北斗，砂糖，迪奥娜（四星均为6命）</p>
             <p>圣遗物选择：新超导套，宗室，风套，千岩/与上面角色对应</p>
@@ -121,8 +121,8 @@
     <h4>木偶v3计算数据</h4>
     <div class="item">
         <img src="dps库/v3.png">
-        <button class="fold-btn" onclick="toggle1()">展开v3介绍</button>
-        <div class="fold-content" id="txt1">
+        <button class="fold-btn" onclick="toggle2()">展开v3介绍</button>
+        <div class="fold-content" id="txt2">
             <p>计算队伍：桑多涅，北斗，砂糖，迪奥娜（四星均为6命）</p>
             <p>圣遗物选择：新超导套，宗室，风套，千岩/与上面角色对应</p>
             <p>30词条，21s轴</p>
@@ -140,8 +140,8 @@
     <h5>木偶v2计算数据</h5>
     <div class="item">
         <img src="dps库/v2.png">
-        <button class="fold-btn" onclick="toggle2()">展开v2介绍</button>
-        <div class="fold-content" id="txt2">
+        <button class="fold-btn" onclick="toggle3()">展开v2介绍</button>
+        <div class="fold-content" id="txt3">
             
             <p>计算队伍：桑多涅，北斗，砂糖，迪奥娜（四星均为6命）</p>
             <p>圣遗物选择：新超导套，宗室，风套，千岩/与上面角色对应</p>
@@ -155,8 +155,8 @@
     <h6>木偶v1计算数据</h6>
     <div class="item">
         <img src="dps库/v1.png">
-        <button class="fold-btn" onclick="toggle3()">展开v1介绍</button>
-        <div class="fold-content" id="txt3">
+        <button class="fold-btn" onclick="toggle4()">展开v1介绍</button>
+        <div class="fold-content" id="txt4">
             
             <p>计算队伍：桑多涅，北斗，砂糖，迪奥娜（四星均为6命）</p>
             <p>圣遗物选择：新超导套，宗室，风套，千岩/与上面角色对应</p>
@@ -176,6 +176,10 @@ function toggle2(){
 }
 function toggle3(){
     let d=document.getElementById('txt3');
+    d.style.display=d.style.display==='none'?'block':'none';
+}
+function toggle4(){
+    let d=document.getElementById('txt4');
     d.style.display=d.style.display==='none'?'block':'none';
 }
 </script>

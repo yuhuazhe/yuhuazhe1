@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+     <link rel="icon" href="资料库.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实战DPS数据库</title>
+    <style>
+
+ 
+
+
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing: border-box;
+        }
+        body{
+            background-color: #121212;
+            color:#ddd;
+            font-family: "Microsoft Yahei",sans-serif;
+            display: flex;
+            justify-content: center;
+            padding:40px 16px;
+        }
+        .container{
+            width:100%;
+            max-width:720px;
+        }
+        a{
+            text-decoration: none;
+        }
+        /*标题*/
+        .title-group h1{
+            font-size:clamp(36px,8vw,56px);
+            font-weight:normal;
+            color:#ee2828;
+        }
+        .title-group p{
+            font-size:clamp(20px,4vw,32px);
+            color:#b9b9b9;
+            margin-top:8px;
+            font-style:italic;
+        }
+        .split-line{
+            width:100%;
+            height:1px;
+            background:#444;
+            margin:36px 0;
+        }
+        /*卡片改为左右并排，手机自动变回上下堆叠*/
+        .card-wrap{
+            display:flex;
+            gap:16px;
+            flex-wrap: wrap;
+        }
+        .card-wrap > a{
+            flex:1;
+            min-width:280px;
+        }
+        .card-item{
+            border:2px solid #777;
+            border-radius:18px;
+            overflow:hidden;
+            position:relative;
+        }
+        .card-item img{
+            width:100%;
+            display:block;
+        }
+        .card-text{
+            position:absolute;
+            left:20px;
+            bottom:20px;
+            color:#fff;
+        }
+        .card-text .cn{
+            font-size:clamp(18px,4vw,22px);
+        }
+        .card-text .en{
+            font-size:clamp(14px,3vw,17px);
+            opacity:0.85;
+        }
+        /*底部提示栏*/
+        .tip-bar{
+            display:flex;
+            align-items:center;
+            background:#ff9898;
+            padding:14px 18px;
+            border-radius:12px;
+            margin-top:50px;
+            gap:12px;
+            flex-wrap: wrap;
+        }
+        .close-x{
+            color:#fff;
+            font-size:22px;
+        }
+        .tip-text{
+            flex:1;
+            font-size:clamp(16px,3vw,20px);
+        }
+        .btn-restore{
+            background:#2578f5;
+            color:#fff;
+            border:none;
+            padding:10px 22px;
+            border-radius:8px;
+            font-size:clamp(16px,3vw,20px);
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title-group">
+            <h1>实战DPS数据库</h1>
+            <p>在查看时请仔细阅读相关条例</p>
+        
+
+       <div align="center" style="margin:8px 0;">
+<button class="log-btn" onclick="toggleLog()">点击查看声明</button>
+
+</div>
+
+
+<!-- 仅把最后两行日志包进隐藏容器，原文字不变 -->
+<div id="logBox" style="display:none;">
+<p>v1.0版添加了桑多涅板块</p>
+<p>v1.1版添加了数据库板块，添加了木偶v1-v3数据</p>
+<p>v1.2优化了整体布局，新增更新日志说明</p>
+<p>v1.3添加了洛恩，尼可及武器相关数据，添加了个人表格使用模块，优化了布局</p>
+<p>1.4添加了由b站up主鲷鱼烧烧xxx自主开发的木偶计算程序，资料库寻找</p>
+<p>1.5添加了公式板块，自主计算器该up主已完成全面完善</p>
+<p>1.6由于星超导机制更改，已完成v1.5的数据更新</p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+
+
+</div>
+
+<script>
+function toggleLog(){
+    let box=document.getElementById('logBox')
+    box.style.display = box.style.display==='none'?'block':'none'
+}
+</script>
+
+
+
+        <div class="split-line"></div>
+
+        <!--大屏左右并排，小屏自动上下-->
+        <div class="card-wrap">
+            <a href="木偶实战dps统计/muoushizhandpstongji.html">
+                <div class="card-item">
+                    <img src="sangduonie/shaon.png" alt="满能量启动">
+                    <div class="card-text">
+                        <div class="cn">满能量启动</div>
+                        <div class="en"></div>
+                    </div>
+                </div>
+            </a>
+            <a href="木偶实战dps统计/muoushizhandpstongji.html">
+                <div class="card-item">
+                    <img src="sangduonie/头像2.png" alt="零能量启动">
+                    <div class="card-text">
+                        <div class="cn">零能量启动</div>
+                        <div class="en"></div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+       
+</html>

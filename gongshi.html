@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <link rel="icon" href="资料库.png">
+     <link rel="icon" href="资料库.png">
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -82,7 +82,7 @@
     <!-- 顶部标题框 -->
     <div class="header-box">
         <h1 class="header-title">计算公式</h1>
-        <p class="header-subtitle">更新至星超导计算公式 最后更新日期：2026.6.3</p>
+        <p class="header-subtitle">暂未进行相关计算excel上传/自动计算器暂未进行校验，代码没啥问题 最后更新日期：2026.6.4</p>
         <p class="header-note">公式源于网络验证后上传<br></p>
     </div>
 
@@ -95,9 +95,437 @@
         <p class="header-note">公式源于网络验证后上传<br></p>
         <P>注：星超导反应无反应伤害只有星超导直伤/前后台角色满足条件均可造成星超导直伤</P>
         <P>计算公式可由月反应做类推</P>
+        <P>星超导直伤计算公式：星超导基础倍率×角色属性×倍率×（1+基础提升%）×【1+（6+元素精通）/（元素精通+2000）+星超导增伤%】</P>
+        <P>最终直伤＝（直伤基础＋额外提升）×暴击区×抗性系数×擢升</P>
+        <P>基础提升如：桑多涅天赋的14%</P>
+        <P>角色属性：如攻击力等</P>
+        <P>额外提升俗称羽毛，如七七6命</P>
+        <P>星超导基础倍率：当触发次数为0/1/2/3/4/5/6/7/8/9/10/11/12</P>
+        <P>星超导基础倍率：1.0/1.45/1.5/1.54/1.60/1.64/1.70/1.75/1.79/1.85/1.89/1.95/2.0</P>
+        <P></P>
+        <P></P>
+
+        <a href="公式存储/星超导计算.xlsx" download class="down-btn">模板excel下载</a>
+
+
+        <style>
+.xcd_wrap{max-width:1200px;margin:35px auto 0;padding:0 8px;}
+.xcd_title{text-align:center;font-size:clamp(20px,4vw,24px);color:#ffd322;margin-bottom:16px;}
+.xcd_table_head{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    background:#2b2b2b;
+    padding:13px 8px;
+    border-radius:8px 8px 0 0;
+    font-weight:bold;gap:6px;color:#fff;
+}
+.xcd_table_row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    padding:12px 8px;border-bottom:1px solid #333;gap:6px;
+}
+.xcd_input{
+    width:100%;background:#222;border:1px solid #555;color:#fff;
+    padding:8px;border-radius:6px;font-size:15px;outline:none;
+}
+.xcd_result{
+    width:100%;background:#222;border:1px solid #555;color:#fff;
+    padding:8px;border-radius:6px;
+}
+.xcd_btn{
+    width:100%;margin-top:14px;padding:11px;background:#2578f5;
+    border:none;border-radius:6px;color:#fff;font-size:16px;cursor:pointer;
+}
+@media(max-width:720px){
+    .xcd_table_head,.xcd_table_row{grid-template-columns:1fr 1fr;gap:4px;}
+}
+</style>
+
+<div class="xcd_wrap">
+    <div class="xcd_title">星超导直伤计算器</div>
+
+    <div class="xcd_table_head">
+        <div>星超导基础倍率</div>
+        <div>角色属性(攻击力)</div>
+    </div>
+    <div class="xcd_table_row">
+        <div><input class="xcd_input" id="xcdBase" placeholder="0次1.0、1次1.45...12次2.0"></div>
+        <div><input class="xcd_input" id="attr" placeholder="输入面板攻击力"></div>
+    </div>
+
+    <div class="xcd_table_head">
+        <div>1+基础提升倍率</div>
+        <div>元素精通数值</div>
+    </div>
+    <div class="xcd_table_row">
+        <div><input class="xcd_input" id="upBase" placeholder="提升14%填1.14"></div>
+        <div><input class="xcd_input" id="emXcd" placeholder="角色精通"></div>
+    </div>
+
+    <div class="xcd_table_head">
+        <div>星超导增伤百分比</div>
+        <div>暴击区</div>
+    </div>
+    <div class="xcd_table_row">
+        <div><input class="xcd_input" id="addXcd" placeholder="增伤30%填30"></div>
+        <div><input class="xcd_input" id="critXcd" placeholder="暴击区加成"></div>
+    </div>
+
+    <div class="xcd_table_head">
+        <div>抗性系数</div>
+        <div>额外提升倍率</div>
+    </div>
+    <div class="xcd_table_row">
+        <div><input class="xcd_input" id="resXcd" placeholder="抗性计算器结果"></div>
+        <div><input class="xcd_input" id="extraUp" placeholder="羽毛等额外提升"></div>
+    </div>
+
+    <div class="xcd_table_head">
+        <div>星超导最终直伤</div>
+        <div></div>
+    </div>
+    <div class="xcd_table_row">
+        <div><div class="xcd_result" id="xcdOut">等待计算</div></div>
+        <div></div>
+    </div>
+
+    <button class="xcd_btn" onclick="calcXcd()">计算星超导伤害</button>
+</div>
+
+<script>
+function calcXcd(){
+    let baseMul = Number(document.getElementById('xcdBase').value)||1;
+    let attrVal = Number(document.getElementById('attr').value)||0;
+    let baseUp = Number(document.getElementById('upBase').value)||1;
+    let em = Number(document.getElementById('emXcd').value)||0;
+    let addPct = Number(document.getElementById('addXcd').value)||0;
+    let critMul = Number(document.getElementById('critXcd').value)||1;
+    let resMul = Number(document.getElementById('resXcd').value)||1;
+    let extraMul = Number(document.getElementById('extraUp').value)||1;
+
+    let emCoef = 6*em/(em+2000);
+    let dmgAddAll = 1 + emCoef + addPct/100;
+
+    //原公式：基础倍率×属性×(1+基础提升)×(1+精通项+增伤%) → 再×额外提升×暴击区×抗性
+    let dmg = baseMul * attrVal * baseUp * dmgAddAll * extraMul * critMul * resMul;
+    document.getElementById('xcdOut').innerText = dmg.toFixed(2);
+}
+</script>
+
 
 
     </div>
+
+
+    <div class="header-box">
+        <h2 class="header-title">防御力 抗性</h2>
+        <p class="header-subtitle"></p>
+        <p class="header-note">公式源于网络验证后上传<br></p>
+        <P>通用抗性公式：</P>
+        <P>1-抗性/2，抗性≤0</P>
+        <P>1-抗性，0＜抗性≤75%</P>
+        <P>1/（4×抗性+1），抗性＞75%</P>
+        <P>角色攻击敌人时的防御系数：</P>
+        <P>（角色等级＋100）/[（角色等级＋100）＋（敌人等级＋100）×（1-减防）×（1-无视防御）]</P>
+        <P>（来自角色的减防不能超过 90%，无视防御不能超过 100%）</P>
+        <P>敌人攻击角色时的防御系数：</P>
+        <P>（5×敌人等级＋500）/（5×敌人等级＋500＋角色防御）</P>
+        <P></P>
+        <P></P>
+
+        <a href="公式存储/星超导计算.xlsx" download class="down-btn">模板excel下载</a>
+
+        
+
+        <style>
+
+/*全部rc命名空间，不会污染原有css样式*/
+.rc_wrap{
+    max-width:1200px;
+    margin:35px auto 0;
+    padding:0 8px;
+}
+.rc_title{
+    text-align:center;
+    font-size:clamp(20px,4vw,24px);
+    color:#ffd322;
+    margin-bottom:16px;
+}
+/*方格表头，沿用你原有深色方框风格*/
+.rc_table_head{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    background:#2b2b2b;
+    padding:13px 8px;
+    border-radius:8px 8px 0 0;
+    font-weight:bold;
+    gap:6px;
+    color:#fff;
+}
+.rc_table_row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    padding:12px 8px;
+    border-bottom:1px solid #333;
+    gap:6px;
+}
+.rc_input{
+    width:100%;
+    background:#222;
+    border:1px solid #555;
+    color:#fff;
+    padding:8px;
+    border-radius:6px;
+    font-size:15px;
+    outline:none;
+}
+.rc_result_box{
+    width:100%;
+    background:#222;
+    border:1px solid #555;
+    color:#fff;
+    padding:8px;
+    border-radius:6px;
+}
+.rc_calc_btn{
+    width:100%;
+    margin-top:14px;
+    padding:11px;
+    background:#2578f5;
+    border:none;
+    border-radius:6px;
+    color:#fff;
+    font-size:16px;
+    cursor:pointer;
+}
+.rc_info{
+    margin-top:12px;
+    padding:12px;
+    background:#202020;
+    border:1px solid #444;
+    border-radius:6px;
+    color:#cccccc;
+    font-size:13px;
+}
+/*移动端自适应双列方格*/
+@media(max-width:720px){
+    .rc_table_head,.rc_table_row{
+        grid-template-columns:1fr 1fr;
+        gap:4px;
+    }
+}
+</style>
+
+<div class="rc_wrap">
+    <div class="rc_title">抗性系数计算器</div>
+    <div class="rc_table_head">
+        <div>敌人初始抗性(%)</div>
+        <div>总减抗数值(%)</div>
+    </div>
+    <div class="rc_table_row">
+        <div><input class="rc_input" id="rc_origin" placeholder="例：0.1"></div>
+        <div><input class="rc_input" id="rc_reduce" placeholder="例：0.4"></div>
+    </div>
+    <div class="rc_table_head">
+        <div>最终抗性R</div>
+        <div>抗性系数</div>
+    </div>
+    <div class="rc_table_row">
+        <div><div class="rc_result_box" id="rc_finalRes">等待计算</div></div>
+        <div><div class="rc_result_box" id="rc_coeff">等待计算</div></div>
+    </div>
+    <button class="rc_calc_btn" onclick="rcCalculate()">点击计算系数</button>
+    <div class="rc_info">
+        敌人的初始抗性/减抗数值需要输入小数<br>
+       抗性系数输出第二格无需理会，代码问题<br>
+       <br>
+        
+    </div>
+</div>
+
+<script>
+function rcCalculate(){
+    //读取输入
+    let origin = Number(document.getElementById('rc_origin').value)||0;
+    let reduce = Number(document.getElementById('rc_reduce').value)||0;
+    //最终抗性=原始抗性-减抗
+    let finalR = origin - reduce;
+    let coef;
+
+    //三段正确判定
+    if(finalR > 0.75){
+        coef = 1/(1 + 4*finalR);
+    }else if(finalR >= 0){
+        coef = 1 - finalR;
+    }else{
+        coef = 1 - finalR/2;
+    }
+
+    //输出数据
+    document.getElementById('rc_finalRes').innerText = (finalR*100).toFixed(2)+"";
+    document.getElementById('rc_coeff').innerText = coef.toFixed(4)+" | "+(coef*100).toFixed(2)+"";
+}
+</script>
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+
+    <div class="header-box">
+        <h2 class="header-title">常规伤害</h2>
+        <p class="header-subtitle"></p>
+        <p class="header-note">公式源于网络验证后上传<br></p>
+        <P>角色造成的常规伤害：(基础值 + 激化值 + 基础值加成) × (1 + 增伤 %+ 易伤 %- 减伤 %) × 抗性系数 × 防御系数 × 暴击区 × 蒸发融化系数</P>
+        <P>（注：若攻击没有出现伤害数字（例如命中护盾），则本次伤害不会计算蒸发融化系数）</P>
+        <P>基础值：攻击力 * 倍率，攻击力可以替换为其他属性（生命值，元素精通等）</P>
+        <P>基础值加成：描述中带有【造成的伤害提高 X】的效果</P>
+
+        <P>增伤：描述中带有【我方造成的伤害提高 X%】的效果</P>
+        <P>易伤：描述中带有【目标受到的伤害提高 X%】的效果</P>
+        <P>减伤：描述中带有【目标受到的伤害降低 X%】的效果</P>
+        <P></P>
+        <P></P>
+        <P></P>
+        <P></P>
+
+        <a href="公式存储/星超导计算.xlsx" download class="down-btn">模板excel下载</a>
+
+
+    </div>
+
+     <div class="header-box">
+        <h2 class="header-title">月感电</h2>
+        <p class="header-subtitle"></p>
+        <p class="header-note">公式源于网络验证后上传<br></p>
+        <P>特定情况下，雷触及水时，会生成一片不可移动的雷暴云，持续 6s</P>
+
+        <P>雷暴云：每 2s 攻击一次附近所有同时具有雷和水的目标，并消耗 0.4 元素量的雷和水（破盾效率极低）触发月感电时，若附近已有雷暴云，则会刷新持续时间月感电的倍率为 1.8，基础伤害为:1446.85×1.8=2604.33</P>
+
+        <P>月感电造成伤害时，所有参与反应的角色都会提供伤害值，但除伤害最高的角色外，其余角色的提供的伤害值会降低</P>
+        <P>月感电无视防御，可以暴击（取决于每个角色自己的暴击率和暴击伤害）</P>
+
+        <P>反应月感电＝1446.85×1.8×（1+基础提升%）×（1+6×元素精通/元素精通＋2000+月感电增伤%）×抗性系数×暴击区×擢升</P>										
+												
+
+        <P>最终伤害＝伤害最高角色+1/2第二高角色＋1/12第三高角色+1/12第四高角色</P>
+        <P>若原本伤害最高的角色没有暴击，则有可能另一名暴击的角色成为最高</P>
+        <P>某些角色可以基于攻击力，直接造成月感电伤害，通过这种方式造成的伤害无视防御力，不受益于常规增伤 / 减伤，但受益于元素精通，且有额外系数 3x:</P>
+        <P>直伤月感电＝	3×攻击力×倍率×（1+基础提升%）×（1+6×元素精通/元素精通＋2000＋月感电增伤%）×抗性系数×暴击区×擢升</P>
+        <P></P>
+        <P></P>
+
+        <a href="公式存储/星超导计算.xlsx" download class="down-btn">模板excel下载</a>
+
+
+    
+
+<style>
+.ygd_wrap{max-width:1200px;margin:35px auto 0;padding:0 8px;}
+.ygd_title{text-align:center;font-size:clamp(20px,4vw,24px);color:#ffd322;margin-bottom:16px;}
+.ygd_table_head{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    background:#2b2b2b;
+    padding:13px 8px;
+    border-radius:8px 8px 0 0;
+    font-weight:bold;gap:6px;color:#fff;
+}
+.ygd_table_row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    padding:12px 8px;border-bottom:1px solid #333;gap:6px;
+}
+.ygd_input{
+    width:100%;background:#222;border:1px solid #555;color:#fff;
+    padding:8px;border-radius:6px;font-size:15px;outline:none;
+}
+.ygd_result{
+    width:100%;background:#222;border:1px solid #555;color:#fff;
+    padding:8px;border-radius:6px;
+}
+.ygd_btn{
+    width:100%;margin-top:14px;padding:11px;background:#2578f5;
+    border:none;border-radius:6px;color:#fff;font-size:16px;cursor:pointer;
+}
+@media(max-width:720px){
+    .ygd_table_head,.ygd_table_row{grid-template-columns:1fr 1fr;gap:4px;}
+}
+</style>
+
+<div class="ygd_wrap">
+    <div class="ygd_title">直伤月感电计算器</div>
+
+    <div class="ygd_table_head">
+        <div>角色攻击力</div>
+        <div>基础提升</div>
+    </div>
+    <div class="ygd_table_row">
+        <div><input class="ygd_input" id="atk" placeholder="输入面板攻击力"></div>
+        <div><input class="ygd_input" id="upRate" placeholder="需按实际公式"></div>
+    </div>
+
+    <div class="ygd_table_head">
+        <div>元素精通</div>
+        <div>月感电增伤百分比</div>
+    </div>
+    <div class="ygd_table_row">
+        <div><input class="ygd_input" id="em" placeholder="角色精通数值"></div>
+        <div><input class="ygd_input" id="addPer" placeholder="例如25就填25"></div>
+    </div>
+
+    <div class="ygd_table_head">
+        <div>抗性系数（抗性计算器算出）</div>
+        <div>暴击区</div>
+    </div>
+    <div class="ygd_table_row">
+        <div><input class="ygd_input" id="res" placeholder="参考抗性计算板块"></div>
+        <div><input class="ygd_input" id="critUp" placeholder="暴击区"></div>
+    </div>
+
+    <div class="ygd_table_head">
+        <div>最终直伤月感电伤害</div>
+        <div></div>
+    </div>
+    <div class="ygd_table_row">
+        <div><div class="ygd_result" id="out">等待计算</div></div>
+        <div></div>
+    </div>
+
+    <button class="ygd_btn" onclick="calcZhiShang()">开始计算</button>
+</div>
+
+<script>
+function calcZhiShang(){
+    let atk = Number(document.getElementById('atk').value)||0;
+    let upRate = Number(document.getElementById('upRate').value)||1;
+    let em = Number(document.getElementById('em').value)||0;
+    let addPer = Number(document.getElementById('addPer').value)||0;
+    let res = Number(document.getElementById('res').value)||1;
+    let critUp = Number(document.getElementById('critUp').value)||1;
+
+    let emBonus = 6*em/(em+2000);
+    let allAdd = 1 + emBonus + addPer/100;
+    //原图固定系数3
+    let damage = 3 * atk * upRate * allAdd * res * critUp;
+
+    document.getElementById('out').innerText = damage.toFixed(2);
+}
+
+</script>
+<div class="rc_info">
+        暂未进行计算的准确性进行验证，代码似乎没什么问题<br>
+       如遇到结果不准确请联系创作者<br>
+       <br>
+</div>
+
 
 
 

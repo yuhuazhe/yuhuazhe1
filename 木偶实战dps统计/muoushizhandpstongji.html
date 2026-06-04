@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <link rel="icon" href="资料库.png">
+      <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>木偶实战dps统计</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", sans-serif;
+        }
+        body {
+            background-color: #111111;
+            color: #eee;
+            padding: 30px 12px;
+        }
+        /*顶部标题框*/
+        .title-box {
+            max-width: 1200px;
+            margin: 0 auto 25px;
+            background: #7a4545;
+            padding: 18px;
+            text-align: center;
+            border-radius: 12px;
+            border: 1px solid #f90000;
+        }
+        .title-box h2 {
+            font-size: clamp(22px,5vw,32px);
+            color: #ffd760;
+        }
+        .table-wrap {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        /*表头布局*/
+        .table-head {
+            display: grid;
+            grid-template-columns: 50px 1fr 70px 95px 140px;
+            background-color: #2b2b2b;
+            padding:14px 8px;
+            border-radius:8px 8px 0 0;
+            font-size:clamp(14px,2vw,17px);
+            font-weight:bold;
+            gap:6px;
+        }.team-item {
+            display: grid;
+            grid-template-columns: 50px 1fr 70px 95px 140px;
+            padding:12px 8px;
+            border-bottom:1px solid #333;
+            align-items:flex-start;
+            gap:6px;
+        }
+        .num-col {
+            font-size:clamp(18px,3vw,24px);
+            font-weight:bold;
+            color:#ffd322;
+            text-align:center;
+        }
+        /*展示框样式（只读不能改）*/
+        .show-text{
+            width:100%;
+            background:#222;
+            border:1px solid #555;
+            color:#fff;
+            padding:8px;
+            border-radius:6px;
+            font-size:15px;
+        }
+        /*角色独立框*/
+        .role-box {
+            margin-top:8px;
+            width:100%;
+            min-height:42px;
+            background:#1c1c1c;
+            border:1px solid #444;
+            border-radius:6px;
+            padding:7px;
+            display:flex;
+            gap:6px;
+            flex-wrap:wrap;
+        }
+        /*手机适配：序号、队伍名、金、DPS、链接同一行，角色框整行在下*/
+        @media (max-width:720px) {
+            .table-head,.team-item {
+                grid-template-columns: 42px minmax(0,1fr) 62px 78px 105px;
+                gap:4px;
+                padding:10px 4px;
+            }
+            .team-name{
+                grid-column: 1 / -1;
+                margin-top:6px;
+            }
+            .num-col{grid-row:1;grid-column:1;}
+            .gold-col{grid-row:1;grid-column:3;}
+            .dps-col{grid-row:1;grid-column:4;}
+            .link-col{grid-row:1;grid-column:5;}
+            .show-text{
+                padding:6px 2px;
+                font-size:13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="title-box">
+        <h2>木偶实战DPS</h2>
+    </div>
+
+    <div class="table-wrap">
+        <div class="table-head">
+            <div>序号</div>
+            <div>队伍名称</div>
+            <div>金数</div>
+            <div>DPS</div>
+            <div>视频链接</div>
+        </div>
+
+        <!--新增队伍只复制整段team-item，在代码里改文字即可-->
+        <div class="team-item">
+            <div class="num-col">1</div>
+            <div class="team-name">
+                <div class="show-text">木偶四星队</div>
+                <div class="role-box">01木偶6迪奥娜6北斗6砂糖</div>
+            </div>
+            <div class="gold-col">
+                <div class="show-text">2金</div>
+            </div>
+            <div class="dps-col">
+                <div class="show-text">4</div>
+            </div>
+            <div class="link-col">
+                <div class="show-text">htt</div>
+            </div>
+        </div>
+
+        <div class="team-item">
+            <div class="num-col">2</div>
+            <div class="team-name">
+                <div class="show-text">木偶五星队</div>
+                <div class="role-box">木偶八重迪奥娜砂糖</div>
+            </div>
+            <div class="gold-col">
+                <div class="show-text">3金</div>
+            </div>
+            <div class="dps-col">
+                <div class="show-text">3</div>
+            </div>
+            <div class="link-col">
+                <div class="show-text">htt</div>
+            </div>
+        </div>
+
+
+
+  
+
+<!--新增：带边框居中的查看统计按钮框-->
+<div style="max-width:1200px;margin:22px auto 0;padding:0 8px;text-align:center;">
+    <a href="https://docs.qq.com/sheet/DUkZIdEhEd2RVb0dp?tab=BB08J2" style="display:inline-block;border:1px solid #555;background:#222;color:#0382f8;padding:7px 16px;border-radius:6px;font-size:clamp(15px,3vw,17px);text-decoration:underline;">点击查看统计文件</a>
+</div>
+
+
+</body>
+</html>
