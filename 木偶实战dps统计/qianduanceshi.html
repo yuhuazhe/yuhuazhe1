@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>木偶实战DPS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", sans-serif;
+        }
+        body {
+            background-color: #121212;
+            padding: 40px 20px;
+            color:#fff;
+        }
+        .title-box {
+            background-color: #7c4242;
+            border: 2px solid #d83838;
+            border-radius: 12px;
+            padding: 22px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .title-box h1 {
+            color: #ffdd66;
+            font-size: 42px;
+            font-weight: bold;
+            margin-bottom:16px;
+        }
+        .search-wrap{
+            display:flex;
+            gap:12px;
+            justify-content:center;
+            flex-wrap:wrap;
+            margin-bottom:16px;
+        }
+        .search-input,.sort-select{
+            background:#222;
+            color:#fff;
+            border:1px solid #555;
+            padding:8px 12px;
+            border-radius:6px;
+            font-size:16px;
+        }
+        .title-btn-group{
+            display:flex;
+            gap:20px;
+            justify-content:center;
+            flex-wrap:wrap;
+        }
+        .check-btn, .submit-btn {
+            background-color: #2c2c2c;
+            border: 1px solid #555;
+            color: #3399ff;
+            font-size: 20px;
+            padding: 8px 22px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .submit-btn{
+            color:#56ff87;
+            border-color:#2e773f;
+        }
+        .table-head {
+            display: grid;
+            grid-template-columns: 50px 120px 1fr 70px 80px 160px;
+            background-color: #2b2b2b;
+            padding: 16px 15px;
+            border-radius: 8px 8px 0 0;
+            gap:8px;
+            align-items:center;
+        }
+        .table-head span {
+            color: #fff;
+            font-size: 20px;
+            font-weight: 500;
+            text-align:center;
+        }
+        .row-item {
+            border-bottom: 1px solid #444;
+            padding: 12px 0;
+        }
+        .row-top {
+            display: grid;
+            grid-template-columns: 50px 120px 1fr 70px 80px 160px;
+            padding: 8px 15px;
+            align-items: center;
+            gap:8px;
+        }
+        .num {
+            color: #ffd022;
+            font-size: 26px;
+            font-weight: bold;
+            text-align:center;
+        }
+        .readonly-input{
+            background-color: #222222;
+            border: 1px solid #444;
+            color: #ffffff;
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-size: 18px;
+            pointer-events:none;
+            opacity:0.85;
+            text-align:center;
+        }
+        .row-bottom {
+            padding: 0 calc(50px + 120px + 23px);
+            margin-top:6px;
+        }
+        .detail-readonly {
+            width: calc(100% - 15px);
+            background-color: #222222;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-size: 18px;
+            pointer-events:none;
+            opacity:0.85;
+        }
+        .mask{
+            position:fixed;
+            top:0;left:0;
+            width:100%;height:100%;
+            background:rgba(0,0,0,0.75);
+            display:none;
+            align-items:center;
+            justify-content:center;
+            z-index:999;
+        }
+        .pop-box{
+            width:min(92%,620px);
+            background:#222;
+            border:1px solid #555;
+            border-radius:10px;
+            padding:25px;
+        }
+        .pop-box h3{
+            color:#ffdd66;
+            text-align:center;
+            margin-bottom:20px;
+            font-size:24px;
+        }
+        .form-item{
+            margin-bottom:16px;
+        }
+        .form-item label{
+            display:block;
+            margin-bottom:6px;
+            color:#eee;
+        }
+        .form-item input{
+            width:100%;
+            background:#1a1a1a;
+            border:1px solid #444;
+            color:#fff;
+            padding:10px;
+            border-radius:5px;
+            font-size:16px;
+        }
+        .pop-btn-group{
+            display:flex;
+            gap:15px;
+            justify-content:center;
+            margin-top:25px;
+        }
+        .pop-submit,.pop-close{
+            padding:9px 24px;
+            border-radius:5px;
+            border:none;
+            font-size:17px;
+            cursor:pointer;
+        }
+        .pop-submit{
+            background:#278843;
+            color:#fff;
+        }
+        .pop-close{
+            background:#663333;
+            color:#fff;
+        }
+        @media screen and (max-width:768px) {
+            .table-head{
+                grid-template-columns:40px 90px 1fr 55px 60px 110px;
+                padding:10px 8px;
+            }
+            .row-top{
+                grid-template-columns:40px 90px 1fr 55px 60px 110px;
+                padding:6px 8px;
+            }
+            .row-bottom{
+                padding:0 calc(40px + 90px + 12px);
+            }
+            .table-head span{
+                font-size:15px;
+            }
+            .readonly-input{
+                font-size:14px;
+                padding:7px 6px;
+            }
+            .num{
+                font-size:22px;
+            }
+            .title-box h1{
+                font-size:30px;
+            }
+            .check-btn,.submit-btn{
+                font-size:16px;
+                padding:6px 14px;
+            }
+            .search-input,.sort-select{
+                font-size:14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="title-box">
+        <h1>木偶实战DPS</h1>
+        <div class="search-wrap">
+            <input class="search-input" id="searchKey" placeholder="输入昵称/角色筛选">
+            <select class="sort-select" id="sortType">
+                <option value="default">默认排序</option>
+                <option value="dpsAsc">DPS从小到大</option>
+                <option value="dpsDesc">DPS从大到小</option>
+                <option value="goldAsc">金数升序</option>
+                <option value="goldDesc">金数降序</option>
+            </select>
+        </div>
+        <div class="title-btn-group">
+            <button class="check-btn">点击查看统计文件</button>
+            <button class="submit-btn" id="openPop">投稿新队伍数据</button>
+        </div>
+    </div>
+
+    <div class="table-head">
+        <span>序号</span>
+        <span>昵称</span>
+        <span>角色</span>
+        <span>金数</span>
+        <span>DPS</span>
+        <span>视频链接</span>
+    </div>
+    <div id="dataList"></div>
+
+    <div class="mask" id="popMask">
+        <div class="pop-box">
+            <h3>投稿木偶实战DPS数据</h3>
+            <form id="postForm">
+                <div class="form-item"><label>投稿昵称</label><input type="text" name="nickname" required placeholder="填写昵称，示例：原神玩家"></div>
+                <div class="form-item"><label>角色</label><input type="text" name="teamName" required placeholder="示例：木偶"></div>
+                <div class="form-item"><label>角色明细</label><input type="text" name="roleDetail" required placeholder="示例：木偶6命、迪奥娜6命、北斗6命、砂糖6命"></div>
+                <div class="form-item"><label>金数</label><input type="text" name="gold" required placeholder="示例：2金"></div>
+                <div class="form-item"><label>DPS</label><input type="text" name="dps" required placeholder="示例：4.2w"></div>
+                <div class="form-item"><label>视频链接</label><input type="text" name="videoUrl" required placeholder="填写B站/抖音链接"></div>
+                <div class="pop-btn-group">
+                    <button type="submit" class="pop-submit">提交投稿</button>
+                    <button type="button" class="pop-close" id="closePop">关闭</button>
+                </div>
+            </form>
+        </div>
+    </div>
+<script>
+//部署完Render后替换成：https://xxx.onrender.com
+const API_HOST = "https://替换你的Render域名";
+const mask = document.getElementById('popMask');
+const searchKey = document.getElementById('searchKey');
+const sortType = document.getElementById('sortType');
+let sourceAllData = [];
+
+document.getElementById('openPop').onclick = ()=>mask.style.display='flex';
+document.getElementById('closePop').onclick = ()=>mask.style.display='none';
+
+searchKey.addEventListener('input', renderFilterData);
+sortType.addEventListener('change', renderFilterData);
+
+const form = document.getElementById('postForm');
+form.onsubmit = async(e)=>{
+    e.preventDefault();
+    const fd = new FormData(form);
+    const obj = Object.fromEntries(fd.entries());
+    try{
+        const res = await fetch(API_HOST+'/api/submitDps',{
+            method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(obj)
+        })
+        const ret = await res.json();
+        if(ret.code===200){
+            alert(ret.msg);mask.style.display='none';form.reset();loadPassData();
+        }else alert(ret.msg);
+    }catch(err){
+        alert("服务器连接失败，请稍后再投");
+    }
+}
+
+async function loadPassData(){
+    try{
+        const res = await fetch(API_HOST+'/api/getPassDps');
+        const list = await res.json();
+        if(list.length === 0){
+            list.push({
+                nickname:"示例投稿人",
+                teamName:"木偶",
+                roleDetail:"木偶6命、迪奥娜6命、北斗6命、砂糖6命",
+                gold:"2金",
+                dps:"4.2w",
+                videoUrl:"https://www.bilibili.com/"
+            })
+        }
+        sourceAllData = [...list];
+        renderFilterData();
+    }catch{
+        document.getElementById('dataList').innerHTML="<p style='text-align:center;color:#aaa'>数据加载失败</p>";
+    }
+}
+
+function renderFilterData(){
+    let key = searchKey.value.trim().toLowerCase();
+    let arr = sourceAllData.filter(item=>{
+        return item.nickname.toLowerCase().includes(key) || item.teamName.toLowerCase().includes(key)
+    })
+    const getNum = s=>Number(String(s).replace(/[wW]/g,''));
+    switch(sortType.value){
+        case 'dpsAsc':
+            arr.sort((a,b)=>getNum(a.dps)-getNum(b.dps));break;
+        case 'dpsDesc':
+            arr.sort((a,b)=>getNum(b.dps)-getNum(a.dps));break;
+        case 'goldAsc':
+            arr.sort((a,b)=>getNum(a.gold)-getNum(b.gold));break;
+        case 'goldDesc':
+            arr.sort((a,b)=>getNum(b.gold)-getNum(a.gold));break;
+    }
+    let html='';
+    arr.forEach((item,i)=>{
+        html+=`
+        <div class="row-item">
+            <div class="row-top">
+                <div class="num">${i+1}</div>
+                <input class="readonly-input" value="${item.nickname}" readonly>
+                <input class="readonly-input" value="${item.teamName}" readonly>
+                <input class="readonly-input" value="${item.gold}" readonly>
+                <input class="readonly-input" value="${item.dps}" readonly>
+                <input class="readonly-input" value="${item.videoUrl}" readonly>
+            </div>
+            <div class="row-bottom">
+                <input class="detail-readonly" value="${item.roleDetail}" readonly>
+            </div>
+        </div>`
+    })
+    document.getElementById('dataList').innerHTML=html || '<p style="text-align:center;color:#aaa">无匹配数据</p>';
+}
+loadPassData();
+</script>
+</body>
+</html>

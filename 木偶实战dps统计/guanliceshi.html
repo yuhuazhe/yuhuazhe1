@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员审核后台</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;color:#fff;font-family:微软雅黑;}
+        body{background:#121212;padding:30px 20px;}
+        h2{color:#ffdd66;text-align:center;margin-bottom:30px;font-size:28px;}
+        .item-box{background:#222;border:1px solid #444;padding:15px;border-radius:8px;margin-bottom:12px;}
+        .btn-group{margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;}
+        button{padding:6px 14px;border:none;border-radius:4px;cursor:pointer;}
+        .pass{background:#297939;}
+        .reject{background:#992c2c;}
+        .edit{background:#25599c;}
+        .mask{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:none;align-items:center;justify-content:center;z-index:999;}
+        .edit-pop{width:min(92%,550px);background:#222;padding:22px;border:1px solid #555;border-radius:8px;}
+        .form-item{margin-bottom:12px;}
+        .form-item input{width:100%;padding:9px;background:#1a1a1a;border:1px solid #444;border-radius:4px;}
+        .pop-btns{display:flex;gap:12px;justify-content:center;margin-top:20px;}
+    </style>
+</head>
+<body>
+    <h2>投稿数据审核管理（待审核列表）</h2>
+    <div id="pendingList"></div>
+    <div class="mask" id="editMask">
+        <div class="edit-pop">
+            <div class="form-item"><label>昵称</label><input id="eNick"></div>
+            <div class="form-item"><label>角色</label><input id="eTeam"></div>
+            <div class="form-item"><label>角色明细</label><input id="eRole"></div>
+            <div class="form-item"><label>金数</label><input id="eGold"></div>
+            <div class="form-item"><label>DPS</label><input id="eDps"></div>
+            <div class="form-item"><label>视频链接</label><input id="eUrl"></div>
+            <input type="hidden" id="editId">
+            <input type="hidden" id="isPending">
+            <div class="pop-btns">
+                <button onclick="saveEdit()" class="pass">保存修改</button>
+                <button onclick="closeEdit()" class="reject">关闭</button>
+            </div>
+        </div>
+    </div>
+<script>
+const API_HOST = "https://替换你的Render域名";
+async function loadList(){
+    try{
+        const res=await fetch(API_HOST+'/admin/getPending');
+        const list=await res.json();
+        let html='';
+        list.forEach(item=>{
+            html+=`<div class="item-box">
+            <p>ID：${item.id}｜昵称：${item.nickname}</p>
+            <p>主角色：${item.teamName}</p>
+            <p>配置：${item.roleDetail}</p>
+            <p>金：${item.gold}｜DPS：${item.dps}｜链接：${item.videoUrl}</p>
+            <div class="btn-group">
+            <button class="pass" onclick="pass(${item.id})">审核通过</button>
+            <button class="reject" onclick="reject(${item.id})">驳回</button>
+            <button class="edit" onclick='openEdit(${JSON.stringify(item).replace(/"/g,"&quot;")},1)'>编辑</button>
+            </div></div>`
+        })
+        document.getElementById('pendingList').innerHTML=html;
+    }catch{
+        document.getElementById('pendingList').innerHTML="<p>接口异常</p>";
+    }
+}
+async function pass(pid){
+    await fetch(API_HOST+'/admin/pass',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pid})})
+    alert('审核成功');loadList();
+}
+async function reject(pid){
+    await fetch(API_HOST+'/admin/reject',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pid})})
+    alert('已驳回');loadList();
+}
+function openEdit(d,isp){
+    document.getElementById('editId').value=d.id;
+    document.getElementById('isPending').value=isp;
+    document.getElementById('eNick').value=d.nickname;
+    document.getElementById('eTeam').value=d.teamName;
+    document.getElementById('eRole').value=d.roleDetail;
+    document.getElementById('eGold').value=d.gold;
+    document.getElementById('eDps').value=d.dps;
+    document.getElementById('eUrl').value=d.videoUrl;
+    document.getElementById('editMask').style.display='flex';
+}
+function closeEdit(){document.getElementById('editMask').style.display='none';}
+async function saveEdit(){
+    const data={
+        id:document.getElementById('editId').value,
+        nickname:document.getElementById('eNick').value,
+        teamName:document.getElementById('eTeam').value,
+        roleDetail:document.getElementById('eRole').value,
+        gold:document.getElementById('eGold').value,
+        dps:document.getElementById('eDps').value,
+        videoUrl:document.getElementById('eUrl').value,
+        isPending:document.getElementById('isPending').value
+    }
+    await fetch(API_HOST+'/admin/editData',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})
+    alert('修改完成');closeEdit();loadList();
+}
+loadList();
+</script>
+</body>
+</html>
