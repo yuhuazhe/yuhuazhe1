@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>角色面板计算</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Microsoft YaHei}
+body{background:#23272c;color:#eee;padding:24px;max-width:920px;margin:0 auto}
+.box-group{margin-bottom:22px;border:1px solid #444a55;border-radius:6px;overflow:hidden}
+.group-title{padding:10px 14px;background:#3a4049;font-size:16px;font-weight:bold}
+.item-row{display:flex;align-items:center;padding:7px 14px;background:#2c3138;border-bottom:1px solid #3c424c}
+.item-row:nth-child(even){background:#282c32}
+.label{width:220px}
+.item-row input{flex:1;background:#1f2328;border:1px solid #49505b;color:#fff;padding:5px 8px;border-radius:3px;font-size:14px}
+.result-box{border:1px solid #553c3c;border-radius:6px;background:#2f2727;padding:12px}
+.result-title{font-size:16px;margin-bottom:10px;color:#ff9494;font-weight:bold}
+.res-item{display:flex;padding:4px 0}
+.res-name{width:220px}
+.res-val{color:#ff6363;font-weight:bold}
+</style>
+</head>
+<body>
+
+<!--1 角色基础属性-->
+<div class="box-group">
+  <div class="group-title">一、角色基础属性</div>
+  <div class="item-row"><span class="label">基础攻击力</span><input id="baseAtk" value="347" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">基础生命值</span><input id="baseHp" value="12417" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">基础防御力</span><input id="baseDef" value="600" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">突破暴击率</span><input id="breakCritRate" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">突破暴击伤害</span><input id="breakCritDmg" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">突破攻击力%</span><input id="breakAtkPer" value="1.2" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">突破生命值%</span><input id="breakHpPer" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">突破防御力%</span><input id="breakDefPer" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">突破元素精通</span><input id="breakEm" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">突破充能效率</span><input id="breakEr" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">突破属性增伤</span><input id="breakDmg" value="0" oninput="calcAll()"></div>
+</div>
+
+<!--2 武器属性-->
+<div class="box-group">
+  <div class="group-title">二、武器属性</div>
+  <div class="item-row"><span class="label">武器基础白值攻击</span><input id="weaponBaseAtk" value="510" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">武器固定数值攻击</span><input id="weaponMainAtk" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">武器副词条-暴击率</span><input id="weaponCritRateSub" value="0.276" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">武器副词条-暴击伤害</span><input id="weaponCritDmgSub" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">武器副词条-固定攻击</span><input id="weaponAtkSub" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">武器副词条-生命值</span><input id="weaponHpSub" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">武器副词条-防御力</span><input id="weaponDefSub" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">武器副词条-增伤</span><input id="weaponDmgSub" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">武器副词条-元素精通</span><input id="weaponEmSub" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">武器副词条-充能效率</span><input id="weaponErSub" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">武器被动-暴击率</span><input id="weaponCritRatePass" value="0.08" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">武器被动-暴击伤害</span><input id="weaponCritDmgPass" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">武器被动-攻击百分比</span><input id="weaponAtkPerPass" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">武器被动-生命百分比</span><input id="weaponHpPerPass" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">武器被动-防御百分比</span><input id="weaponDefPerPass" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">武器被动-伤害加成</span><input id="weaponDmgPass" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">武器被动-元素精通</span><input id="weaponEmPass" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">武器被动-充能效率</span><input id="weaponErPass" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">无效</span><input id="weaponEmBonusPass" value="0" oninput="calcAll()"></div>
+</div>
+
+<!--3 圣遗物主属性-->
+<div class="box-group">
+  <div class="group-title">三、圣遗物主属性配置</div>
+  <div class="item-row"><span class="label">暴击率头部(0/1)</span><input id="artMainCritRate" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">爆伤头部(0/1)</span><input id="artMainCritDmg" value="1" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">攻击百分比沙漏(0/1/2)</span><input id="artMainAtkPer" value="2" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">生命百分比沙漏</span><input id="artMainHpPer" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">元素精通（0/1/2）</span><input id="artMainEm" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">元素杯子</span><input id="artMainDmg" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">防御百分比（0/1/2）</span><input id="artMainDefPer" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">充能效率</span><input id="artMainEr" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">治疗加成</span><input id="artMainHeal" value="0" oninput="calcAll()"></div>
+</div>
+
+<!--4 圣遗物副词条数-->
+<div class="box-group">
+  <div class="group-title">四、圣遗物副词条数量</div>
+  <div class="item-row"><span class="label">暴击率词条数(单条3.3%)</span><input id="artSubCritRateCnt" value="12" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">暴击伤害词条数(单条6.6%)</span><input id="artSubCritDmgCnt" value="10" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">攻击%词条数(单条5%)</span><input id="artSubAtkPerCnt" value="4" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">生命%词条数(单条5%)</span><input id="artSubHpPerCnt" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">元素精通词条(单条20)</span><input id="artSubEmCnt" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">充能词条数(单条5.5%)</span><input id="artSubErCnt" value="4" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">防御%词条(单条6.2%)</span><input id="artSubDefPerCnt" value="0" oninput="calcAll()"></div>
+</div>
+
+<!--5 套装加成-->
+<div class="box-group">
+  <div class="group-title">五、圣遗物套装效果</div>
+  <div class="item-row"><span class="label">套装暴击率加成</span><input id="artSetCritRate" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">套装攻击%加成</span><input id="artSetAtkPer" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">套装生命%加成</span><input id="artSetHpPer" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">套装防御%加成</span><input id="artSetDefPer" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">套装属性增伤</span><input id="artSetDmg" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">套装元素精通</span><input id="artSetEm" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">套装充能效率</span><input id="artSetEr" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">圣遗物精通额外收益</span><input id="artEmBonus" value="0" oninput="calcAll()"></div>
+</div>
+
+<!--6 队伍增益-->
+<div class="box-group">
+  <div class="group-title">六、队伍辅助buff</div>
+  <div class="item-row"><span class="label">队伍暴击率加成</span><input id="teamCritRate" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">队伍暴击伤害加成</span><input id="teamCritDmg" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">队伍攻击百分比</span><input id="teamAtkPer" value="0.2" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">队伍生命百分比</span><input id="teamHpPer" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">队伍防御百分比</span><input id="teamDefPer" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">队伍增伤加成</span><input id="teamDmg" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">队伍元素精通</span><input id="teamEm" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">队伍固定攻击力</span><input id="teamAtkFlat" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">队伍固定防御力</span><input id="teamDefFlat" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">队伍固定生命值</span><input id="teamHpFlat" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">无效</span><input id="teamEmBonus" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">无效</span><input id="teamDmgFlat" value="0" oninput="calcAll()"></div>
+  <div class="item-row"><span class="label">队伍充能效率</span><input id="teamEr" value="0" oninput="calcAll()"></div>
+</div>
+
+<!--结果面板（删除防御、抗性相关结算项）-->
+<div class="result-box">
+<div class="result-title">最终面板结算结果</div>
+<div class="res-item"><span class="res-name">基础+武器白值</span><span class="res-val" id="resBaseAtk"></span></div>
+<div class="res-item"><span class="res-name">总面板攻击力</span><span class="res-val" id="resAtk"></span></div>
+<div class="res-item"><span class="res-name">总面板生命值</span><span class="res-val" id="resHp"></span></div>
+<div class="res-item"><span class="res-name">总面板防御力</span><span class="res-val" id="resDef"></span></div>
+<div class="res-item"><span class="res-name">暴击率</span><span class="res-val" id="resCritRate"></span></div>
+<div class="res-item"><span class="res-name">暴击伤害</span><span class="res-val" id="resCritDmg"></span></div>
+<div class="res-item"><span class="res-name">伤害加成总和</span><span class="res-val" id="resDmgTotal"></span></div>
+<div class="res-item"><span class="res-name">总元素精通</span><span class="res-val" id="resEm"></span></div>
+<div class="res-item"><span class="res-name">元素充能效率</span><span class="res-val" id="resEr"></span></div>
+</div>
+
+<script>
+function calcAll() {
+    //角色基础
+    const baseAtk = Number(document.getElementById('baseAtk').value);
+    const baseHp = Number(document.getElementById('baseHp').value);
+    const baseDef = Number(document.getElementById('baseDef').value);
+    const breakCritRate = Number(document.getElementById('breakCritRate').value);
+    const breakCritDmg = Number(document.getElementById('breakCritDmg').value);
+    const breakAtkPer = Number(document.getElementById('breakAtkPer').value);
+    const breakHpPer = Number(document.getElementById('breakHpPer').value);
+    const breakDefPer = Number(document.getElementById('breakDefPer').value);
+    const breakEm = Number(document.getElementById('breakEm').value);
+    const breakEr = Number(document.getElementById('breakEr').value);
+    const breakDmg = Number(document.getElementById('breakDmg').value);
+
+    //武器
+    const weaponBaseAtk = Number(document.getElementById('weaponBaseAtk').value);
+    const weaponMainAtk = Number(document.getElementById('weaponMainAtk').value);
+    const weaponCritRateSub = Number(document.getElementById('weaponCritRateSub').value);
+    const weaponCritDmgSub = Number(document.getElementById('weaponCritDmgSub').value);
+    const weaponAtkSub = Number(document.getElementById('weaponAtkSub').value);
+    const weaponHpSub = Number(document.getElementById('weaponHpSub').value);
+    const weaponDefSub = Number(document.getElementById('weaponDefSub').value);
+    const weaponDmgSub = Number(document.getElementById('weaponDmgSub').value);
+    const weaponEmSub = Number(document.getElementById('weaponEmSub').value);
+    const weaponErSub = Number(document.getElementById('weaponErSub').value);
+    const weaponCritRatePass = Number(document.getElementById('weaponCritRatePass').value);
+    const weaponCritDmgPass = Number(document.getElementById('weaponCritDmgPass').value);
+    const weaponAtkPerPass = Number(document.getElementById('weaponAtkPerPass').value);
+    const weaponHpPerPass = Number(document.getElementById('weaponHpPerPass').value);
+    const weaponDefPerPass = Number(document.getElementById('weaponDefPerPass').value);
+    const weaponDmgPass = Number(document.getElementById('weaponDmgPass').value);
+    const weaponEmPass = Number(document.getElementById('weaponEmPass').value);
+    const weaponErPass = Number(document.getElementById('weaponErPass').value);
+    const weaponEmBonusPass = Number(document.getElementById('weaponEmBonusPass').value);
+
+    //主词条
+    const artMainCritRate = Number(document.getElementById('artMainCritRate').value);
+    const artMainCritDmg = Number(document.getElementById('artMainCritDmg').value);
+    const artMainAtkPer = Number(document.getElementById('artMainAtkPer').value);
+    const artMainHpPer = Number(document.getElementById('artMainHpPer').value);
+    const artMainEm = Number(document.getElementById('artMainEm').value);
+    const artMainDmg = Number(document.getElementById('artMainDmg').value);
+    const artMainDefPer = Number(document.getElementById('artMainDefPer').value);
+    const artMainEr = Number(document.getElementById('artMainEr').value);
+
+    //副词条数量
+    const artSubCritRateCnt = Number(document.getElementById('artSubCritRateCnt').value);
+    const artSubCritDmgCnt = Number(document.getElementById('artSubCritDmgCnt').value);
+    const artSubAtkPerCnt = Number(document.getElementById('artSubAtkPerCnt').value);
+    const artSubHpPerCnt = Number(document.getElementById('artSubHpPerCnt').value);
+    const artSubEmCnt = Number(document.getElementById('artSubEmCnt').value);
+    const artSubErCnt = Number(document.getElementById('artSubErCnt').value);
+    const artSubDefPerCnt = Number(document.getElementById('artSubDefPerCnt').value);
+
+    //套装
+    const artSetCritRate = Number(document.getElementById('artSetCritRate').value);
+    const artSetAtkPer = Number(document.getElementById('artSetAtkPer').value);
+    const artSetHpPer = Number(document.getElementById('artSetHpPer').value);
+    const artSetDefPer = Number(document.getElementById('artSetDefPer').value);
+    const artSetDmg = Number(document.getElementById('artSetDmg').value);
+    const artSetEm = Number(document.getElementById('artSetEm').value);
+    const artSetEr = Number(document.getElementById('artSetEr').value);
+    const artEmBonus = Number(document.getElementById('artEmBonus').value);
+
+    //队伍
+    const teamCritRate = Number(document.getElementById('teamCritRate').value);
+    const teamCritDmg = Number(document.getElementById('teamCritDmg').value);
+    const teamAtkPer = Number(document.getElementById('teamAtkPer').value);
+    const teamHpPer = Number(document.getElementById('teamHpPer').value);
+    const teamDefPer = Number(document.getElementById('teamDefPer').value);
+    const teamDmg = Number(document.getElementById('teamDmg').value);
+    const teamEm = Number(document.getElementById('teamEm').value);
+    const teamAtkFlat = Number(document.getElementById('teamAtkFlat').value);
+    const teamDefFlat = Number(document.getElementById('teamDefFlat').value);
+    const teamHpFlat = Number(document.getElementById('teamHpFlat').value);
+    const teamEmBonus = Number(document.getElementById('teamEmBonus').value);
+    const teamDmgFlat = Number(document.getElementById('teamDmgFlat').value);
+    const teamEr = Number(document.getElementById('teamEr').value);
+
+    //单条固定值
+    const subCritRateSingle = 0.033;
+    const subCritDmgSingle = 0.066;
+    const subAtkPerSingle = 0.05;
+    const subHpPerSingle = 0.05;
+    const subEmSingle = 20;
+    const subErSingle = 0.055;
+    const subDefPerSingle = 0.062;
+
+    //汇总计算
+    let totalCritRate = breakCritRate + weaponCritRateSub + weaponCritRatePass + artSubCritRateCnt*subCritRateSingle + artMainCritRate*0.311 + artSetCritRate + teamCritRate;
+    let totalCritDmg = breakCritDmg + weaponCritDmgSub + weaponCritDmgPass + artSubCritDmgCnt*subCritDmgSingle + artMainCritDmg*0.622 + artSetDmg + teamCritDmg;
+
+    let totalAtkPer = breakAtkPer + weaponAtkPerPass + artSubAtkPerCnt*subAtkPerSingle + artMainAtkPer*0.466 + artSetAtkPer + teamAtkPer;
+    let totalFlatAtk = weaponAtkSub + weaponMainAtk + teamAtkFlat;
+    let panelAtk = (baseAtk + weaponBaseAtk)*(1+totalAtkPer)+totalFlatAtk;
+
+    let totalHpPer = breakHpPer + weaponHpPerPass + artSubHpPerCnt*subHpPerSingle + artMainHpPer*0.466 + artSetHpPer + teamHpPer;
+    let flatHp = weaponHpSub + teamHpFlat;
+    let panelHp = baseHp*(1+totalHpPer)+flatHp;
+
+    let totalDefPer = breakDefPer + weaponDefPerPass + artSubDefPerCnt*subDefPerSingle + artMainDefPer*0.466 + artSetDefPer + teamDefPer;
+    let flatDef = weaponDefSub + teamDefFlat;
+    let panelDef = baseDef*(1+totalDefPer)+flatDef;
+
+    let totalEm = breakEm + weaponEmSub + weaponEmPass + artSubEmCnt*subEmSingle + artMainEm*187 + artSetEm + teamEm;
+    let totalEr = breakEr + weaponErSub + weaponErPass + artSubErCnt*subErSingle + artMainEr*0.518 + artSetEr + teamEr;
+    let totalDmgBonus = breakDmg + weaponDmgSub + weaponDmgPass + artMainDmg*0.466 + artSetDmg + teamDmg + teamDmgFlat;
+
+    //赋值结果（删掉防御乘区、抗性乘区输出）
+    document.getElementById('resBaseAtk').innerText = (baseAtk+weaponBaseAtk).toFixed(0);
+    document.getElementById('resAtk').innerText = panelAtk.toFixed(1);
+    document.getElementById('resHp').innerText = panelHp.toFixed(1);
+    document.getElementById('resDef').innerText = panelDef.toFixed(1);
+    document.getElementById('resCritRate').innerText = (totalCritRate*100).toFixed(2)+"%";
+    document.getElementById('resCritDmg').innerText = (totalCritDmg*100).toFixed(2)+"%";
+    document.getElementById('resDmgTotal').innerText = (totalDmgBonus*100).toFixed(2)+"%";
+    document.getElementById('resEm').innerText = totalEm.toFixed(0);
+    document.getElementById('resEr').innerText = totalEr.toFixed(2);
+}
+window.onload = calcAll;
+</script>
+</body>
+
+
+<p>以上为自动化计算模块，输入对应数值即可</p>
+<p>暂未进行计算校准，若有误差请及时反馈</p>
+
+
+
+
+</html>
