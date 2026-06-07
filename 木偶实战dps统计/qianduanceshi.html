@@ -2,357 +2,232 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <title>木偶实战DPS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>队伍DPS数据展示</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
-            margin: 0;
-            padding: 0;
             box-sizing: border-box;
-            font-family: "Microsoft Yahei", sans-serif;
         }
         body {
-            background-color: #121212;
-            padding: 40px 20px;
-            color:#fff;
+            font-family: "Noto Sans SC", sans-serif;
+            background-color: #080808;
+            color: #e5e7eb;
         }
-        .title-box {
-            background-color: #7c4242;
-            border: 2px solid #d83838;
-            border-radius: 12px;
-            padding: 22px 20px;
-            text-align: center;
-            margin-bottom: 30px;
+        .header-card {
+            background-color: #181818;
+            border: 1px solid #374151;
         }
-        .title-box h1 {
-            color: #ffdd66;
-            font-size: 42px;
-            font-weight: bold;
-            margin-bottom:16px;
+        .btn-primary {
+            background-color: #111827;
+            border: 1px solid #3b82f6;
+            color: #3b82f6;
         }
-        .search-wrap{
-            display:flex;
-            gap:12px;
-            justify-content:center;
-            flex-wrap:wrap;
-            margin-bottom:16px;
+        .btn-primary:hover {
+            background-color: #3b82f6;
+            color: #000;
         }
-        .search-input,.sort-select{
-            background:#222;
-            color:#fff;
-            border:1px solid #555;
-            padding:8px 12px;
-            border-radius:6px;
-            font-size:16px;
+        .btn-submit {
+            background-color: #111827;
+            border: 1px solid #10b981;
+            color: #10b981;
         }
-        .title-btn-group{
-            display:flex;
-            gap:20px;
-            justify-content:center;
-            flex-wrap:wrap;
+        .btn-submit:hover {
+            background-color: #10b981;
+            color: #000;
         }
-        .check-btn, .submit-btn {
-            background-color: #2c2c2c;
-            border: 1px solid #555;
-            color: #3399ff;
-            font-size: 20px;
-            padding: 8px 22px;
-            border-radius: 6px;
-            cursor: pointer;
+        .input-dark {
+            background-color: #111827;
+            border: 1px solid #374151;
+            color: #f3f4f6;
         }
-        .submit-btn{
-            color:#56ff87;
-            border-color:#2e773f;
+        .input-dark:focus {
+            outline: none;
+            border-color: #3b82f6;
         }
-        .table-head {
-            display: grid;
-            grid-template-columns: 50px 120px 1fr 70px 80px 160px;
-            background-color: #2b2b2b;
-            padding: 16px 15px;
-            border-radius: 8px 8px 0 0;
-            gap:8px;
-            align-items:center;
+        table {
+            border-collapse: collapse;
         }
-        .table-head span {
-            color: #fff;
-            font-size: 20px;
-            font-weight: 500;
-            text-align:center;
+        th {
+            background-color: #1f2937;
         }
-        .row-item {
-            border-bottom: 1px solid #444;
-            padding: 12px 0;
-        }
-        .row-top {
-            display: grid;
-            grid-template-columns: 50px 120px 1fr 70px 80px 160px;
-            padding: 8px 15px;
-            align-items: center;
-            gap:8px;
-        }
-        .num {
-            color: #ffd022;
-            font-size: 26px;
-            font-weight: bold;
-            text-align:center;
-        }
-        .readonly-input{
-            background-color: #222222;
-            border: 1px solid #444;
-            color: #ffffff;
-            padding: 10px 12px;
-            border-radius: 6px;
-            font-size: 18px;
-            pointer-events:none;
-            opacity:0.85;
-            text-align:center;
-        }
-        .row-bottom {
-            padding: 0 calc(50px + 120px + 23px);
-            margin-top:6px;
-        }
-        .detail-readonly {
-            width: calc(100% - 15px);
-            background-color: #222222;
-            border: 1px solid #444;
-            color: #fff;
-            padding: 10px 12px;
-            border-radius: 6px;
-            font-size: 18px;
-            pointer-events:none;
-            opacity:0.85;
-        }
-        .mask{
-            position:fixed;
-            top:0;left:0;
-            width:100%;height:100%;
-            background:rgba(0,0,0,0.75);
-            display:none;
-            align-items:center;
-            justify-content:center;
-            z-index:999;
-        }
-        .pop-box{
-            width:min(92%,620px);
-            background:#222;
-            border:1px solid #555;
-            border-radius:10px;
-            padding:25px;
-        }
-        .pop-box h3{
-            color:#ffdd66;
-            text-align:center;
-            margin-bottom:20px;
-            font-size:24px;
-        }
-        .form-item{
-            margin-bottom:16px;
-        }
-        .form-item label{
-            display:block;
-            margin-bottom:6px;
-            color:#eee;
-        }
-        .form-item input{
-            width:100%;
-            background:#1a1a1a;
-            border:1px solid #444;
-            color:#fff;
-            padding:10px;
-            border-radius:5px;
-            font-size:16px;
-        }
-        .pop-btn-group{
-            display:flex;
-            gap:15px;
-            justify-content:center;
-            margin-top:25px;
-        }
-        .pop-submit,.pop-close{
-            padding:9px 24px;
-            border-radius:5px;
-            border:none;
-            font-size:17px;
-            cursor:pointer;
-        }
-        .pop-submit{
-            background:#278843;
-            color:#fff;
-        }
-        .pop-close{
-            background:#663333;
-            color:#fff;
-        }
-        @media screen and (max-width:768px) {
-            .table-head{
-                grid-template-columns:40px 90px 1fr 55px 60px 110px;
-                padding:10px 8px;
-            }
-            .row-top{
-                grid-template-columns:40px 90px 1fr 55px 60px 110px;
-                padding:6px 8px;
-            }
-            .row-bottom{
-                padding:0 calc(40px + 90px + 12px);
-            }
-            .table-head span{
-                font-size:15px;
-            }
-            .readonly-input{
-                font-size:14px;
-                padding:7px 6px;
-            }
-            .num{
-                font-size:22px;
-            }
-            .title-box h1{
-                font-size:30px;
-            }
-            .check-btn,.submit-btn{
-                font-size:16px;
-                padding:6px 14px;
-            }
-            .search-input,.sort-select{
-                font-size:14px;
-            }
+        .modal {
+            display: none;
+            background-color: rgba(0,0,0,0.85);
         }
     </style>
 </head>
-<body>
-    <div class="title-box">
-        <h1>木偶实战DPS</h1>
-        <div class="search-wrap">
-            <input class="search-input" id="searchKey" placeholder="输入昵称/角色筛选">
-            <select class="sort-select" id="sortType">
+<body class="min-h-screen p-3 md:p-6">
+    <!-- 头部区域 -->
+    <div class="header-card rounded-xl p-5 md:p-8 mb-6 max-w-6xl mx-auto">
+        <h1 class="text-3xl md:text-4xl font-bold text-amber-400 text-center mb-6">队伍DPS数据榜单</h1>
+        <div class="flex flex-col md:flex-row gap-3 justify-center items-center mb-6">
+            <input type="text" id="searchInput" placeholder="搜索昵称/角色队伍" class="input-dark px-4 py-2 rounded-lg w-full md:w-64">
+            <select id="sortSelect" class="input-dark px-4 py-2 rounded-lg w-full md:w-auto">
                 <option value="default">默认排序</option>
-                <option value="dpsAsc">DPS从小到大</option>
-                <option value="dpsDesc">DPS从大到小</option>
-                <option value="goldAsc">金数升序</option>
-                <option value="goldDesc">金数降序</option>
+                <option value="dps-desc">DPS 降序</option>
+                <option value="dps-asc">DPS 升序</option>
+                <option value="gold-desc">金数降序</option>
             </select>
         </div>
-        <div class="title-btn-group">
-            <button class="check-btn">点击查看统计文件</button>
-            <button class="submit-btn" id="openPop">投稿新队伍数据</button>
+        <div class="flex flex-col md:flex-row gap-3 justify-center">
+            <button class="btn-primary px-5 py-2 rounded-lg">查看统计</button>
+            <button onclick="openSubmitModal()" class="btn-submit px-5 py-2 rounded-lg">投稿新数据</button>
         </div>
     </div>
 
-    <div class="table-head">
-        <span>序号</span>
-        <span>昵称</span>
-        <span>角色</span>
-        <span>金数</span>
-        <span>DPS</span>
-        <span>视频链接</span>
+    <!-- 数据表格 -->
+    <div class="max-w-6xl mx-auto overflow-x-auto">
+        <table class="w-full rounded-lg overflow-hidden">
+            <thead>
+                <tr class="text-left text-sm md:text-base">
+                    <th class="p-3 md:p-4">序号</th>
+                    <th class="p-3 md:p-4">昵称</th>
+                    <th class="p-3 md:p-4">角色队伍</th>
+                    <th class="p-3 md:p-4">金数</th>
+                    <th class="p-3 md:p-4">DPS</th>
+                    <th class="p-3 md:p-4">视频链接</th>
+                </tr>
+            </thead>
+            <tbody id="dataTableBody" class="divide-y divide-gray-800"></tbody>
+        </table>
     </div>
-    <div id="dataList"></div>
 
-    <div class="mask" id="popMask">
-        <div class="pop-box">
-            <h3>投稿木偶实战DPS数据</h3>
-            <form id="postForm">
-                <div class="form-item"><label>投稿昵称</label><input type="text" name="nickname" required placeholder="填写昵称，示例：原神玩家"></div>
-                <div class="form-item"><label>角色</label><input type="text" name="teamName" required placeholder="示例：木偶"></div>
-                <div class="form-item"><label>角色明细</label><input type="text" name="roleDetail" required placeholder="示例：木偶6命、迪奥娜6命、北斗6命、砂糖6命"></div>
-                <div class="form-item"><label>金数</label><input type="text" name="gold" required placeholder="示例：2金"></div>
-                <div class="form-item"><label>DPS</label><input type="text" name="dps" required placeholder="示例：4.2w"></div>
-                <div class="form-item"><label>视频链接</label><input type="text" name="videoUrl" required placeholder="填写B站/抖音链接"></div>
-                <div class="pop-btn-group">
-                    <button type="submit" class="pop-submit">提交投稿</button>
-                    <button type="button" class="pop-close" id="closePop">关闭</button>
+    <!-- 投稿弹窗 -->
+    <div id="submitModal" class="modal fixed inset-0 z-50 flex items-center justify-center p-3">
+        <div class="bg-[#121212] border border-gray-700 rounded-xl p-5 w-full max-w-md">
+            <h2 class="text-xl font-bold text-amber-400 mb-5 text-center">提交投稿数据</h2>
+            <form id="submitForm" class="space-y-4">
+                <div>
+                    <label class="block mb-1 text-sm">昵称 <span class="text-red-400">*</span></label>
+                    <input type="text" name="nickname" required class="input-dark w-full px-3 py-2 rounded-lg">
+                </div>
+                <div>
+                    <label class="block mb-1 text-sm">角色/队伍 <span class="text-red-400">*</span></label>
+                    <input type="text" name="team" required class="input-dark w-full px-3 py-2 rounded-lg">
+                </div>
+                <div>
+                    <label class="block mb-1 text-sm">金数 <span class="text-red-400">*</span></label>
+                    <input type="number" name="gold" required class="input-dark w-full px-3 py-2 rounded-lg">
+                </div>
+                <div>
+                    <label class="block mb-1 text-sm">DPS <span class="text-red-400">*</span></label>
+                    <input type="number" step="any" name="dps" required class="input-dark w-full px-3 py-2 rounded-lg">
+                </div>
+                <div>
+                    <label class="block mb-1 text-sm">视频链接</label>
+                    <input type="url" name="videoUrl" class="input-dark w-full px-3 py-2 rounded-lg">
+                </div>
+                <div class="flex gap-4 justify-center pt-2">
+                    <button type="button" onclick="closeSubmitModal()" class="px-5 py-2 rounded-lg bg-gray-700 hover:bg-gray-600">取消</button>
+                    <button type="submit" class="btn-submit px-5 py-2 rounded-lg">提交</button>
                 </div>
             </form>
         </div>
     </div>
-<script>
-//部署完Render后替换成：https://xxx.onrender.com
-const API_HOST = "https://替换你的Render域名";
-const mask = document.getElementById('popMask');
-const searchKey = document.getElementById('searchKey');
-const sortType = document.getElementById('sortType');
-let sourceAllData = [];
 
-document.getElementById('openPop').onclick = ()=>mask.style.display='flex';
-document.getElementById('closePop').onclick = ()=>mask.style.display='none';
+    <script>
+        // 同仓库部署，直接使用相对路径
+        const API_BASE_URL = "/api";
 
-searchKey.addEventListener('input', renderFilterData);
-sortType.addEventListener('change', renderFilterData);
-
-const form = document.getElementById('postForm');
-form.onsubmit = async(e)=>{
-    e.preventDefault();
-    const fd = new FormData(form);
-    const obj = Object.fromEntries(fd.entries());
-    try{
-        const res = await fetch(API_HOST+'/api/submitDps',{
-            method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(obj)
-        })
-        const ret = await res.json();
-        if(ret.code===200){
-            alert(ret.msg);mask.style.display='none';form.reset();loadPassData();
-        }else alert(ret.msg);
-    }catch(err){
-        alert("服务器连接失败，请稍后再投");
-    }
-}
-
-async function loadPassData(){
-    try{
-        const res = await fetch(API_HOST+'/api/getPassDps');
-        const list = await res.json();
-        if(list.length === 0){
-            list.push({
-                nickname:"示例投稿人",
-                teamName:"木偶",
-                roleDetail:"木偶6命、迪奥娜6命、北斗6命、砂糖6命",
-                gold:"2金",
-                dps:"4.2w",
-                videoUrl:"https://www.bilibili.com/"
-            })
+        // 加载已审核数据
+        async function loadData() {
+            const tbody = document.getElementById("dataTableBody");
+            try {
+                const res = await fetch(`${API_BASE_URL}/data`);
+                const data = await res.json();
+                renderTable(data);
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-red-400">数据加载失败</td></tr>`;
+            }
         }
-        sourceAllData = [...list];
-        renderFilterData();
-    }catch{
-        document.getElementById('dataList').innerHTML="<p style='text-align:center;color:#aaa'>数据加载失败</p>";
-    }
-}
 
-function renderFilterData(){
-    let key = searchKey.value.trim().toLowerCase();
-    let arr = sourceAllData.filter(item=>{
-        return item.nickname.toLowerCase().includes(key) || item.teamName.toLowerCase().includes(key)
-    })
-    const getNum = s=>Number(String(s).replace(/[wW]/g,''));
-    switch(sortType.value){
-        case 'dpsAsc':
-            arr.sort((a,b)=>getNum(a.dps)-getNum(b.dps));break;
-        case 'dpsDesc':
-            arr.sort((a,b)=>getNum(b.dps)-getNum(a.dps));break;
-        case 'goldAsc':
-            arr.sort((a,b)=>getNum(a.gold)-getNum(b.gold));break;
-        case 'goldDesc':
-            arr.sort((a,b)=>getNum(b.gold)-getNum(a.gold));break;
-    }
-    let html='';
-    arr.forEach((item,i)=>{
-        html+=`
-        <div class="row-item">
-            <div class="row-top">
-                <div class="num">${i+1}</div>
-                <input class="readonly-input" value="${item.nickname}" readonly>
-                <input class="readonly-input" value="${item.teamName}" readonly>
-                <input class="readonly-input" value="${item.gold}" readonly>
-                <input class="readonly-input" value="${item.dps}" readonly>
-                <input class="readonly-input" value="${item.videoUrl}" readonly>
-            </div>
-            <div class="row-bottom">
-                <input class="detail-readonly" value="${item.roleDetail}" readonly>
-            </div>
-        </div>`
-    })
-    document.getElementById('dataList').innerHTML=html || '<p style="text-align:center;color:#aaa">无匹配数据</p>';
-}
-loadPassData();
-</script>
+        // 渲染表格 + 筛选排序
+        function renderTable(data) {
+            const tbody = document.getElementById("dataTableBody");
+            const keyWord = document.getElementById("searchInput").value.toLowerCase();
+            const sortType = document.getElementById("sortSelect").value;
+
+            let list = data.filter(item => 
+                item.nickname.toLowerCase().includes(keyWord) ||
+                item.team.toLowerCase().includes(keyWord)
+            );
+
+            switch(sortType) {
+                case "dps-desc":
+                    list.sort((a,b) => b.dps - a.dps);
+                    break;
+                case "dps-asc":
+                    list.sort((a,b) => a.dps - b.dps);
+                    break;
+                case "gold-desc":
+                    list.sort((a,b) => b.gold - a.gold);
+                    break;
+            }
+
+            if(list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-400">暂无数据</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = list.map((item, idx) => `
+                <tr class="hover:bg-gray-900">
+                    <td class="p-3 md:p-4">${idx + 1}</td>
+                    <td class="p-3 md:p-4">${item.nickname}</td>
+                    <td class="p-3 md:p-4">${item.team}</td>
+                    <td class="p-3 md:p-4">${item.gold}</td>
+                    <td class="p-3 md:p-4">${item.dps}</td>
+                    <td class="p-3 md:p-4">
+                        ${item.videoUrl ? `<a href="${item.videoUrl}" target="_blank" class="text-blue-400 hover:underline">查看链接</a>` : "-"}
+                    </td>
+                </tr>
+            `).join("");
+        }
+
+        // 弹窗控制
+        function openSubmitModal() {
+            document.getElementById("submitModal").style.display = "flex";
+        }
+        function closeSubmitModal() {
+            document.getElementById("submitModal").style.display = "none";
+            document.getElementById("submitForm").reset();
+        }
+
+        // 提交投稿
+        document.getElementById("submitForm").addEventListener("submit", async e => {
+            e.preventDefault();
+            const form = new FormData(e.target);
+            const postData = {
+                nickname: form.get("nickname"),
+                team: form.get("team"),
+                gold: Number(form.get("gold")),
+                dps: Number(form.get("dps")),
+                videoUrl: form.get("videoUrl") || ""
+            };
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/submit`, {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify(postData)
+                });
+                if(res.ok) {
+                    alert("投稿成功！等待管理员审核");
+                    closeSubmitModal();
+                } else {
+                    alert("投稿失败，请重试");
+                }
+            } catch {
+                alert("网络异常，请稍后再试");
+            }
+        });
+
+        // 监听搜索、排序
+        document.getElementById("searchInput").addEventListener("input", loadData);
+        document.getElementById("sortSelect").addEventListener("change", loadData);
+
+        // 初始化
+        loadData();
+    </script>
 </body>
 </html>
