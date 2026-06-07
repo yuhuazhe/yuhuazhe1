@@ -1,33 +1,48 @@
 const { kv } = require('@vercel/kv');
 
 module.exports = async (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    if (req.method === 'OPTIONS') return res.status(200).end();
+  // 跨域头必须写对
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: '请求方式不允许' });
-    }
+  // 处理预检请求
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
-    const { nickname, team, gold, dps, videoUrl } = req.body;
-    if (!nickname || !team || !gold || !dps) {
-        return res.status(400).json({ error: '必填项不能为空' });
-    }
+  // 只允许 POST
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: '请求方式不允许' });
+  }
 
-    try {
-        let pendingList = await kv.get('pending_submissions') || [];
-        pendingList.push({
-            id: Date.now(),
-            nickname,
-            team,
-            gold,
-            dps,
-            videoUrl: videoUrl || '',
-            createdAt: new Date().toISOString()
-        });
-        await kv.set('pending_submissions', pendingList);
-        res.status(200).json({ success: true });
-    } catch (err) {
-        res.status(500).json({ error: '提交失败' });
-    }
+  // ✅ 关键：手动解析 JSON 请求体，解决 req.body 为空的问题
+  let body;
+  try {
+    body = JSON.parse(req.body);
+  } catch (e) {
+    return res.status(400).json({ error: '请求体格式错误' });
+  }
+
+  const { nickname, team, gold, dps, videoUrl } = body;
+
+  // 校验（这里改成了更合理的判断，0也能通过）
+  if (!nickname || !team || gold == null || isNaN(gold) || dps == null || isNaN(dps)) {
+    return res.status(400).json({ error: '必填项不能为空或格式错误' });
+  }
+
+  try {
+    let pendingList = await kv.get('pending_submissions') || [];
+    pendingList.push({
+      id: Date.now(),
+      nickname,
+      team,
+      gold,
+      dps,
+      videoUrl: videoUrl || '',
+      createdAt: new Date().toISOString()
+    });
+    await kv.set('pending_submissions', pendingList);
+    return res.status(200).json({ success: true });
+  } catch (err) {
+    return res.status(500).json({ error: '提交失败' });
+  }
 };
