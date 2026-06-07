@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员审核后台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #080808;
+            color: #e5e7eb;
+        }
+        .input-dark {
+            background-color: #111827;
+            border: 1px solid #374151;
+            color: #f3f4f6;
+        }
+        .input-dark:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-2xl md:text-3xl font-bold text-amber-400 mb-6">管理员投稿审核系统</h1>
+
+        <!-- 登录区域 -->
+        <div id="loginBox" class="max-w-md mx-auto mb-8">
+            <input type="password" id="pwdInput" placeholder="请输入管理员密码" class="input-dark w-full px-4 py-2 rounded-lg mb-4">
+            <button onclick="adminLogin()" class="w-full py-2 rounded-lg bg-blue-600 hover:bg-blue-500">登录后台</button>
+        </div>
+
+        <!-- 审核列表区域 -->
+        <div id="auditBox" class="hidden">
+            <h2 class="text-xl mb-4 text-gray-300">待审核列表</h2>
+            <div id="pendingList" class="space-y-4"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = "/api";
+        let adminToken = "";
+
+        // 管理员登录
+        async function adminLogin() {
+            const pwd = document.getElementById("pwdInput").value.trim();
+            const res = await fetch(`${API_BASE_URL}/admin/login`, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({password: pwd})
+            });
+            if(res.ok) {
+                const data = await res.json();
+                adminToken = data.token;
+                document.getElementById("loginBox").classList.add("hidden");
+                document.getElementById("auditBox").classList.remove("hidden");
+                loadPendingData();
+            } else {
+                alert("密码错误！");
+            }
+        }
+
+        // 加载待审核数据
+        async function loadPendingData() {
+            const res = await fetch(`${API_BASE_URL}/admin/pending`, {
+                headers: {Authorization: `Bearer ${adminToken}`}
+            });
+            const list = await res.json();
+            const container = document.getElementById("pendingList");
+
+            if(list.length === 0) {
+                container.innerHTML = "<p class='text-gray-400'>暂无待审核投稿</p>";
+                return;
+            }
+
+            container.innerHTML = list.map(item => `
+                <div class="bg-[#121212] border border-gray-700 rounded-lg p-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                        <div>
+                            <label class="text-sm text-gray-400">昵称</label>
+                            <input type="text" class="input-dark w-full px-3 py-1 rounded mt-1" 
+                                data-id="${item.id}" data-key="nickname" value="${item.nickname}">
+                        </div>
+                        <div>
+                            <label class="text-sm text-gray-400">角色队伍</label>
+                            <input type="text" class="input-dark w-full px-3 py-1 rounded mt-1" 
+                                data-id="${item.id}" data-key="team" value="${item.team}">
+                        </div>
+                        <div>
+                            <label class="text-sm text-gray-400">金数</label>
+                            <input type="number" class="input-dark w-full px-3 py-1 rounded mt-1" 
+                                data-id="${item.id}" data-key="gold" value="${item.gold}">
+                        </div>
+                        <div>
+                            <label class="text-sm text-gray-400">DPS</label>
+                            <input type="number" step="any" class="input-dark w-full px-3 py-1 rounded mt-1" 
+                                data-id="${item.id}" data-key="dps" value="${item.dps}">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="text-sm text-gray-400">视频链接</label>
+                            <input type="url" class="input-dark w-full px-3 py-1 rounded mt-1" 
+                                data-id="${item.id}" data-key="videoUrl" value="${item.videoUrl}">
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <button onclick="passSubmit(${item.id})" class="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-500">通过并发布</button>
+                        <button onclick="rejectSubmit(${item.id})" class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500">驳回</button>
+                    </div>
+                </div>
+            `).join("");
+        }
+
+        // 通过投稿（支持修正内容）
+        async function passSubmit(id) {
+            const inputs = document.querySelectorAll(`input[data-id="${id}"]`);
+            const editData = {};
+            inputs.forEach(el => {
+                editData[el.dataset.key] = el.value;
+            });
+
+            await fetch(`${API_BASE_URL}/admin/approve`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${adminToken}`
+                },
+                body: JSON.stringify({id, correctedData: editData})
+            });
+            loadPendingData();
+        }
+
+        // 驳回投稿
+        async function rejectSubmit(id) {
+            await fetch(`${API_BASE_URL}/admin/reject`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${adminToken}`
+                },
+                body: JSON.stringify({id})
+            });
+            loadPendingData();
+        }
+    </script>
+</body>
+</html>
