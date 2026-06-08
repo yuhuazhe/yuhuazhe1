@@ -1,183 +1,380 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-     <link rel="icon" href="资料库.png">
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title></title>
+    <title>伤害计算公式</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
-            background-color: #000;
-            color: #fff;
-            font-family: sans-serif;
+            font-family: "Microsoft Yahei", sans-serif;
+            background-color: #0f0f0f;
+            color: #cccccc;
+            line-height: 1.8;
             padding: 20px;
+            max-width: 1280px;
+            margin: 0 auto;
         }
 
-        /* 顶部标题框 */
-        .header-box {
-            border: 2px solid #999;
-            border-radius: 16px;
-            padding: 20px;
+        /* 主标题 */
+        h1 {
+            color: #58a6ff;
             text-align: center;
-            background-color: rgba(0,0,0,0.6);
             margin-bottom: 40px;
-        }
-        .header-title {
-            font-size: 40px;
-            color: #b76ed8;
-            font-weight: bold;
-            margin: 0 0 10px;
-        }
-        .header-subtitle {
-            font-size: 22px;
-            color: #ddd;
-            margin: 0 0 10px;
-        }
-        .header-note {
-            font-size: 16px;
-            color: #bbb;
-            line-height: 1.5;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #2386ff;
         }
 
-        /* 角色卡片容器 */
-        .card-container {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 20px;
+        /* 大板块标题 */
+        h2 {
+            color: #c792ea;
+            margin: 40px 0 20px;
+            padding-left: 12px;
+            border-left: 4px solid #c792ea;
+            font-size: 20px;
         }
 
-        /* 角色卡片样式 */
-        .char-card {
-            width: 180px;
-            border: 2px solid #999;
-            border-radius: 12px;
-            overflow: hidden;
-            background-color: rgba(0,0,0,0.6);
+        /* 小标题 */
+        h3 {
+            color: #89ddff;
+            margin: 20px 0 10px;
+            font-size: 17px;
+        }
+
+        /* 板块容器 */
+        .section {
+            background-color: #1a1a1a;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.6);
+        }
+
+        /* 普通描述文本 */
+        .text-desc {
+            color: #d1d1d1;
+            font-size: 15px;
+            margin: 10px 0;
+            line-height: 1.7;
+        }
+
+        /* 公式样式：专属字体+高亮色 */
+        .formula {
+            background-color: #252525;
+            color: #ffcb6b;
+            font-family: "Consolas", "Courier New", monospace;
+            font-size: 14px;
+            padding: 16px;
+            border-radius: 6px;
+            margin: 12px 0;
+            overflow-x: auto;
+            border-left: 3px solid #ffcb6b;
+        }
+
+        /* 单个跳转链接 居中 */
+        .jump-link {
             text-align: center;
-            text-decoration: none; /* 去掉链接下划线 */
-            color: inherit;       /* 文字颜色继承 */
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid #333;
         }
-        .char-card img {
-            width: 100%;
-            aspect-ratio: 1 / 1;
-            object-fit: cover;
+
+        .jump-link a {
+            display: inline-block;
+            color: #89ddff;
+            text-decoration: none;
+            padding: 6px 14px;
+            border: 1px solid #89ddff;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: all 0.25s ease;
         }
-        .char-name {
-            padding: 10px 0;
-            font-size: 18px;
-            color: #fff;
+
+        .jump-link a:hover {
+            background-color: #89ddff;
+            color: #0f0f0f;
+        }
+
+        /* 备注文本 */
+        .note {
+            color: #888;
+            font-size: 14px;
+            margin: 8px 0;
+            padding-left: 10px;
+            border-left: 2px solid #444;
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+            .section {
+                padding: 18px;
+            }
+            .formula {
+                font-size: 13px;
+                padding: 12px;
+            }
+            h2 {
+                font-size: 18px;
+            }
         }
     </style>
-
 </head>
 <body>
-    
-    <!-- 顶部标题框 -->
-    <div class="header-box">
-        <h1 class="header-title">计算公式</h1>
-        <p class="header-subtitle">暂未进行相关计算excel上传 最后更新日期：2026.6.5</p>
-        <p class="header-note">公式源于网络验证后上传/网页计算在网页程序板块<br></p>
+    <h1>伤害计算公式</h1>
+    <h2>声明:以下公式源于网络收集并上传,若有错误请及时反馈</h2>
+
+    <!-- 1. 等级修正系数 -->
+    <div class="section" id="level">
+        <h2>等级修正系数</h2>
+        <div class="formula">
+            若角色为 95 级，将公式中的 1446.85 替换为 1561.46
+        </div>
+        <div class="formula">
+            若角色为 100 级，将公式中的 1446.85 替换为 1674.81
+        </div>
+        <!-- 单个跳转链接，自行修改 href 和文字 -->
+        <div class="jump-link">
+            <a href="#defense">跳转至下一板块</a>
+        </div>
     </div>
 
-
-
-
-<div class="header-box">
-        <h2 class="header-title">星超导计算公式</h2>
-        <p class="header-subtitle"></p>
-        <p class="header-note">公式源于网络验证后上传<br></p>
-        <P>注：星超导反应无反应伤害只有星超导直伤/前后台角色满足条件均可造成星超导直伤</P>
-        <P>计算公式可由月反应做类推</P>
-        <P>星超导直伤计算公式：星超导基础倍率×角色属性×倍率×（1+基础提升%）×【1+（6+元素精通）/（元素精通+2000）+星超导增伤%】</P>
-        <P>最终直伤＝（直伤基础＋额外提升）×暴击区×抗性系数×擢升</P>
-        <P>基础提升如：桑多涅天赋的14%</P>
-        <P>角色属性：如攻击力等</P>
-        <P>额外提升俗称羽毛，如七七6命</P>
-        <P>星超导基础倍率：当触发次数为0/1/2/3/4/5/6/7/8/9/10/11/12</P>
-        <P>星超导基础倍率：1.0/1.45/1.5/1.54/1.60/1.64/1.70/1.75/1.79/1.85/1.89/1.95/2.0</P>
-        <P></P>
-        <P></P>
-
-        <a href="公式存储/星超导计算.xlsx" download class="down-btn">模板excel下载</a>
-
-
-        
-</script>
-
-
-
-
-
-
-
-
-
-    </div>
-
-    <div class="header-box">
-        <h2 class="header-title">常规伤害</h2>
-        <p class="header-subtitle"></p>
-        <p class="header-note">公式源于网络验证后上传<br></p>
-        <P>角色造成的常规伤害：(基础值 + 激化值 + 基础值加成) × (1 + 增伤 %+ 易伤 %- 减伤 %) × 抗性系数 × 防御系数 × 暴击区 × 蒸发融化系数</P>
-        <P>（注：若攻击没有出现伤害数字（例如命中护盾），则本次伤害不会计算蒸发融化系数）</P>
-        <P>基础值：攻击力 * 倍率，攻击力可以替换为其他属性（生命值，元素精通等）</P>
-        <P>基础值加成：描述中带有【造成的伤害提高 X】的效果</P>
-
-        <P>增伤：描述中带有【我方造成的伤害提高 X%】的效果</P>
-        <P>易伤：描述中带有【目标受到的伤害提高 X%】的效果</P>
-        <P>减伤：描述中带有【目标受到的伤害降低 X%】的效果</P>
-        <P></P>
-        <P></P>
-        <P></P>
-        <P></P>
-
-        <a href="公式存储/星超导计算.xlsx" download class="down-btn">模板excel下载</a>
-
-
-    </div>
-
-     <div class="header-box">
-        <h2 class="header-title">月感电</h2>
-        <p class="header-subtitle"></p>
-        <p class="header-note">公式源于网络验证后上传<br></p>
-        <P>特定情况下，雷触及水时，会生成一片不可移动的雷暴云，持续 6s</P>
-
-        <P>雷暴云：每 2s 攻击一次附近所有同时具有雷和水的目标，并消耗 0.4 元素量的雷和水（破盾效率极低）触发月感电时，若附近已有雷暴云，则会刷新持续时间月感电的倍率为 1.8，基础伤害为:1446.85×1.8=2604.33</P>
-
-        <P>月感电造成伤害时，所有参与反应的角色都会提供伤害值，但除伤害最高的角色外，其余角色的提供的伤害值会降低</P>
-        <P>月感电无视防御，可以暴击（取决于每个角色自己的暴击率和暴击伤害）</P>
-
-        <P>反应月感电＝1446.85×1.8×（1+基础提升%）×（1+6×元素精通/元素精通＋2000+月感电增伤%）×抗性系数×暴击区×擢升</P>										
-												
-
-        <P>最终伤害＝伤害最高角色+1/2第二高角色＋1/12第三高角色+1/12第四高角色</P>
-        <P>若原本伤害最高的角色没有暴击，则有可能另一名暴击的角色成为最高</P>
-        <P>某些角色可以基于攻击力，直接造成月感电伤害，通过这种方式造成的伤害无视防御力，不受益于常规增伤 / 减伤，但受益于元素精通，且有额外系数 3x:</P>
-        <P>直伤月感电＝	3×攻击力×倍率×（1+基础提升%）×（1+6×元素精通/元素精通＋2000＋月感电增伤%）×抗性系数×暴击区×擢升</P>
-        <P></P>
-        <P></P>
-
-        <a href="公式存储/星超导计算.xlsx" download class="down-btn">模板excel下载</a>
+    <!-- 2. 防御力 & 抗性 -->
+    <div class="section" id="defense">
+        <h2>防御力 & 抗性</h2>
+        <h3>通用抗性公式:</h3>
+        <div class="formula">
+            1 - 抗性 / 2 &nbsp;&nbsp;&nbsp;&nbsp; 当抗性 &lt;= 0
+        </div>
+        <div class="formula">
+            抗性系数 = 1 - 抗性 &nbsp;&nbsp;&nbsp;&nbsp; 当 0 &lt; 抗性 &lt;= 75%
+        </div>
+        <div class="formula">
+            1 / (4 + 抗性 + 1) &nbsp;&nbsp;&nbsp;&nbsp; 当 75% &lt;= 抗性
         </div>
 
+        <div class="text-desc">角色攻击敌人时的防御系数：</div>
+        <div class="formula">
+            (角色等级 + 100) / [(角色等级 + 100) + (敌人等级 + 100) * (1-减防) * (1-无视防御)]
+        </div>
+        <div class="note">(来自角色的减防不能超过 90%，无视防御不能超过 100%)</div>
 
-    
+        <div class="text-desc">敌人攻击角色时的防御系数：</div>
+        <div class="formula">
+            (5 * 敌人等级 + 500) / (5 * 敌人等级 + 500 + 角色防御)
+        </div>
 
+        <!-- 单个跳转链接 -->
+        <div class="jump-link">
+            <a href="#normal">跳转至下一板块</a>
+        </div>
+    </div>
 
+    <!-- 3. 常规伤害 -->
+    <div class="section" id="normal">
+        <h2>常规伤害</h2>
+        <div class="formula">
+            角色造成的常规伤害: <br>
+            (基础值 + 激化值 + 基础值加成) * (1 + 增伤% + 易伤% - 减伤%) * 抗性系数 * 防御系数 * 暴击区 * 蒸发融化系数
+        </div>
+        <div class="note">(注: 若攻击没有出现伤害数字（例如命中护盾），则本次伤害不会计算蒸发融化系数)</div>
 
+        <div class="text-desc">基础值：攻击力*倍率，攻击力可以替换为其他属性（生命值，元素精通等）</div>
+        <div class="text-desc">基础值加成：描述中带有【造成的伤害提高 X】的效果</div>
+        <div class="text-desc">增伤：描述中带有【我方造成的伤害提高 X%】的效果<br>易伤：描述中带有【目标受到的伤害提高 X%】的效果<br>减伤：描述中带有【目标受到的伤害降低 X%】的效果</div>
+        <div class="text-desc">激化值：见【激化反应】章节</div>
+        <div class="text-desc">蒸发融化系数：见【增幅反应】章节</div>
 
+        <!-- 单个跳转链接 -->
+        <div class="jump-link">
+            <a href="#hyper">跳转至下一板块</a>
+        </div>
+    </div>
 
-    
+    <!-- 4. 星超导 -->
+    <div class="section" id="hyper">
+        <h2>星超导</h2>
+        <div class="formula">
+            星超导基础倍率与星超导伤害次数相关，当次数为 0/1/2/3/4/5/6/7/8/9/10/11/12 时，星超导基础倍率分别为 <br>
+            1.0, 1.45, 1.5, 1.54, 1.60, 1.64, 1.70, 1.75, 1.79, 1.85, 1.89, 1.95, 2.0
+        </div>
+        <div class="formula">
+            直伤基础 = 星超导基础倍率 * 攻击力/精通 * 倍率 * (1 + 基础提升%) * (1 + (6 * 元素精通) / (元素精通 + 2000) + 星超导增伤%)
+        </div>
+        <div class="formula">
+            最终直伤 = (直伤基础 + 额外提升) * 抗性系数 * 暴击区 * 擢升 <br>
+            基础提升: 木偶天赋 (14%) <br>
+            额外提升（羽毛: 七七 6 命<br>
+            
+            注：暂未对传统增伤数值进行上传
+        </div>
 
+        <!-- 单个跳转链接 -->
+        <div class="jump-link">
+            <a href="网页自动化计算/xingchaodaowangyezidonghua.html">点击跳转自动化板块</a>
+        </div>
+    </div>
 
+    <!-- 5. 月结晶 -->
+    <div class="section" id="crystal">
+        <h2>月结晶</h2>
+        <div class="text-desc">月结晶的伤害计算和月感电一致，唯一的区别是直伤月结晶需把月感电的 3 换成 1.6，反应月结晶需把月感电的 1.8 换成 0.96</div>
+        <div class="formula">
+            直伤基础 = 1.6 * 属性 * 倍率 * (1 + 基础提升%) * (1 + (6 * 元素精通) / (元素精通 + 2000) + 月结晶增伤%) <br>
+            最终直伤 = (直伤基础 + 额外提升) * 抗性系数 * 暴击区 * 擢升 <br>
+            基础提升: 兹白天赋 (14%) 哥伦比亚天赋 (7%) 莉奈娅天赋 (14%) <br>
+            额外提升: 兹白天赋一，叶洛亚元素爆发等。
+        </div>
+        <div class="formula">
+            反应月结晶 = 1446.85 * 0.96 * (1 + 基础提升%) * (1 + (6 * 元素精通) / (元素精通 + 2000) + 月结晶增伤%) * 抗性系数 * 暴击区 * 擢升 <br>
+            最终伤害 = 伤害最高角色 + 1/2 第二高角色 + 1/12 第三高角色 + 1/12 第四高角色<br>
+            注：暂未对此公式进行修正，请等待二次更新
+        </div>
 
+        <!-- 单个跳转链接 -->
+        <div class="jump-link">
+            <a href="#electro">跳转至下一板块</a>
+        </div>
+    </div>
 
+    <!-- 6. 月感电 -->
+    <div class="section" id="electro">
+        <h2>月感电</h2>
+        <div class="text-desc">特定情况下，雷触及水时，会生成一片不可移动的雷暴云，持续 6s。雷暴云: 每 2s 攻击一次附近所有同时具有雷和水的目标，并消耗 0.4 元素量的雷和水（破盾效率极低）。触发月感电时，若附近已有雷暴云，则会刷新持续时间月感电的倍率为 1.8，基础伤害为 1446.85 * 1.8 = 2604.33</div>
+        <div class="formula">
+            月感电造成伤害时，所有参与反应的角色都会提供伤害值，但除伤害最高的角色外，其余角色的提供的伤害值会降低 <br>
+            反应月感电 = 1446.85 * 1.8 * (1 + 基础提升%) * (1 + (6 * 元素精通) / (元素精通 + 2000) + 月感电增伤%) * 抗性系数 * 暴击区 * 擢升 <br>
+            最终伤害 = 伤害最高角色 + 1/2 第二高角色 + 1/12 第三高角色 + 1/12 第四高角色 <br>
+            若原本伤害最高的角色没有暴击，则有可能另一名暴击的角色成为最高
+        </div>
+        <div class="formula">
+            某些角色可以基于攻击力，直接造成月感电伤害，通过这种方式造成的伤害无视防御力，不受益于常规增伤/减伤，但受益于元素精通，且有额外系数 3x <br>
+            直伤月感电 = 3 * 属性 * 倍率 * (1 + 基础提升%) * (1 + (6 * 元素精通) / (元素精通 + 2000) + 反应增伤%) * 抗性系数 * 暴击区 * 擢升
+        </div>
 
-    
+        <!-- 单个跳转链接 -->
+        <div class="jump-link">
+            <a href="#bloom">跳转至下一板块</a>
+        </div>
+    </div>
+
+    <!-- 7. 月绽放 -->
+    <div class="section" id="bloom">
+        <h2>月绽放</h2>
+        <div class="text-desc">特定情况下，草触及水时，会生草原核，并为队伍提供「草露」，可被特定角色消耗。草原核伤害不算月绽放，月绽放伤害只包括直伤月绽放伤害。直伤月绽放无视防御，不受益于常规增伤/减伤，但受益于元素精通</div>
+        <div class="formula">
+            直伤基础 = 属性 * 倍率 * (1 + 基础提升%) * (1 + (6 * 元素精通) / (元素精通 + 2000) + 月绽放增伤%) <br>
+            最终直伤 = (直伤基础 + 额外提升) * 抗性系数 * 暴击区 * 擢升 <br>
+            基础提升: 菈乌玛天赋 (14%) 哥伦比亚天赋 (7%) 奈芙尔天赋 (14%) <br>
+            额外提升: 菈乌玛元素爆发等。
+        </div>
+        <div class="formula">
+            草原核伤害仍为绽放/烈绽放/超绽放伤害，反应倍率为: 绽放 2|烈绽放 超绽放 3 <br>
+            草原核基础 = 1446.85 * 反应倍率 * (1 + (16 * 元素精通) / (元素精通 + 2000) + 反应增伤%) <br>
+            草原核伤害 = (草原核基础 + 额外提升) * 抗性系数 <br>
+            额外提升: 菈乌玛元素爆发
+        </div>
+
+        <!-- 单个跳转链接 -->
+        <div class="jump-link">
+            <a href="#intensify">跳转至下一板块</a>
+        </div>
+    </div>
+
+    <!-- 8. 激化反应 -->
+    <div class="section" id="intensify">
+        <h2>激化反应</h2>
+        <div class="text-desc">当雷元素触及草元素时，会按照 1：1：1 的比例互相消耗并生成原激化元素。原激化元素可以发生绽放和燃烧反应，在这些反应中的表现和草元素相同。原激化元素的持续时间: (6 + 5 × 元素量) 秒。雷和草不共存，但原激化和雷、原激化和草都可以共存当附着雷/草元素的攻击命中具有原激化的目标时，将分别引发超激化/蔓激化反应，不消耗任何元素，但为本次伤害贡献激化值（完整公式见【常规伤害】章节）</div>
+        <div class="formula">
+            超激化值 = 1446.85 * 1.15 * (1 + (5 * 元素精通) / (元素精通 + 2000) + 超激化提高%) <br>
+            蔓激化值 = 1446.85 * 1.25 * (1 + (5 * 元素精通) / (元素精通 + 2000) + 蔓激化提高%)
+        </div>
+        <div class="formula">
+            当敌人触发上述反应时，原本的 1446.85 的数值有变化: <br>
+            90 级 1202.81|95 级 1411.74|100 级 1674.81 <br>
+            105 级 1884.98|110 级 1963.85
+        </div>
+
+        <!-- 单个跳转链接 -->
+        <div class="jump-link">
+            <a href="#transform">跳转至下一板块</a>
+        </div>
+    </div>
+
+    <!-- 9. 剧变反应 -->
+    <div class="section" id="transform">
+        <h2>剧变反应</h2>
+        <div class="text-desc">剧变反应包括: 超载、超导、感电、燃烧、碎冰、扩散、绽放、超绽放、烈绽放。剧变反应造成的伤害不受益于常规增伤/易伤/减伤，且无视防御力、不能暴击</div>
+        <div class="formula">
+            剧变基础 = 1446.85 * 反应倍率 * (1 + (16 * 元素精通) / (元素精通 + 2000) + 反应增伤%) <br>
+            剧变伤害 = (剧变基础 + 额外提升) * 抗性系数
+        </div>
+        <div class="formula">
+            反应倍率: <br>
+            扩散 0.65(每 0.25s 一次) <br>
+            燃烧 0.25 <br>
+            超载 2.75|碎冰 3 <br>
+            绽放 2|烈绽放/超绽放 3
+        </div>
+        <div class="formula">
+            触发剧变反应没有冷却，但剧变反应的伤害有冷却: <br>
+            每 0.5s 最多 1 次: 超载 <br>
+            每 0.5s 最多 2 次: 超导、碎冰、扩散、绽放、烈绽放
+        </div>
+        <div class="formula">
+            当敌人触发上述反应时，原本的 1446.85 的数值有变化: <br>
+            90 级 1202.81|95 级 1411.74|100 级 1674.81 <br>
+            105 级 1884.98|110 级 1963.85
+        </div>
+
+        <!-- 单个跳转链接 -->
+        <div class="jump-link">
+            <a href="#amplify">跳转至下一板块</a>
+        </div>
+    </div>
+
+    <!-- 10. 增幅反应 -->
+    <div class="section" id="amplify">
+        <h2>增幅反应</h2>
+        <div class="text-desc">增幅反应包括: 蒸发、融化。触发增幅反应时，会为本次伤害附加蒸发融化系数（完整公式见【常规伤害】章节）。若攻击没有出现伤害数字（例如命中护盾），则本次伤害不会计算蒸发融化系数</div>
+        <div class="formula">
+            蒸发融化系数 = 基础系数 * (1 + (2.78 * 元素精通) / (元素精通 + 1400) + 反应增伤%)
+        </div>
+        <div class="formula">
+            基础系数: <br>
+            2.0 蒸发 火→水 <br>
+            2.0 融化 水→冰 <br>
+            1.5 蒸发 火→水 <br>
+            1.5 融化 冰→火
+        </div>
+
+        <!-- 单个跳转链接 -->
+        <div class="jump-link">
+            <a href="#crystallize">跳转至下一板块</a>
+        </div>
+    </div>
+
+    <!-- 11. 结晶反应 -->
+    <div class="section" id="crystallize">
+        <h2>结晶反应</h2>
+        <div class="text-desc">触发结晶反应时，会掉落对应火/水/雷/冰元素的晶片，拾取后可获得护盾。结晶护盾对其自身属性的伤害有 250% 的吸收效率</div>
+        <div class="formula">
+            结晶盾量 = 1851.06 * (1 + (4.44 * 元素精通) / (元素精通 + 1400))
+        </div>
+        <div class="text-desc">角色具有护盾时，护盾量还会受护盾强效影响，护盾强效取决于持有护盾的角色，而非创造晶片的角色</div>
+
+        <!-- 单个跳转链接 -->
+        <div class="jump-link">
+            <a href="#level">跳转至下一板块</a>
+        </div>
+    </div>
+
+</body>
+</html>
