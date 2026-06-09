@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>抗性/防御系数计算</title>
+    <style>
+        :root {
+            --bg-main: #121212;
+            --bg-card: #1e1e1e;
+            --border-color: #333;
+            --text-primary: #e0e0e0;
+            --text-secondary: #aaa;
+            --accent-color: #bb86fc;
+            --accent-blue: #64b5f6;
+            --success-color: #81c784;
+            --danger-color: #e57373;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 16px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: var(--accent-color);
+            text-align: center;
+            margin: 16px 0 24px;
+            font-size: clamp(1.5rem, 3vw, 2rem);
+        }
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .card h2 {
+            color: var(--accent-blue);
+            margin-bottom: 16px;
+            font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-group label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        .form-group input {
+            background-color: var(--bg-main);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px 12px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+        .btn {
+            background-color: var(--accent-color);
+            color: #000;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 16px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            width: 100%;
+            margin-top: 8px;
+        }
+        .btn:hover {
+            background-color: #9c27b0;
+        }
+        .result-box {
+            margin-top: 16px;
+            padding: 12px;
+            background-color: var(--bg-main);
+            border-radius: 6px;
+            border-left: 4px solid var(--success-color);
+        }
+        .result-item {
+            margin: 6px 0;
+        }
+        .label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        .value {
+            color: var(--success-color);
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        .note {
+            margin-top: 12px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        .note span {
+            color: var(--danger-color);
+        }
+        @media (max-width: 600px) {
+            .card {
+                padding: 16px;
+            }
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>抗性/防御系数计算</h1>
+
+        <!-- 抗性系数计算 -->
+        <div class="card">
+            <h2>抗性系数计算</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="baseResist">敌人初始抗性 (%)</label>
+                    <input type="number" id="baseResist" placeholder="例：10" step="0.1" value="10">
+                </div>
+                <div class="form-group">
+                    <label for="resistDown">减抗数值 (%)</label>
+                    <input type="number" id="resistDown" placeholder="例：40" step="0.1" value="0">
+                </div>
+            </div>
+            <button class="btn" onclick="calcResist()">计算抗性系数</button>
+            <div class="result-box" id="resistResult" style="display: none;">
+                <div class="result-item">
+                    <span class="label">最终抗性：</span>
+                    <span class="value" id="finalResist"></span>
+                </div>
+                <div class="result-item">
+                    <span class="label">抗性系数：</span>
+                    <span class="value" id="resistCoeff"></span>
+                </div>
+                <div class="result-item label" id="resistFormula"></div>
+            </div>
+        </div>
+
+        <!-- 防御系数计算 -->
+        <div class="card">
+            <h2>防御系数计算</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="charLv">角色等级</label>
+                    <input type="number" id="charLv" placeholder="角色等级" value="90">
+                </div>
+                <div class="form-group">
+                    <label for="enemyLv">敌人等级</label>
+                    <input type="number" id="enemyLv" placeholder="敌人等级" value="90">
+                </div>
+                <div class="form-group">
+                    <label for="defReduction">减防百分比 (%)</label>
+                    <input type="number" id="defReduction" placeholder="上限90%" step="0.1" value="0">
+                </div>
+                <div class="form-group">
+                    <label for="ignoreDef">无视防御百分比 (%)</label>
+                    <input type="number" id="ignoreDef" placeholder="上限100%" step="0.1" value="0">
+                </div>
+            </div>
+            <button class="btn" onclick="calcDefense()">计算防御系数</button>
+            <div class="result-box" id="defenseResult" style="display: none;">
+                <div class="result-item">
+                    <span class="label">防御系数：</span>
+                    <span class="value" id="defenseCoeff"></span>
+                </div>
+            </div>
+            <div class="note">
+                <span>注意：</span> 减防上限90%，无视防御上限100%，数值将自动截断。
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 抗性计算：初始抗性 - 减抗 = 最终抗性，再计算系数
+        function calcResist() {
+            const base = parseFloat(document.getElementById('baseResist').value);
+            const down = parseFloat(document.getElementById('resistDown').value);
+
+            if (isNaN(base) || isNaN(down)) {
+                alert("请输入有效数字");
+                return;
+            }
+
+            // 计算最终抗性
+            const finalResistPercent = base - down;
+            const finalResist = finalResistPercent / 100;
+            let resistCoeff, formula;
+
+            // 原神标准抗性公式
+            if (finalResist <= 0) {
+                resistCoeff = 1 - finalResist / 2;
+                formula = "套用公式：1 - 最终抗性 ÷ 2（最终抗性 ≤ 0%）";
+            } else if (finalResist > 0 && finalResist <= 0.75) {
+                resistCoeff = 1 - finalResist;
+                formula = "套用公式：1 - 最终抗性（0% ＜ 最终抗性 ≤ 75%）";
+            } else {
+                resistCoeff = 1 / (finalResist + 5);
+                formula = "套用公式：1 ÷ (最终抗性 + 5)（最终抗性 ＞ 75%）";
+            }
+
+            // 展示结果
+            document.getElementById('resistResult').style.display = 'block';
+            document.getElementById('finalResist').textContent = finalResistPercent.toFixed(2) + " %";
+            document.getElementById('resistCoeff').textContent = resistCoeff.toFixed(4);
+            document.getElementById('resistFormula').textContent = formula;
+        }
+
+        // 防御系数计算
+        function calcDefense() {
+            const charLv = parseInt(document.getElementById('charLv').value);
+            const enemyLv = parseInt(document.getElementById('enemyLv').value);
+            let defRed = parseFloat(document.getElementById('defReduction').value);
+            let ignoreDef = parseFloat(document.getElementById('ignoreDef').value);
+
+            if (isNaN(charLv) || isNaN(enemyLv) || isNaN(defRed) || isNaN(ignoreDef)) {
+                alert("请输入有效数字");
+                return;
+            }
+
+            // 数值限制
+            defRed = Math.min(defRed, 90);
+            ignoreDef = Math.min(ignoreDef, 100);
+
+            const charVal = charLv + 100;
+            const enemyDef = (enemyLv + 100) * (1 - defRed / 100) * (1 - ignoreDef / 100);
+            const defCoeff = charVal / (charVal + enemyDef);
+
+            document.getElementById('defenseResult').style.display = 'block';
+            document.getElementById('defenseCoeff').textContent = defCoeff.toFixed(4);
+        }
+    </script>
+</body>
+</html>

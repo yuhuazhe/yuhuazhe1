@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>月感电伤害计算器</title>
+    <style>
+        :root {
+            --bg: #121212;
+            --card: #1e1e1e;
+            --text: #e0e0e0;
+            --accent: #bb86fc;
+            --border: #333;
+            --success: #4caf50;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            padding: 16px;
+            line-height: 1.5;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: var(--accent);
+            margin-bottom: 24px;
+            font-size: 28px;
+        }
+        .tab-container {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            background: var(--card);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all .2s;
+            font-size: 15px;
+        }
+        .tab-btn.active {
+            background: var(--accent);
+            color: #000;
+            border-color: var(--accent);
+        }
+        .tab-btn:hover {
+            border-color: var(--accent);
+        }
+        .tab-content {
+            display: none;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 16px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+        }
+        th, td {
+            border: 1px solid var(--border);
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background: #252525;
+            font-weight: 600;
+        }
+        input {
+            width: 100%;
+            background: #222;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        .btn {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            transition: opacity .2s;
+        }
+        .btn:hover {
+            opacity: .9;
+        }
+        .result-box {
+            background: #222;
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 12px;
+            font-size: 15px;
+        }
+        .note {
+            color: #aaa;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+        @media (max-width: 768px) {
+            th, td {
+                padding: 6px;
+                font-size: 13px;
+            }
+            input {
+                padding: 6px;
+                font-size: 13px;
+            }
+            .tab-btn {
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>月感电伤害计算器</h1>
+
+    <div class="tab-container">
+        <button class="tab-btn active" data-tab="reaction">反应月感电</button>
+        <button class="tab-btn" data-tab="direct">直伤月感电</button>
+    </div>
+
+    <!-- 反应月感电 子板块 -->
+    <div class="tab-content active" id="reaction">
+        <h3>反应月感电</h3>
+        <p class="note">
+            说明：输入4位角色各自的面板后，系统会自动按「最高伤害×1 + 第二×1/2 + 第三×1/12 + 第四×1/12」的规则分配系数。
+        </p>
+
+        <table>
+            <thead>
+            <tr>
+                <th>角色</th>
+                <th>基础提升%</th>
+                <th>元素精通</th>
+                <th>月感电增伤%</th>
+                <th>抗性系数</th>
+                <th>暴击区</th>
+                <th>擢升</th>
+                <th>单人伤害值</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>p1</td>
+                <td><input type="number" id="r1_base" placeholder="0" step="any"></td>
+                <td><input type="number" id="r1_em" placeholder="0" step="any"></td>
+                <td><input type="number" id="r1_bonus" placeholder="0" step="any"></td>
+                <td><input type="number" id="r1_resist" placeholder="1" step="any"></td>
+                <td><input type="number" id="r1_crit" placeholder="1" step="any"></td>
+                <td><input type="number" id="r1_boost" placeholder="1" step="any"></td>
+                <td id="r1_damage">-</td>
+            </tr>
+            <tr>
+                <td>p2</td>
+                <td><input type="number" id="r2_base" placeholder="0" step="any"></td>
+                <td><input type="number" id="r2_em" placeholder="0" step="any"></td>
+                <td><input type="number" id="r2_bonus" placeholder="0" step="any"></td>
+                <td><input type="number" id="r2_resist" placeholder="1" step="any"></td>
+                <td><input type="number" id="r2_crit" placeholder="1" step="any"></td>
+                <td><input type="number" id="r2_boost" placeholder="1" step="any"></td>
+                <td id="r2_damage">-</td>
+            </tr>
+            <tr>
+                <td>p3</td>
+                <td><input type="number" id="r3_base" placeholder="0" step="any"></td>
+                <td><input type="number" id="r3_em" placeholder="0" step="any"></td>
+                <td><input type="number" id="r3_bonus" placeholder="0" step="any"></td>
+                <td><input type="number" id="r3_resist" placeholder="1" step="any"></td>
+                <td><input type="number" id="r3_crit" placeholder="1" step="any"></td>
+                <td><input type="number" id="r3_boost" placeholder="1" step="any"></td>
+                <td id="r3_damage">-</td>
+            </tr>
+            <tr>
+                <td>p4</td>
+                <td><input type="number" id="r4_base" placeholder="0" step="any"></td>
+                <td><input type="number" id="r4_em" placeholder="0" step="any"></td>
+                <td><input type="number" id="r4_bonus" placeholder="0" step="any"></td>
+                <td><input type="number" id="r4_resist" placeholder="1" step="any"></td>
+                <td><input type="number" id="r4_crit" placeholder="1" step="any"></td>
+                <td><input type="number" id="r4_boost" placeholder="1" step="any"></td>
+                <td id="r4_damage">-</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <button class="btn" onclick="calcReaction()">计算月感电伤害</button>
+
+        <div class="result-box">
+            <div>排序后系数分配（最高→最低）：<span id="r_rank">-</span></div>
+            <div>最终月感电伤害：<strong id="r_final">-</strong></div>
+        </div>
+    </div>
+
+    <!-- 直伤月感电 子板块 -->
+    <div class="tab-content" id="direct">
+        <h3>直伤月感电</h3>
+        <p class="note">
+            说明：公式为 3 × 属性 × 倍率 × (1 + 基础提升) × (1 + 反应精通部分 + 反应增伤%) × 抗性系数 × 暴击区 × 擢升
+        </p>
+
+        <table>
+            <thead>
+            <tr>
+                <th>属性值</th>
+                <th>倍率</th>
+                <th>基础提升%</th>
+                <th>元素精通</th>
+                <th>反应增伤%</th>
+                <th>抗性系数</th>
+                <th>暴击区</th>
+                <th>擢升</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td><input type="number" id="d_attr" placeholder="0" step="any"></td>
+                <td><input type="number" id="d_ratio" placeholder="1" step="any"></td>
+                <td><input type="number" id="d_base" placeholder="0" step="any"></td>
+                <td><input type="number" id="d_em" placeholder="0" step="any"></td>
+                <td><input type="number" id="d_bonus" placeholder="0" step="any"></td>
+                <td><input type="number" id="d_resist" placeholder="1" step="any"></td>
+                <td><input type="number" id="d_crit" placeholder="1" step="any"></td>
+                <td><input type="number" id="d_boost" placeholder="1" step="any"></td>
+            </tr>
+            </tbody>
+        </table>
+
+        <button class="btn" onclick="calcDirect()">计算直伤月感电伤害</button>
+
+        <div class="result-box">
+            <div>直伤月感电伤害：<strong id="d_final">-</strong></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 切换标签
+    const tabs = document.querySelectorAll('.tab-btn');
+    const contents = document.querySelectorAll('.tab-content');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const t = tab.dataset.tab;
+            tabs.forEach(b => b.classList.remove('active'));
+            contents.forEach(c => c.classList.remove('active'));
+            tab.classList.add('active');
+            document.getElementById(t).classList.add('active');
+        });
+    });
+
+    // 通用：获取输入值，默认0
+    function getVal(id) {
+        const el = document.getElementById(id);
+        return el ? (parseFloat(el.value) || 0) : 0;
+    }
+
+    // 反应月感电计算
+    const baseCoeff = 1446.85 * 1.8; // 2604.33
+    function calcReaction() {
+        const roles = [];
+        for (let i = 1; i <= 4; i++) {
+            const base = getVal(`r${i}_base`) / 100;
+            const em = getVal(`r${i}_em`);
+            const bonus = getVal(`r${i}_bonus`) / 100;
+            const resist = getVal(`r${i}_resist`) || 1;
+            const crit = getVal(`r${i}_crit`) || 1;
+            const boost = getVal(`r${i}_boost`) || 1;
+
+            const emMult = (6 * em) / (em + 2000);
+            const dmg = baseCoeff * (1 + base) * (1 + emMult + bonus) * resist * crit * boost;
+            document.getElementById(`r${i}_damage`).textContent = dmg.toFixed(2);
+            roles.push({ id: i, dmg });
+        }
+
+        // 按伤害从高到低排序
+        roles.sort((a, b) => b.dmg - a.dmg);
+
+        // 分配系数：最高1倍，第二1/2，第三1/12，第四1/12
+        const coeffs = [1, 0.5, 1/12, 1/12];
+        let total = 0;
+        let rankText = [];
+        for (let i = 0; i < 4; i++) {
+            total += roles[i].dmg * coeffs[i];
+            rankText.push(`角色${roles[i].id}(系数×${coeffs[i]})`);
+        }
+
+        document.getElementById('r_rank').textContent = rankText.join(' → ');
+        document.getElementById('r_final').textContent = total.toFixed(2);
+    }
+
+    // 直伤月感电计算
+    function calcDirect() {
+        const attr = getVal('d_attr');
+        const ratio = getVal('d_ratio') || 1;
+        const base = getVal('d_base') / 100;
+        const em = getVal('d_em');
+        const bonus = getVal('d_bonus') / 100;
+        const resist = getVal('d_resist') || 1;
+        const crit = getVal('d_crit') || 1;
+        const boost = getVal('d_boost') || 1;
+
+        const emMult = (6 * em) / (em + 2000);
+        const dmg = 3 * attr * ratio * (1 + base) * (1 + emMult + bonus) * resist * crit * boost;
+        document.getElementById('d_final').textContent = dmg.toFixed(2);
+    }
+</script>
+</body>
+</html>
