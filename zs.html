@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <!-- 移动端适配核心标签 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>原神角色攻略</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        body {
+            background-color: #121418;
+            color: #f0f0f0;
+            padding: 20px;
+        }
+
+        /* 顶部标题栏 */
+        .page-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            margin-bottom: 24px;
+        }
+        .page-title {
+            font-size: 48px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+        .element-select {
+            position: absolute;
+            right: 0;
+            background-color: #22252b;
+            color: #fff;
+            border: 1px solid #3a3e47;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .element-select:focus {
+            outline: none;
+            border-color: #5c626e;
+        }
+
+        /* 更新记录折叠面板 */
+        .collapse-box {
+            background-color: #1c1f25;
+            border: 1px solid #2d3139;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        .collapse-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 18px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        .collapse-icon {
+            transition: transform 0.3s ease;
+        }
+        .collapse-icon.rotate {
+            transform: rotate(180deg);
+        }
+        .collapse-content {
+            padding: 0 18px;
+            height: 0;
+            overflow: hidden;
+            transition: height 0.3s ease;
+            color: #b0b6c2;
+            line-height: 1.6;
+        }
+        .collapse-content.open {
+            padding-bottom: 16px;
+            height: auto;
+        }
+
+        /* 角色卡片容器 - 自适应多列布局 */
+        .character-container {
+            display: grid;
+            /* 自动适配：最小140px宽度，自动填充列数 */
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 32px 20px;
+        }
+
+        /* 单个角色卡片 */
+        .character-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .character-card:hover {
+            transform: scale(1.05);
+        }
+        .char-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 8px;
+            border: 2px solid #333842;
+            object-fit: cover;
+            background-color: #1a1d22;
+        }
+        .char-name {
+            margin-top: 10px;
+            font-size: 18px;
+            color: #e8e8e8;
+        }
+
+        /* 手机端适配：单列布局，缩小尺寸 */
+        @media screen and (max-width: 768px) {
+            .page-title {
+                font-size: 28px;
+            }
+            .element-select {
+                font-size: 14px;
+                padding: 6px 10px;
+            }
+            .character-container {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                gap: 24px 12px;
+            }
+            .char-avatar {
+                width: 90px;
+                height: 90px;
+            }
+            .char-name {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部标题+筛选 -->
+    <div class="page-header">
+        <h1 class="page-title">原神角色攻略</h1>
+        <select class="element-select" id="elementFilter">
+            <option value="all">全部元素</option>
+            <option value="pyro">火</option>
+            <option value="hydro">水</option>
+            <option value="anemo">风</option>
+            <option value="electro">雷</option>
+            <option value="dendro">草</option>
+            <option value="cryo">冰</option>
+            <option value="geo">岩</option>
+        </select>
+    </div>
+
+    <!-- 更新记录折叠面板 -->
+    <div class="collapse-box">
+        <div class="collapse-header" id="collapseToggle">
+            <span>更新记录</span>
+            <span class="collapse-icon">▼</span>
+        </div>
+        <div class="collapse-content" id="collapsePanel">
+            <p>v1.0新增角色桑多涅，优化了布局排版</p>
+            <p></p>
+            <p></p>
+        </div>
+    </div>
+
+    <!-- 角色卡片列表区域 -->
+    <div class="character-container" id="charWrap">
+        <!-- 示例角色1：桑多涅 -->
+        <a href="桑多涅/展示页.html" class="character-card" data-element="cryo">
+            <img class="char-avatar" src="桑多涅/新建文件夹/木偶.png" alt="桑多涅">
+            <div class="char-name">桑多涅</div>
+        </a>
+
+        <!-- 下面可无限复制新增角色，格式统一 -->
+        <a href="/character/nahida" class="character-card" data-element="hydro">
+            <img class="char-avatar" src="少女/哥伦比亚.png" alt="哥伦比亚">
+            <div class="char-name">哥伦比亚</div>
+        </a>
+        <a href="/character/hu-tao" class="character-card" data-element="pyro">
+            <img class="char-avatar" src="hutao.png" alt="">
+            <div class="char-name"></div>
+        </a>
+        <a href="/character/furina" class="character-card" data-element="hydro">
+            <img class="char-avatar" src="furina.png" alt="">
+            <div class="char-name"></div>
+        </a>
+        <a href="/character/wanderer" class="character-card" data-element="anemo">
+            <img class="char-avatar" src="wanderer.png" alt="">
+            <div class="char-name"></div>
+        </a>
+    </div>
+
+    <script>
+        // 1. 更新记录折叠展开逻辑
+        const toggleBtn = document.getElementById('collapseToggle');
+        const panel = document.getElementById('collapsePanel');
+        const icon = document.querySelector('.collapse-icon');
+        toggleBtn.addEventListener('click', () => {
+            panel.classList.toggle('open');
+            icon.classList.toggle('rotate');
+        });
+
+        // 2. 元素筛选功能
+        const filterSelect = document.getElementById('elementFilter');
+        const allCards = document.querySelectorAll('.character-card');
+        filterSelect.addEventListener('change', function () {
+            const selectVal = this.value;
+            allCards.forEach(card => {
+                if (selectVal === 'all' || card.dataset.element === selectVal) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            })
+        })
+    </script>
+</body>
+</html>
