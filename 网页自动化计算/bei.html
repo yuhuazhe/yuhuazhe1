@@ -114,6 +114,7 @@ max-height: 400px;
 overflow-y: auto;
 font-size: 13px;
 color: #e2e2eb;
+white-space: pre-wrap;
 }
 .time-seg {
 border-bottom: 1px solid #282840;
@@ -137,6 +138,25 @@ padding: 6px;
 background: #10101a;
 border-radius: 4px;
 color: #e2e2eb;
+}
+.loading-tip {
+text-align: center;
+padding: 20px;
+color: #c5c5dd;
+}
+/* 打字光标 */
+.typing-cursor {
+display: inline-block;
+width: 8px;
+height: 16px;
+background: #fff;
+animation: blink 0.7s infinite;
+vertical-align: middle;
+margin-left: 2px;
+}
+@keyframes blink {
+0%, 100% {opacity: 1;}
+50% {opacity: 0;}
 }
 /* 移动端适配 */
 @media (max-width: 600px) {
@@ -220,13 +240,15 @@ max-height: 300px;
 <div class="detail-wrap" id="detailBox">
 <div class="card">
 <div class="card-title">0~20s计算明细</div>
-<div class="detail-card" id="detailContent"></div>
+<div class="detail-card" id="detailContent">
+<div class="loading-tip" id="loadingTip">正在加载计算流程...</div>
+</div>
 </div>
 </div>
 </div>
 
 <script>
-// ]
+// 时间分段数据
 const timeSegments = [
 [0, 2, 0, "北斗长按E技能"],
 [2, 3, 0, "北斗释放q技能（200精通、15%减抗持续15s，20%攻击加成持续12s）"],
@@ -248,98 +270,111 @@ const timeSegments = [
 
 // 展开/收起详情
 document.getElementById('toggleDetailBtn').onclick = () => {
-const box = document.getElementById('detailBox');
-box.style.display = box.style.display === 'block' ? 'none' : 'block';
+  const box = document.getElementById('detailBox');
+  box.style.display = box.style.display === 'block' ? 'none' : 'block';
 };
 
-// 核心计算
-document.getElementById('calcBtn').onclick = function() {
-// 读取输入
-const atkCharBase = Number(document.getElementById('atkBaseChar').value);
-const atkWeaponBase = Number(document.getElementById('atkBaseWeapon').value);
-const panelAtk = Number(document.getElementById('atkPanel').value);
-const cr = Number(document.getElementById('critRate').value);
-const cd = Number(document.getElementById('critDmg').value);
-const starBaseMul = Number(document.getElementById('starBaseMult').value);
-const panelEM = Number(document.getElementById('emPanel').value);
-const panelStarDmgAdd = Number(document.getElementById('starDmgBonusPanel').value);
-const enemyRawResist = Number(document.getElementById('enemyResist').value);
-const baseUpPercent = Number(document.getElementById('baseUp').value) / 100;
-
-const totalBaseATK = atkCharBase + atkWeaponBase;
-let totalAllDmg = 0;
-let detailHTML = "";
-
-// 时间分段
-timeSegments.forEach(seg => {
-const [tStart, tEnd, mul, desc] = seg;
-const duration = tEnd - tStart;
-let segDamage = 0;
-
-// 本段HTML容器
-let segHtml = `<div class="time-seg">
-<div class="time-title">【${tStart}s ~ ${tEnd}s】 本段耗时：${duration.toFixed(1)}s</div>
-<div class="gain-line">流程：${desc}</div>`;
-
-if(mul > 0) {
-// 初始化本段增益
-let addAtkPercent = 0;
-let addEM = 0;
-let addStarDmgBonus = 0;
-let totalResistReduce = 0;
-
-// 1.北斗Q：2s释放，精通/减抗持续15s(2~17s)；攻击加成持续12s(2~14s)
-if(tStart >= 2 && tStart < 17) {
-addEM += 200;
-totalResistReduce += 15;
-if(tStart < 14) addAtkPercent += 0.2;
-}
-// 2.迪奥娜E：3s释放，精通/星增伤持续12s(3~15s)；20%攻击永久全程生效
-if(tStart >= 3 && tStart < 15) {
-addEM += 200;
-addStarDmgBonus += 0.4;
-}
-addAtkPercent += 0.2;
-// 3.砂糖：5s释放，减抗/精通持续8s(5~13s)；攻击加成持续10s(5~15s)
-if(tStart >= 5 && tStart < 13) {
-totalResistReduce += 40;
-addEM += 100;
-}
-if(tStart >= 5 && tStart < 15) addAtkPercent += 0.48;
-
-// 法则1：总攻击力 = 面板输入攻击力 + 总基础攻击力 × 百分比攻击力加成
-const totalATK = panelAtk + totalBaseATK * addAtkPercent;
-// 法则2：星超导增伤 = 面板输入星超导增伤 + 队友星超导伤害加成
-const totalStarDmgAdd = panelStarDmgAdd + addStarDmgBonus;
-// 法则3：元素精通 = 面板输入精通 + 队友提供的精通
-const totalEM = panelEM + addEM;
-
-// 抗性计算
-const realEnemyResist = enemyRawResist - totalResistReduce;
-let resistCoeff;
-if(realEnemyResist <= 0) {
-resistCoeff = 1 - realEnemyResist / 200;
-} else {
-resistCoeff = 100 / (100 + realEnemyResist);
+/**
+ * 逐字打字机渲染函数
+ * @param {string} text 完整文本
+ * @param {number} speed 单字间隔ms
+ * @param {HTMLElement} wrapDom 输出容器
+ */
+async function typeWriter(text, speed = 15, wrapDom) {
+  wrapDom.innerHTML = `<span class="typing-cursor"></span>`;
+  const cursor = wrapDom.querySelector('.typing-cursor');
+  for (let i = 0; i < text.length; i++) {
+    cursor.before(document.createTextNode(text[i]));
+    await new Promise(res => setTimeout(res, speed));
+  }
+  cursor.remove();
 }
 
-// 反应精通系数 (6 * 元素精通) / (元素精通 + 2000)
-const emReactionMul = (6 * totalEM) / (totalEM + 2000);
+// 核心计算按钮
+document.getElementById('calcBtn').onclick = async function() {
+  const btn = this;
+  btn.disabled = true;
+  btn.textContent = "计算中...";
 
-// 表格直伤基础公式
-const baseDmg = starBaseMul * totalATK * mul * (1 + baseUpPercent) * (1 + emReactionMul + totalStarDmgAdd);
+  const detailBox = document.getElementById('detailBox');
+  const loadingTip = document.getElementById('loadingTip');
+  const detailContent = document.getElementById('detailContent');
 
-// 暴击期望
-const critExpect = 1 + cr * cd;
+  // 打开面板，重置加载提示
+  detailBox.style.display = 'block';
+  detailContent.innerHTML = `<div class="loading-tip" id="loadingTip">正在加载计算流程...</div>`;
 
-// 单次伤害 = 直伤基础 × 抗性系数 × 暴击期望
-segDamage = baseDmg * resistCoeff * critExpect;
-totalAllDmg += segDamage;
+  // 模拟计算耗时
+  await new Promise(res => setTimeout(res, 800));
 
-// 本段完整计算过程展示
-segHtml += `
-<div class="calc-formula">
-1.总攻击力计算：面板攻击${panelAtk} + 总基础攻击${totalBaseATK} × 攻击加成${addAtkPercent.toFixed(2)} = ${totalATK.toFixed(2)}
+  // 读取输入
+  const atkCharBase = Number(document.getElementById('atkBaseChar').value);
+  const atkWeaponBase = Number(document.getElementById('atkBaseWeapon').value);
+  const panelAtk = Number(document.getElementById('atkPanel').value);
+  const cr = Number(document.getElementById('critRate').value);
+  const cd = Number(document.getElementById('critDmg').value);
+  const starBaseMul = Number(document.getElementById('starBaseMult').value);
+  const panelEM = Number(document.getElementById('emPanel').value);
+  const panelStarDmgAdd = Number(document.getElementById('starDmgBonusPanel').value);
+  const enemyRawResist = Number(document.getElementById('enemyResist').value);
+  const baseUpPercent = Number(document.getElementById('baseUp').value) / 100;
+
+  const totalBaseATK = atkCharBase + atkWeaponBase;
+  let totalAllDmg = 0;
+  let fullText = "";
+
+  // 拼接完整纯文本（去掉html标签，纯文字用于逐字输出）
+  timeSegments.forEach((seg) => {
+    const [tStart, tEnd, mul, desc] = seg;
+    const duration = tEnd - tStart;
+    let segDamage = 0;
+
+    fullText += `【${tStart}s ~ ${tEnd}s】 本段耗时：${duration.toFixed(1)}s\n流程：${desc}\n`;
+
+    if(mul > 0) {
+      let addAtkPercent = 0;
+      let addEM = 0;
+      let addStarDmgBonus = 0;
+      let totalResistReduce = 0;
+
+      // 北斗Q
+      if(tStart >= 2 && tStart < 17) {
+        addEM += 200;
+        totalResistReduce += 15;
+        if(tStart < 14) addAtkPercent += 0.2;
+      }
+      // 迪奥娜E
+      if(tStart >= 3 && tStart < 15) {
+        addEM += 200;
+        addStarDmgBonus += 0.4;
+      }
+      addAtkPercent += 0.2;
+      // 砂糖
+      if(tStart >= 5 && tStart < 13) {
+        totalResistReduce += 40;
+        addEM += 100;
+      }
+      if(tStart >= 5 && tStart < 15) addAtkPercent += 0.48;
+
+      const totalATK = panelAtk + totalBaseATK * addAtkPercent;
+      const totalStarDmgAdd = panelStarDmgAdd + addStarDmgBonus;
+      const totalEM = panelEM + addEM;
+
+      const realEnemyResist = enemyRawResist - totalResistReduce;
+      let resistCoeff;
+      if(realEnemyResist <= 0) {
+        resistCoeff = 1 - realEnemyResist / 200;
+      } else {
+        resistCoeff = 100 / (100 + realEnemyResist);
+      }
+
+      const emReactionMul = (6 * totalEM) / (totalEM + 2000);
+      const baseDmg = starBaseMul * totalATK * mul * (1 + baseUpPercent) * (1 + emReactionMul + totalStarDmgAdd);
+      const critExpect = 1 + cr * cd;
+      segDamage = baseDmg * resistCoeff * critExpect;
+      totalAllDmg += segDamage;
+
+      fullText += `1.总攻击力计算：面板攻击${panelAtk} + 总基础攻击${totalBaseATK} × 攻击加成${addAtkPercent.toFixed(2)} = ${totalATK.toFixed(2)}
 2.总星超导增伤：面板${panelStarDmgAdd} + 队友加成${addStarDmgBonus} = ${totalStarDmgAdd.toFixed(2)}
 3.总元素精通：面板${panelEM} + 队友提供${addEM} = ${totalEM}
 4.敌人抗性：原始${enemyRawResist}% - 减抗${totalResistReduce}% = ${realEnemyResist}%，抗性系数${resistCoeff.toFixed(3)}
@@ -347,28 +382,28 @@ segHtml += `
 6.直伤基础 = ${starBaseMul} × ${totalATK.toFixed(0)} × ${mul} × ${(1+baseUpPercent).toFixed(2)} × (1+${emReactionMul.toFixed(3)}+${totalStarDmgAdd.toFixed(2)}) = ${baseDmg.toFixed(2)}
 7.暴击期望 = 1 + ${cr} × ${cd} = ${critExpect.toFixed(3)}
 8.本段单次伤害 = ${baseDmg.toFixed(2)} × ${resistCoeff.toFixed(3)} × ${critExpect.toFixed(3)} = ${segDamage.toFixed(2)}
-</div>`;
-} else {
-segHtml += `<div>本段无输出倍率，不产生伤害</div>`;
-}
-segHtml += `</div>`;
-detailHTML += segHtml;
-});
+\n`;
+    } else {
+      fullText += `本段无输出倍率，不产生伤害\n\n`;
+    }
+  });
 
-// 输出最终结果
-const finalDPS = totalAllDmg / 20;
-document.getElementById('totalDmg').innerText = totalAllDmg.toFixed(2);
-document.getElementById('dpsVal').innerText = finalDPS.toFixed(2);
-document.getElementById('detailContent').innerHTML = detailHTML;
-document.getElementById('detailBox').style.display = '';
-}
+  // 填充总伤结果
+  const finalDPS = totalAllDmg / 20;
+  document.getElementById('totalDmg').innerText = totalAllDmg.toFixed(2);
+  document.getElementById('dpsVal').innerText = finalDPS.toFixed(2);
 
+  // 清空加载文字，开始逐字打字
+  loadingTip.remove();
+  await typeWriter(fullText, 15, detailContent);
+
+  // 恢复按钮
+  btn.disabled = false;
+  btn.textContent = "计算总伤";
+}
 </script>
-
-
-</body>
 
 <p>该程序只适用于0命</p>
 <p>暂未加入冰伤以及变动系数计算，后续进行完善</p>
-
+</body>
 </html>
