@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>v1测试</title>
+<style>
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+font-family: "Microsoft YaHei", sans-serif;
+}
+body {
+background: #0c0c12;
+color: #e2e2eb;
+padding: 12px;
+}
+.container {
+max-width: 1000px;
+margin: 0 auto;
+}
+.card {
+background: #161620;
+border: 1px solid #2a2a40;
+border-radius: 10px;
+padding: 16px;
+margin-bottom: 14px;
+box-shadow: 0 0 12px rgba(0,0,0,0.5);
+}
+.card-title {
+font-size: 18px;
+font-weight: bold;
+margin-bottom: 12px;
+color: #e2e2eb;
+border-bottom: 1px solid #2d2d45;
+padding-bottom: 6px;
+}
+.grid-row {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+gap: 10px;
+margin-bottom: 10px;
+}
+.input-item {
+display: flex;
+flex-direction: column;
+gap: 4px;
+}
+label {
+font-size: 14px;
+color: #c5c5dd;
+}
+input {
+background: #0f0f18;
+border: 1px solid #353555;
+color: #e2e2eb;
+padding: 8px 10px;
+border-radius: 6px;
+font-size: 15px;
+}
+input:focus {
+outline: none;
+border-color: #555577;
+box-shadow: 0 0 4px rgba(80,80,120,0.3);
+}
+.btn-group {
+display: flex;
+gap: 10px;
+margin: 14px 0;
+flex-wrap: wrap;
+}
+button {
+padding: 9px 18px;
+border: 1px solid #404060;
+border-radius: 6px;
+cursor: pointer;
+font-size: 15px;
+font-weight: normal;
+color: #e2e2eb;
+background: #222236;
+}
+button:hover {
+background: #2c2c48;
+}
+.result-box {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 12px;
+margin-top: 10px;
+}
+.result-item {
+background: #0f0f18;
+padding: 10px;
+border-radius: 6px;
+border: 1px solid #303050;
+}
+.result-val {
+font-size: 20px;
+font-weight: bold;
+margin-top: 4px;
+color: #e2e2eb;
+}
+.detail-wrap {
+margin-top: 12px;
+display: none;
+}
+.detail-card {
+background: #0e0e16;
+border: 1px solid #2c2c48;
+border-radius: 8px;
+padding: 12px;
+max-height: 400px;
+overflow-y: auto;
+font-size: 13px;
+color: #e2e2eb;
+}
+.time-seg {
+border-bottom: 1px solid #282840;
+padding: 8px 0;
+}
+.time-seg:last-child {
+border-bottom: none;
+}
+.time-title {
+font-weight: bold;
+margin-bottom: 4px;
+color: #e2e2eb;
+}
+.gain-line {
+padding-left: 10px;
+color: #d1d1e6;
+}
+.calc-formula {
+margin: 6px 0;
+padding: 6px;
+background: #10101a;
+border-radius: 4px;
+color: #e2e2eb;
+}
+/* 移动端适配 */
+@media (max-width: 600px) {
+.grid-row {
+grid-template-columns: 1fr;
+}
+.result-box {
+grid-template-columns: 1fr;
+}
+.card {
+padding: 12px;
+}
+.detail-card {
+max-height: 300px;
+}
+}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="card">
+<div class="card-title">角色面板输入</div>
+<div class="grid-row">
+<div class="input-item">
+<label>角色基础攻击力</label>
+<input id="atkBaseChar" value="342" type="number">
+</div>
+<div class="input-item">
+<label>武器基础攻击力</label>
+<input id="atkBaseWeapon" value="674" type="number">
+</div>
+<div class="input-item">
+<label>面板输入攻击力</label>
+<input id="atkPanel" value="2981" type="number">
+</div>
+<div class="input-item">
+<label>暴击率(0~1)</label>
+<input id="critRate" value="0.95" step="0.01" type="number">
+</div>
+<div class="input-item">
+<label>暴击伤害</label>
+<input id="critDmg" value="2.4" step="0.01" type="number">
+</div>
+<div class="input-item">
+<label>星超导基础倍率</label>
+<input id="starBaseMult" value="1.65" step="0.01" type="number">
+</div>
+<div class="input-item">
+<label>面板输入精通</label>
+<input id="emPanel" value="220" type="number">
+</div>
+<div class="input-item">
+<label>面板星超导增伤</label>
+<input id="starDmgBonusPanel" value="0.88" step="0.01" type="number">
+</div>
+<div class="input-item">
+<label>敌人初始抗性(%)</label>
+<input id="enemyResist" value="10" type="number">
+</div>
+<div class="input-item">
+<label>基础提升(%)</label>
+<input id="baseUp" value="14" type="number">
+</div>
+</div>
+<div class="btn-group">
+<button id="calcBtn">计算总伤</button>
+<button id="toggleDetailBtn">计算流程</button>
+</div>
+<div class="result-box">
+<div class="result-item">
+<div>总伤害</div>
+<div class="result-val" id="totalDmg">--</div>
+</div>
+<div class="result-item">
+<div>DPS</div>
+<div class="result-val" id="dpsVal">--</div>
+</div>
+</div>
+</div>
+
+<div class="detail-wrap" id="detailBox">
+<div class="card">
+<div class="card-title">0~20s计算明细</div>
+<div class="detail-card" id="detailContent"></div>
+</div>
+</div>
+</div>
+
+<script>
+// ]
+const timeSegments = [
+[0, 2, 0, "北斗长按E技能"],
+[2, 3, 0, "北斗释放q技能（200精通、15%减抗持续15s，20%攻击加成持续12s）"],
+[3, 5, 0, "迪奥娜释放技能（200精通、40%星超导伤害加成持续12s，20%永久攻击力加成）"],
+[5, 6, 0, "砂糖提供40%减抗持续8s、100精通持续8s、48%攻击加成持续10s"],
+[6, 7.5, 1.615, "输出段，技能倍率1.615，耗时1.5s"],
+[7.5, 8.5, 1.615, "输出段，技能倍率1.615，耗时1.0s"],
+[8.5, 9.5, 1.615, "输出段，技能倍率1.615，耗时1.0s"],
+[9.5, 10.5, 1.5552, "输出段，技能倍率1.5552，耗时1.0s"],
+[10.5, 12, 7.9392, "输出段，技能倍率7.9392，耗时1.5s"],
+[12, 13.5, 1.615, "输出段，技能倍率1.615，耗时1.5s"],
+[13.5, 14.5, 1.615, "输出段，技能倍率1.615，耗时1.0s"],
+[14.5, 15.5, 1.615, "输出段，技能倍率1.615，耗时1.0s"],
+[15.5, 16.5, 1.5552, "输出段，技能倍率1.5552，耗时1.0s"],
+[16.5, 18, 1.615, "输出段，技能倍率1.615，耗时1.5s"],
+[18, 19, 1.615, "输出段，技能倍率1.615，耗时1.0s"],
+[19, 20, 1.615, "输出段，技能倍率1.615，耗时1.0s"],
+];
+
+// 展开/收起详情
+document.getElementById('toggleDetailBtn').onclick = () => {
+const box = document.getElementById('detailBox');
+box.style.display = box.style.display === 'block' ? 'none' : 'block';
+};
+
+// 核心计算
+document.getElementById('calcBtn').onclick = function() {
+// 读取输入
+const atkCharBase = Number(document.getElementById('atkBaseChar').value);
+const atkWeaponBase = Number(document.getElementById('atkBaseWeapon').value);
+const panelAtk = Number(document.getElementById('atkPanel').value);
+const cr = Number(document.getElementById('critRate').value);
+const cd = Number(document.getElementById('critDmg').value);
+const starBaseMul = Number(document.getElementById('starBaseMult').value);
+const panelEM = Number(document.getElementById('emPanel').value);
+const panelStarDmgAdd = Number(document.getElementById('starDmgBonusPanel').value);
+const enemyRawResist = Number(document.getElementById('enemyResist').value);
+const baseUpPercent = Number(document.getElementById('baseUp').value) / 100;
+
+const totalBaseATK = atkCharBase + atkWeaponBase;
+let totalAllDmg = 0;
+let detailHTML = "";
+
+// 时间分段
+timeSegments.forEach(seg => {
+const [tStart, tEnd, mul, desc] = seg;
+const duration = tEnd - tStart;
+let segDamage = 0;
+
+// 本段HTML容器
+let segHtml = `<div class="time-seg">
+<div class="time-title">【${tStart}s ~ ${tEnd}s】 本段耗时：${duration.toFixed(1)}s</div>
+<div class="gain-line">流程：${desc}</div>`;
+
+if(mul > 0) {
+// 初始化本段增益
+let addAtkPercent = 0;
+let addEM = 0;
+let addStarDmgBonus = 0;
+let totalResistReduce = 0;
+
+// 1.北斗Q：2s释放，精通/减抗持续15s(2~17s)；攻击加成持续12s(2~14s)
+if(tStart >= 2 && tStart < 17) {
+addEM += 200;
+totalResistReduce += 15;
+if(tStart < 14) addAtkPercent += 0.2;
+}
+// 2.迪奥娜E：3s释放，精通/星增伤持续12s(3~15s)；20%攻击永久全程生效
+if(tStart >= 3 && tStart < 15) {
+addEM += 200;
+addStarDmgBonus += 0.4;
+}
+addAtkPercent += 0.2;
+// 3.砂糖：5s释放，减抗/精通持续8s(5~13s)；攻击加成持续10s(5~15s)
+if(tStart >= 5 && tStart < 13) {
+totalResistReduce += 40;
+addEM += 100;
+}
+if(tStart >= 5 && tStart < 15) addAtkPercent += 0.48;
+
+// 法则1：总攻击力 = 面板输入攻击力 + 总基础攻击力 × 百分比攻击力加成
+const totalATK = panelAtk + totalBaseATK * addAtkPercent;
+// 法则2：星超导增伤 = 面板输入星超导增伤 + 队友星超导伤害加成
+const totalStarDmgAdd = panelStarDmgAdd + addStarDmgBonus;
+// 法则3：元素精通 = 面板输入精通 + 队友提供的精通
+const totalEM = panelEM + addEM;
+
+// 抗性计算
+const realEnemyResist = enemyRawResist - totalResistReduce;
+let resistCoeff;
+if(realEnemyResist <= 0) {
+resistCoeff = 1 - realEnemyResist / 200;
+} else {
+resistCoeff = 100 / (100 + realEnemyResist);
+}
+
+// 反应精通系数 (6 * 元素精通) / (元素精通 + 2000)
+const emReactionMul = (6 * totalEM) / (totalEM + 2000);
+
+// 表格直伤基础公式
+const baseDmg = starBaseMul * totalATK * mul * (1 + baseUpPercent) * (1 + emReactionMul + totalStarDmgAdd);
+
+// 暴击期望
+const critExpect = 1 + cr * cd;
+
+// 单次伤害 = 直伤基础 × 抗性系数 × 暴击期望
+segDamage = baseDmg * resistCoeff * critExpect;
+totalAllDmg += segDamage;
+
+// 本段完整计算过程展示
+segHtml += `
+<div class="calc-formula">
+1.总攻击力计算：面板攻击${panelAtk} + 总基础攻击${totalBaseATK} × 攻击加成${addAtkPercent.toFixed(2)} = ${totalATK.toFixed(2)}
+2.总星超导增伤：面板${panelStarDmgAdd} + 队友加成${addStarDmgBonus} = ${totalStarDmgAdd.toFixed(2)}
+3.总元素精通：面板${panelEM} + 队友提供${addEM} = ${totalEM}
+4.敌人抗性：原始${enemyRawResist}% - 减抗${totalResistReduce}% = ${realEnemyResist}%，抗性系数${resistCoeff.toFixed(3)}
+5.精通反应系数：(6×${totalEM}) ÷ (${totalEM}+2000) = ${emReactionMul.toFixed(3)}
+6.直伤基础 = ${starBaseMul} × ${totalATK.toFixed(0)} × ${mul} × ${(1+baseUpPercent).toFixed(2)} × (1+${emReactionMul.toFixed(3)}+${totalStarDmgAdd.toFixed(2)}) = ${baseDmg.toFixed(2)}
+7.暴击期望 = 1 + ${cr} × ${cd} = ${critExpect.toFixed(3)}
+8.本段单次伤害 = ${baseDmg.toFixed(2)} × ${resistCoeff.toFixed(3)} × ${critExpect.toFixed(3)} = ${segDamage.toFixed(2)}
+</div>`;
+} else {
+segHtml += `<div>本段无输出倍率，不产生伤害</div>`;
+}
+segHtml += `</div>`;
+detailHTML += segHtml;
+});
+
+// 输出最终结果
+const finalDPS = totalAllDmg / 20;
+document.getElementById('totalDmg').innerText = totalAllDmg.toFixed(2);
+document.getElementById('dpsVal').innerText = finalDPS.toFixed(2);
+document.getElementById('detailContent').innerHTML = detailHTML;
+document.getElementById('detailBox').style.display = '';
+}
+
+</script>
+
+
+</body>
+
+<p>该程序只适用于0命</p>
+<p>暂未加入冰伤以及变动系数计算，后续进行完善</p>
+
+</html>
