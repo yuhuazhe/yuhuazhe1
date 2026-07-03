@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <link rel="icon" href="资料库.png">
+    <meta charset="UTF-8">
+    <!--手机自适应必备-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>详情页面</title>
+    <style>
+        body{
+            background:#000;
+            color:#eee;
+            max-width:1050px; /*电脑大屏限制最大宽度，不会拉太宽*/
+            margin:0 auto;
+            padding:30px 20px;
+        }
+        h1{
+            color:#ffd700;
+            font-size:32px;
+            text-align:center;
+        }
+        h3{
+            color:#66ccff;
+            font-size:20px;
+            text-align:center;
+            margin-bottom:40px;
+        }
+        .item{
+            width:85%;
+            max-width:800px;/*电脑端单块最大宽度，防止大图无限拉长*/
+            margin:0 auto 45px;
+            text-align:center;
+        }
+        img{
+            width:100%;
+            border:1px solid #444;
+            margin-bottom:8px;
+            display:block;
+        }
+        .fold-btn{
+            background:#222;
+            color:#ffd700;
+            border:1px solid #ffd700;
+            padding:6px 12px;
+            cursor:pointer;
+            font-size:14px;
+            width:fit-content;
+        }
+        .fold-content{
+            display:none;
+            padding:10px;
+            border-left:3px solid #66ccff;
+            margin:8px auto 0;
+            width:100%;
+            text-align:left;
+        }
+        p{
+            line-height:1.8;
+            font-size:16px;
+        }
+        h4{
+            color:#d2f0ff;
+            font-size:20px;
+            text-align:center;
+            margin-bottom:40px;
+        }
+        h5{
+            color:#d2f0ff;
+            font-size:20px;
+            text-align:center;
+            margin-bottom:40px;
+        }
+        h6{
+            color:#d2f0ff;
+            font-size:20px;
+            text-align:center;
+            margin-bottom:40px;
+        }
+        h6{
+            color:#d2f0ff;
+            font-size:20px;
+            text-align:center;
+            margin-bottom:40px;
+        }
+
+
+
+
+
+    </style>
+</head>
+<body>
+    <h1>奥黛塔</h1>
+    <h3>更新日期：7.27  b站羽化哲
+        bug/报错反馈请找up主
+    </h3>
+
+
+    <h6>奥黛塔最终计算数据</h6>
+    <div class="item">
+        <img src="dps库/v6.png">
+        <img src="dps库/最终版八重.png">
+       
+
+        <button class="fold-btn" onclick="toggle6()">展开最终各队伍介绍</button>
+        <div class="fold-content" id="txt6">
+            <p></p>
+            <p></p>
+            
+           
+            <p></p>
+            <p></p>
+            <p></p>
+
+
+
+            
+           
+
+            <p></p>
+        </div>
+         <div style="text-align:center;margin-top:10px;">
+<a href="计算表格/v1.5自用.xlsx" download class="down-btn">自用计算表</a>
+
+
+
+        </div>
+    </div>
+
+    <h6>奥黛塔v5武器差距对比</h6>
+    <div class="item">
+        <img src=".png">
+        <img src="">
+        <img src="">
+
+        <button class="fold-btn" onclick="toggle7()">展开v5武器差距介绍</button>
+        <div class="fold-content" id="txt7">
+            <p></p>
+            <p></p>
+            <p></p>
+            <p></p>
+
+            <p></p>
+            <p></p>
+            <p></p>
+        </div>
+         <div style="text-align:center;margin-top:10px;">
+<a href="计算表格/v1.5自用.xlsx" download class="down-btn">自用计算表</a>
+
+
+
+        </div>
+    </div>
+
+
+
+
+<h6>奥黛塔v4计算数据</h6>
+    <div class="item">
+        <img src=".png">
+        <button class="fold-btn" onclick="toggle5()">展开v5介绍</button>
+        <div class="fold-content" id="txt5">
+            <p></p>
+            <p></p>
+            <p></p>
+            <p></p>
+            <p></p>
+        </div>
+         <div style="text-align:center;margin-top:10px;">
+<a href="计算表格/v1.5自用.xlsx" download class="down-btn">自用计算表</a>
+
+
+
+        </div>
+    </div>
+
+
+
+
+<h6>奥黛塔v4计算数据</h6>
+    <div class="item">
+        <img src=".png">
+        <button class="fold-btn" onclick="toggle1()">展开v4介绍</button>
+        <div class="fold-content" id="txt1">
+            <p></p>
+            <p></p>
+            <p></p>
+            <p></p>
+            <p></p>
+        </div>
+         <div style="text-align:center;margin-top:10px;">
+<a href="计算表格/v1.5自用.xlsx" download class="down-btn">自用计算表</a>
+
+
+
+        </div>
+    </div>
+
+
+
+
+
+    <h4>奥黛塔v3计算数据</h4>
+    <div class="item">
+        <img src=".png">
+        <button class="fold-btn" onclick="toggle2()">展开v3介绍</button>
+        <div class="fold-content" id="txt2">
+            <p></p>
+            <p></p>
+            <p></p>
+            <p></p>
+        </div>
+         <div style="text-align:center;margin-top:10px;">
+<a href="计算表格/v3自用.xlsx" download class="down-btn">自用计算表</a>
+
+
+
+        </div>
+    </div>
+
+
+    <h5>奥黛塔v2计算数据</h5>
+    <div class="item">
+        <img src=".png">
+        <button class="fold-btn" onclick="toggle3()">展开v2介绍</button>
+        <div class="fold-content" id="txt3">
+            
+            <p></p>
+            <p></p>
+            <p></p>
+            <p></p>
+
+        </div>
+    </div>
+
+
+    <h6>奥黛塔v1计算数据</h6>
+    <div class="item">
+        <img src="奥黛塔v1.png">
+        <button class="fold-btn" onclick="toggle4()">展开v1介绍</button>
+        <div class="fold-content" id="txt4">
+            
+            <p>计算队伍：桑多涅，奥黛塔，八重，c6小狼人</p>
+
+           
+            <p>圣遗物选择：新超导套，新辅助，新超导，宗室/与上面角色对应</p>
+            <p>30词条，流程奥ee八eee狼eq木zeqzez/zeqz</p>
+            <p>以上数据仅供参考，请以正式服上线为准</p>
+        </div>
+    </div>
+
+<script>
+function toggle1(){
+    let d=document.getElementById('txt1');
+    d.style.display=d.style.display==='none'?'block':'none';
+}
+function toggle2(){
+    let d=document.getElementById('txt2');
+    d.style.display=d.style.display==='none'?'block':'none';
+}
+function toggle3(){
+    let d=document.getElementById('txt3');
+    d.style.display=d.style.display==='none'?'block':'none';
+}
+function toggle4(){
+    let d=document.getElementById('txt4');
+    d.style.display=d.style.display==='none'?'block':'none';
+}
+function toggle5(){
+    let d=document.getElementById('txt5');
+    d.style.display=d.style.display==='none'?'block':'none';
+}
+function toggle6(){
+    let d=document.getElementById('txt6');
+    d.style.display=d.style.display==='none'?'block':'none';
+}
+function toggle7(){
+    let d=document.getElementById('txt7');
+    d.style.display=d.style.display==='none'?'block':'none';
+}
+
+
+
+</script>
+</body>
+</html>
