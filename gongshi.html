@@ -4,6 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>伤害计算公式</title>
+    <!-- MathJax 公式渲染库 -->
+    <script id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            chtml: {
+                scale: 1.1
+            }
+        };
+    </script>
     <style>
         * {
             margin: 0;
@@ -76,6 +92,14 @@
             border-left: 3px solid #ffcb6b;
         }
 
+        /* MathJax公式颜色适配深色背景 */
+        .formula mjx-container[jax="CHTML"][display="true"] {
+            color: #ffcb6b !important;
+        }
+        .formula mjx-container[jax="CHTML"] {
+            color: #ffcb6b !important;
+        }
+
         /* 单个跳转链接 居中 */
         .jump-link {
             text-align: center;
@@ -135,10 +159,10 @@
     <div class="section" id="level">
         <h2>等级修正系数</h2>
         <div class="formula">
-            若角色为 95 级，将公式中的 1446.85 替换为 1561.46
+            若角色为 95 级，将公式中的 $1446.85$ 替换为 $1561.46$
         </div>
         <div class="formula">
-            若角色为 100 级，将公式中的 1446.85 替换为 1674.81
+            若角色为 100 级，将公式中的 $1446.85$ 替换为 $1674.81$
         </div>
         <!-- 单个跳转链接，自行修改 href 和文字 -->
         <div class="jump-link">
@@ -151,24 +175,28 @@
         <h2>防御力 & 抗性</h2>
         <h3>通用抗性公式:</h3>
         <div class="formula">
-            1 - 抗性 / 2 &nbsp;&nbsp;&nbsp;&nbsp; 当抗性 &lt;= 0
-        </div>
-        <div class="formula">
-            抗性系数 = 1 - 抗性 &nbsp;&nbsp;&nbsp;&nbsp; 当 0 &lt; 抗性 &lt;= 75%
-        </div>
-        <div class="formula">
-            1 / (4 + 抗性 + 1) &nbsp;&nbsp;&nbsp;&nbsp; 当 75% &lt;= 抗性
+            $$
+            \begin{cases}
+            1 - \dfrac{\text{抗性}}{2} & \text{抗性} \le 0 \\
+            1 - \text{抗性} & 0 < \text{抗性} \le 75\% \\
+            \dfrac{1}{4 + \text{抗性} + 1} & \text{抗性} \ge 75\%
+            \end{cases}
+            $$
         </div>
 
         <div class="text-desc">角色攻击敌人时的防御系数：</div>
         <div class="formula">
-            (角色等级 + 100) / [(角色等级 + 100) + (敌人等级 + 100) * (1-减防) * (1-无视防御)]
+            $$
+            \dfrac{\text{角色等级} + 100}{(\text{角色等级} + 100) + (\text{敌人等级} + 100) \times (1-\text{减防}) \times (1-\text{无视防御})}
+            $$
         </div>
         <div class="note">(来自角色的减防不能超过 90%，无视防御不能超过 100%)</div>
 
         <div class="text-desc">敌人攻击角色时的防御系数：</div>
         <div class="formula">
-            (5 * 敌人等级 + 500) / (5 * 敌人等级 + 500 + 角色防御)
+            $$
+            \dfrac{5 \times \text{敌人等级} + 500}{5 \times \text{敌人等级} + 500 + \text{角色防御}}
+            $$
         </div>
 
         <!-- 单个跳转链接 -->
@@ -181,8 +209,13 @@
     <div class="section" id="normal">
         <h2>常规伤害</h2>
         <div class="formula">
-            角色造成的常规伤害: <br>
-            (基础值 + 激化值 + 基础值加成) * (1 + 增伤% + 易伤% - 减伤%) * 抗性系数 * 防御系数 * 暴击区 * 蒸发融化系数
+            $$
+            \begin{aligned}
+            \text{常规伤害} = &(\text{基础值} + \text{激化值} + \text{基础值加成}) \\
+            &\times (1 + \text{增伤\%} + \text{易伤\%} - \text{减伤\%}) \\
+            &\times \text{抗性系数} \times \text{防御系数} \times \text{暴击区} \times \text{蒸发融化系数}
+            \end{aligned}
+            $$
         </div>
         <div class="note">(注: 若攻击没有出现伤害数字（例如命中护盾），则本次伤害不会计算蒸发融化系数)</div>
 
@@ -205,22 +238,95 @@
             星超导基础倍率与hit 数相关：<br>
             冰元素伤害与雷元素的附着次数视为hit 数，即1次附着视为1hit<br>
             星超导基础倍率与附着次数相关，当次数为 0/1/2/3/4/5/6/7/8/9/10/11/12 时<br>
-            星超导基础倍率分别为：1.0, 1.45, 1.5, 1.54, 1.60, 1.64, 1.70, 1.75, 1.79, 1.85, 1.89, 1.95, 2.0
+            星超导基础倍率分别为：$1.0, 1.45, 1.5, 1.54, 1.60, 1.64, 1.70, 1.75, 1.79, 1.85, 1.89, 1.95, 2.0$
         </div>
         <div class="formula">
-            直伤基础 = 星超导基础倍率 * 攻击力/精通 * 倍率 * (1 + 基础提升%) * (1 + (6 * 元素精通) / (元素精通 + 2000) + 星超导增伤%)
+            $$
+            \begin{aligned}
+            \text{直伤基础} =& \text{星超导基础倍率} \times \dfrac{\text{攻击力}}{\text{精通}} \times \text{倍率} \times (1 + \text{基础提升\%}) \\
+            &\times \left(1 + \dfrac{6 \times \text{元素精通}}{\text{元素精通} + 2000} + \text{星超导增伤\%}\right)
+            \end{aligned}
+            $$
         </div>
         <div class="formula">
-            最终直伤 = (直伤基础 + 额外提升) * 抗性系数 * 暴击区 * 擢升 <br>
+            $$
+            \text{最终直伤} = (\text{直伤基础} + \text{额外提升}) \times \text{抗性系数} \times \text{暴击区} \times \text{擢升}
+            $$
             基础提升: 木偶天赋 (14%) <br>
             额外提升（羽毛: 七七 6 命<br>
-            
             注：暂未对传统增伤数值进行上传
         </div>
 
         <!-- 单个跳转链接 -->
         <div class="jump-link">
-            <a href="网页自动化计算/xingchaodaowangyezidonghua.html">点击跳转自动化板块</a>
+            <a href="#starspread">跳转至星扩散板块</a>
+        </div>
+    </div>
+
+    <!-- 新增 星扩散 完整板块（图片内全部内容） -->
+    <div class="section" id="starspread">
+        <h2>星扩散</h2>
+        <div class="note">7.0v1</div>
+        <div class="text-desc">星扩散基础倍率根据造成伤害元素的不同，基础倍率和计算公式也有所不同</div>
+
+        <h3>风涡机制说明</h3>
+        <div class="text-desc">每次触发星扩散反应时，风涡系数会增加 1，最高系数为 6</div>
+        <div class="text-desc">反应星扩散(风)的基础倍率为 0.75，每 4.5s 引爆一次风涡(若在4.5s之前就已叠了6点系数，则立刻引爆并清零)，每点风涡系数都会造成一次伤害，然后将风涡系数清零</div>
+
+        <h3>反应星扩散(风)公式</h3>
+        <div class="formula">
+            $$
+            \begin{aligned}
+            \text{反应星扩散(风)} &= 1446.85 \times 0.75 \times (1+\text{基础提升\%}) \\
+            &\quad \times \left(1 + \frac{6 \times \text{元素精通}}{\text{元素精通}+2000} + \text{星扩散增伤\%}\right) \\
+            &\quad \times \text{抗性系数} \times \text{暴击区} \times \text{擢升}
+            \end{aligned}
+            $$
+        </div>
+        <div class="formula">
+            $$
+            \text{最终伤害} = \frac{3}{5}\text{风元素角色} + \frac{3}{10}\text{其他角色} + \frac{1}{20}\text{其他角色} + \frac{1}{20}\text{其他角色}
+            $$
+        </div>
+        <div class="note">若原本伤害最高的角色没有暴击，则有可能另一名暴击的角色成为最高<br>上述倍率顺序按照角色造成伤害量从大到小，从左到右排序</div>
+
+        <h3>反应星扩散(冰)倍率规则</h3>
+        <div class="text-desc">反应星扩散(冰)的基础倍率会随着风涡系数的不同而变化，当风涡系数为 1~2 时，基础倍率为 2，当风涡系数为 3~6 时，基础倍率为 3</div>
+
+        <h3>反应星扩散(冰)公式</h3>
+        <div class="formula">
+            $$
+            \begin{aligned}
+            \text{反应星扩散(冰)} &= 1446.85 \times \text{基础倍率} \times (1+\text{基础提升\%}) \\
+            &\quad \times \left(1 + \frac{6 \times \text{元素精通}}{\text{元素精通}+2000} + \text{星扩散增伤\%}\right) \\
+            &\quad \times \text{抗性系数} \times \text{暴击区} \times \text{擢升}
+            \end{aligned}
+            $$
+        </div>
+        <div class="formula">
+            $$
+            \text{最终伤害} = \frac{3}{5}\text{冰元素角色} + \frac{3}{10}\text{风元素角色} + \frac{1}{20}\text{其他角色} + \frac{1}{20}\text{其他角色}
+            $$
+        </div>
+        <div class="note">若原本伤害最高的角色没有暴击，则有可能另一名暴击的角色成为最高<br>上述倍率顺序按照角色造成伤害量从大到小，从左到右排序</div>
+
+        <h3>星扩散直伤公式</h3>
+        <div class="formula">
+            $$
+            \begin{aligned}
+            \text{星扩散直伤基础} &= \text{属性} \times \text{倍率} \times (1+\text{基础提升\%}) \\
+            &\quad \times \left(1 + \frac{6 \times \text{元素精通}}{\text{元素精通}+2000} + \text{星扩散增伤\%}\right)
+            \end{aligned}
+            $$
+        </div>
+        <div class="formula">
+            $$
+            \text{最终直伤} = (\text{直伤基础} + \text{额外提升}) \times \text{抗性系数} \times \text{暴击区} \times \text{擢升}
+            $$
+        </div>
+
+        <div class="jump-link">
+            <a href="#crystal">跳转至月结晶板块</a>
         </div>
     </div>
 
@@ -229,14 +335,25 @@
         <h2>月结晶</h2>
         <div class="text-desc">月结晶的伤害计算和月感电一致，唯一的区别是直伤月结晶需把月感电的 3 换成 1.6，反应月结晶需把月感电的 1.8 换成 0.96</div>
         <div class="formula">
-            直伤基础 = 1.6 * 属性 * 倍率 * (1 + 基础提升%) * (1 + (6 * 元素精通) / (元素精通 + 2000) + 月结晶增伤%) <br>
-            最终直伤 = (直伤基础 + 额外提升) * 抗性系数 * 暴击区 * 擢升 <br>
+            $$
+            \begin{aligned}
+            \text{直伤基础} =& 1.6 \times \text{属性} \times \text{倍率} \times (1 + \text{基础提升\%}) \\
+            &\times \left(1 + \dfrac{6 \times \text{元素精通}}{\text{元素精通} + 2000} + \text{月结晶增伤\%}\right) \\
+            \text{最终直伤} =& (\text{直伤基础} + \text{额外提升}) \times \text{抗性系数} \times \text{暴击区} \times \text{擢升}
+            \end{aligned}
+            $$
             基础提升: 兹白天赋 (14%) 哥伦比亚天赋 (7%) 莉奈娅天赋 (14%) <br>
             额外提升: 兹白天赋一，叶洛亚元素爆发等。
         </div>
         <div class="formula">
-            反应月结晶 = 1446.85 * 0.96 * (1 + 基础提升%) * (1 + (6 * 元素精通) / (元素精通 + 2000) + 月结晶增伤%) * 抗性系数 * 暴击区 * 擢升 <br>
-            最终伤害 = 伤害最高角色 + 1/2 第二高角色 + 1/12 第三高角色 + 1/12 第四高角色<br>
+            $$
+            \begin{aligned}
+            \text{反应月结晶} =& 1446.85 \times 0.96 \times (1 + \text{基础提升\%}) \\
+            &\times \left(1 + \dfrac{6 \times \text{元素精通}}{\text{元素精通} + 2000} + \text{月结晶增伤\%}\right) \\
+            &\times \text{抗性系数} \times \text{暴击区} \times \text{擢升} \\
+            \text{最终伤害} =& \text{最高角色伤害} + \dfrac{1}{2}\text{第二高} + \dfrac{1}{12}\text{第三高} + \dfrac{1}{12}\text{第四高}
+            \end{aligned}
+            $$
             注：暂未对此公式进行修正，请等待二次更新
         </div>
 
@@ -249,16 +366,28 @@
     <!-- 6. 月感电 -->
     <div class="section" id="electro">
         <h2>月感电</h2>
-        <div class="text-desc">特定情况下，雷触及水时，会生成一片不可移动的雷暴云，持续 6s。雷暴云: 每 2s 攻击一次附近所有同时具有雷和水的目标，并消耗 0.4 元素量的雷和水（破盾效率极低）。触发月感电时，若附近已有雷暴云，则会刷新持续时间月感电的倍率为 1.8，基础伤害为 1446.85 * 1.8 = 2604.33</div>
+        <div class="text-desc">特定情况下，雷触及水时，会生成一片不可移动的雷暴云，持续 6s。雷暴云: 每 2s 攻击一次附近所有同时具有雷和水的目标，并消耗 0.4 元素量的雷和水（破盾效率极低）。触发月感电时，若附近已有雷暴云，则会刷新持续时间月感电的倍率为 1.8，基础伤害为 $1446.85 \times 1.8 = 2604.33$</div>
         <div class="formula">
+            $$
+            \begin{aligned}
+            \text{反应月感电} =& 1446.85 \times 1.8 \times (1 + \text{基础提升\%}) \\
+            &\times \left(1 + \dfrac{6 \times \text{元素精通}}{\text{元素精通} + 2000} + \text{月感电增伤\%}\right) \\
+            &\times \text{抗性系数} \times \text{暴击区} \times \text{擢升} \\
+            \text{最终伤害} =& \text{最高角色伤害} + \dfrac{1}{2}\text{第二高} + \dfrac{1}{12}\text{第三高} + \dfrac{1}{12}\text{第四高}
+            \end{aligned}
+            $$
             月感电造成伤害时，所有参与反应的角色都会提供伤害值，但除伤害最高的角色外，其余角色的提供的伤害值会降低 <br>
-            反应月感电 = 1446.85 * 1.8 * (1 + 基础提升%) * (1 + (6 * 元素精通) / (元素精通 + 2000) + 月感电增伤%) * 抗性系数 * 暴击区 * 擢升 <br>
-            最终伤害 = 伤害最高角色 + 1/2 第二高角色 + 1/12 第三高角色 + 1/12 第四高角色 <br>
             若原本伤害最高的角色没有暴击，则有可能另一名暴击的角色成为最高
         </div>
         <div class="formula">
-            某些角色可以基于攻击力，直接造成月感电伤害，通过这种方式造成的伤害无视防御力，不受益于常规增伤/减伤，但受益于元素精通，且有额外系数 3x <br>
-            直伤月感电 = 3 * 属性 * 倍率 * (1 + 基础提升%) * (1 + (6 * 元素精通) / (元素精通 + 2000) + 反应增伤%) * 抗性系数 * 暴击区 * 擢升
+            $$
+            \begin{aligned}
+            \text{直伤月感电} =& 3 \times \text{属性} \times \text{倍率} \times (1 + \text{基础提升\%}) \\
+            &\times \left(1 + \dfrac{6 \times \text{元素精通}}{\text{元素精通} + 2000} + \text{反应增伤\%}\right) \\
+            &\times \text{抗性系数} \times \text{暴击区} \times \text{擢升}
+            \end{aligned}
+            $$
+            某些角色可以基于攻击力，直接造成月感电伤害，通过这种方式造成的伤害无视防御力，不受益于常规增伤/减伤，但受益于元素精通，且有额外系数 $3\times$
         </div>
 
         <!-- 单个跳转链接 -->
@@ -272,15 +401,24 @@
         <h2>月绽放</h2>
         <div class="text-desc">特定情况下，草触及水时，会生草原核，并为队伍提供「草露」，可被特定角色消耗。草原核伤害不算月绽放，月绽放伤害只包括直伤月绽放伤害。直伤月绽放无视防御，不受益于常规增伤/减伤，但受益于元素精通</div>
         <div class="formula">
-            直伤基础 = 属性 * 倍率 * (1 + 基础提升%) * (1 + (6 * 元素精通) / (元素精通 + 2000) + 月绽放增伤%) <br>
-            最终直伤 = (直伤基础 + 额外提升) * 抗性系数 * 暴击区 * 擢升 <br>
+            $$
+            \begin{aligned}
+            \text{直伤基础} =& \text{属性} \times \text{倍率} \times (1 + \text{基础提升\%}) \\
+            &\times \left(1 + \dfrac{6 \times \text{元素精通}}{\text{元素精通} + 2000} + \text{月绽放增伤\%}\right) \\
+            \text{最终直伤} =& (\text{直伤基础} + \text{额外提升}) \times \text{抗性系数} \times \text{暴击区} \times \text{擢升}
+            \end{aligned}
+            $$
             基础提升: 菈乌玛天赋 (14%) 哥伦比亚天赋 (7%) 奈芙尔天赋 (14%) <br>
             额外提升: 菈乌玛元素爆发等。
         </div>
         <div class="formula">
-            草原核伤害仍为绽放/烈绽放/超绽放伤害，反应倍率为: 绽放 2|烈绽放 超绽放 3 <br>
-            草原核基础 = 1446.85 * 反应倍率 * (1 + (16 * 元素精通) / (元素精通 + 2000) + 反应增伤%) <br>
-            草原核伤害 = (草原核基础 + 额外提升) * 抗性系数 <br>
+            $$
+            \begin{aligned}
+            \text{草原核基础} =& 1446.85 \times \text{反应倍率} \times \left(1 + \dfrac{16 \times \text{元素精通}}{\text{元素精通} + 2000} + \text{反应增伤\%}\right) \\
+            \text{草原核伤害} =& (\text{草原核基础} + \text{额外提升}) \times \text{抗性系数}
+            \end{aligned}
+            $$
+            草原核伤害仍为绽放/烈绽放/超绽放伤害，反应倍率为: 绽放 $2$ | 烈绽放、超绽放 $3$ <br>
             额外提升: 菈乌玛元素爆发
         </div>
 
@@ -293,15 +431,19 @@
     <!-- 8. 激化反应 -->
     <div class="section" id="intensify">
         <h2>激化反应</h2>
-        <div class="text-desc">当雷元素触及草元素时，会按照 1：1：1 的比例互相消耗并生成原激化元素。原激化元素可以发生绽放和燃烧反应，在这些反应中的表现和草元素相同。原激化元素的持续时间: (6 + 5 × 元素量) 秒。雷和草不共存，但原激化和雷、原激化和草都可以共存当附着雷/草元素的攻击命中具有原激化的目标时，将分别引发超激化/蔓激化反应，不消耗任何元素，但为本次伤害贡献激化值（完整公式见【常规伤害】章节）</div>
+        <div class="text-desc">当雷元素触及草元素时，会按照 1：1：1 的比例互相消耗并生成原激化元素。原激化元素可以发生绽放和燃烧反应，在这些反应中的表现和草元素相同。原激化元素的持续时间: $(6 + 5 \times \text{元素量})$ 秒。雷和草不共存，但原激化和雷、原激化和草都可以共存当附着雷/草元素的攻击命中具有原激化的目标时，将分别引发超激化/蔓激化反应，不消耗任何元素，但为本次伤害贡献激化值（完整公式见【常规伤害】章节）</div>
         <div class="formula">
-            超激化值 = 1446.85 * 1.15 * (1 + (5 * 元素精通) / (元素精通 + 2000) + 超激化提高%) <br>
-            蔓激化值 = 1446.85 * 1.25 * (1 + (5 * 元素精通) / (元素精通 + 2000) + 蔓激化提高%)
+            $$
+            \begin{aligned}
+            \text{超激化值} &= 1446.85 \times 1.15 \times \left(1 + \dfrac{5 \times \text{元素精通}}{\text{元素精通} + 2000} + \text{超激化提高\%}\right) \\
+            \text{蔓激化值} &= 1446.85 \times 1.25 \times \left(1 + \dfrac{5 \times \text{元素精通}}{\text{元素精通} + 2000} + \text{蔓激化提高\%}\right)
+            \end{aligned}
+            $$
         </div>
         <div class="formula">
-            当敌人触发上述反应时，原本的 1446.85 的数值有变化: <br>
-            90 级 1202.81|95 级 1411.74|100 级 1674.81 <br>
-            105 级 1884.98|110 级 1963.85
+            当敌人触发上述反应时，原本的 $1446.85$ 的数值有变化: <br>
+            $90$ 级 $1202.81$ | $95$ 级 $1411.74$ | $100$ 级 $1674.81$ <br>
+            $105$ 级 $1884.98$ | $110$ 级 $1963.85$
         </div>
 
         <!-- 单个跳转链接 -->
@@ -315,25 +457,29 @@
         <h2>剧变反应</h2>
         <div class="text-desc">剧变反应包括: 超载、超导、感电、燃烧、碎冰、扩散、绽放、超绽放、烈绽放。剧变反应造成的伤害不受益于常规增伤/易伤/减伤，且无视防御力、不能暴击</div>
         <div class="formula">
-            剧变基础 = 1446.85 * 反应倍率 * (1 + (16 * 元素精通) / (元素精通 + 2000) + 反应增伤%) <br>
-            剧变伤害 = (剧变基础 + 额外提升) * 抗性系数
+            $$
+            \begin{aligned}
+            \text{剧变基础} &= 1446.85 \times \text{反应倍率} \times \left(1 + \dfrac{16 \times \text{元素精通}}{\text{元素精通} + 2000} + \text{反应增伤\%}\right) \\
+            \text{剧变伤害} &= (\text{剧变基础} + \text{额外提升}) \times \text{抗性系数}
+            \end{aligned}
+            $$
         </div>
         <div class="formula">
             反应倍率: <br>
-            扩散 0.65(每 0.25s 一次) <br>
-            燃烧 0.25 <br>
-            超载 2.75|碎冰 3 <br>
-            绽放 2|烈绽放/超绽放 3
+            扩散 $0.65$(每 $0.25\text{s}$ 一次) <br>
+            燃烧 $0.25$ <br>
+            超载 $2.75$ | 碎冰 $3$ <br>
+            绽放 $2$ | 烈绽放/超绽放 $3$
         </div>
         <div class="formula">
             触发剧变反应没有冷却，但剧变反应的伤害有冷却: <br>
-            每 0.5s 最多 1 次: 超载 <br>
-            每 0.5s 最多 2 次: 超导、碎冰、扩散、绽放、烈绽放
+            每 $0.5\text{s}$ 最多 $1$ 次: 超载 <br>
+            每 $0.5\text{s}$ 最多 $2$ 次: 超导、碎冰、扩散、绽放、烈绽放
         </div>
         <div class="formula">
-            当敌人触发上述反应时，原本的 1446.85 的数值有变化: <br>
-            90 级 1202.81|95 级 1411.74|100 级 1674.81 <br>
-            105 级 1884.98|110 级 1963.85
+            当敌人触发上述反应时，原本的 $1446.85$ 的数值有变化: <br>
+            $90$ 级 $1202.81$ | $95$ 级 $1411.74$ | $100$ 级 $1674.81$ <br>
+            $105$ 级 $1884.98$ | $110$ 级 $1963.85$
         </div>
 
         <!-- 单个跳转链接 -->
@@ -347,14 +493,16 @@
         <h2>增幅反应</h2>
         <div class="text-desc">增幅反应包括: 蒸发、融化。触发增幅反应时，会为本次伤害附加蒸发融化系数（完整公式见【常规伤害】章节）。若攻击没有出现伤害数字（例如命中护盾），则本次伤害不会计算蒸发融化系数</div>
         <div class="formula">
-            蒸发融化系数 = 基础系数 * (1 + (2.78 * 元素精通) / (元素精通 + 1400) + 反应增伤%)
+            $$
+            \text{蒸发融化系数} = \text{基础系数} \times \left(1 + \dfrac{2.78 \times \text{元素精通}}{\text{元素精通} + 1400} + \text{反应增伤\%}\right)
+            $$
         </div>
         <div class="formula">
             基础系数: <br>
-            2.0 蒸发 火→水 <br>
-            2.0 融化 水→冰 <br>
-            1.5 蒸发 火→水 <br>
-            1.5 融化 冰→火
+            $2.0$ 蒸发 火→水 <br>
+            $2.0$ 融化 水→冰 <br>
+            $1.5$ 蒸发 水→火 <br>
+            $1.5$ 融化 冰→火
         </div>
 
         <!-- 单个跳转链接 -->
@@ -366,9 +514,11 @@
     <!-- 11. 结晶反应 -->
     <div class="section" id="crystallize">
         <h2>结晶反应</h2>
-        <div class="text-desc">触发结晶反应时，会掉落对应火/水/雷/冰元素的晶片，拾取后可获得护盾。结晶护盾对其自身属性的伤害有 250% 的吸收效率</div>
+        <div class="text-desc">触发结晶反应时，会掉落对应火/水/雷/冰元素的晶片，拾取后可获得护盾。结晶护盾对其自身属性的伤害有 $250\%$ 的吸收效率</div>
         <div class="formula">
-            结晶盾量 = 1851.06 * (1 + (4.44 * 元素精通) / (元素精通 + 1400))
+            $$
+            \text{结晶盾量} = 1851.06 \times \left(1 + \dfrac{4.44 \times \text{元素精通}}{\text{元素精通} + 1400}\right)
+            $$
         </div>
         <div class="text-desc">角色具有护盾时，护盾量还会受护盾强效影响，护盾强效取决于持有护盾的角色，而非创造晶片的角色</div>
 
