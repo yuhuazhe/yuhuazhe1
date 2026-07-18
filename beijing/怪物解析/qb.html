@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>怪物机制</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        body {
+            background: #0a0a0f;
+            color: #eee;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        /* 返回按钮 + 标题 */
+        .header-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            background: #1a1a24;
+            border: none;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .back-btn:hover {
+            background: #272738;
+        }
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        /* 筛选搜索栏 */
+        .search-filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+        .filter-group {
+            display: flex;
+            gap: 8px;
+        }
+        .filter-tag {
+            padding: 8px 16px;
+            background: #171722;
+            border: 1px solid #2c2c40;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .filter-tag.active {
+            background: #382246;
+            border-color: #9d58c0;
+            color: #e9c8ff;
+        }
+        .filter-tag:hover {
+            border-color: #604275;
+        }
+        .search-box-wrap {
+            flex: 1;
+            min-width: 220px;
+            display: flex;
+            background: #171722;
+            border: 1px solid #2c2c40;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .search-input {
+            flex: 1;
+            padding: 10px 14px;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #fff;
+            font-size: 15px;
+        }
+        .clear-btn {
+            padding: 0 14px;
+            border: none;
+            background: transparent;
+            color: #aaa;
+            cursor: pointer;
+        }
+        .clear-btn:hover {
+            color: #fff;
+        }
+        /* 怪物网格 */
+        .monster-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 18px;
+        }
+        .monster-card {
+            background: #12121b;
+            border: 1px solid #252538;
+            border-radius: 10px;
+            padding: 16px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .monster-card:hover {
+            border-color: #8048a3;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px #47285c44;
+        }
+        .monster-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            object-fit: cover;
+        }
+        .monster-name {
+            text-align: center;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+        /* 详情弹窗遮罩 */
+        .detail-mask {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            padding: 20px;
+        }
+        .detail-wrap {
+            width: 100%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            background: #12121b;
+            border: 1px solid #8048a3;
+            border-radius: 12px;
+            padding: 24px;
+            position: relative;
+        }
+        .close-detail {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #1a1a24;
+            border: none;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        .close-detail:hover {
+            background: #382246;
+        }
+        .detail-header {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .detail-avatar {
+            width: 140px;
+            height: 140px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+        .detail-title h2 {
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
+        .detail-type-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #382246;
+            border-radius: 4px;
+            color: #e9c8ff;
+            font-size: 14px;
+        }
+        .detail-content {
+            line-height: 1.7;
+            color: #ccc;
+            white-space: pre-line;
+        }
+        /* 移动端适配 */
+        @media (max-width: 600px) {
+            .page-title {
+                font-size: 22px;
+            }
+            .monster-grid {
+                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+                gap: 12px;
+            }
+            .monster-avatar {
+                width: 72px;
+                height: 72px;
+            }
+            .detail-header {
+                justify-content: center;
+                text-align: center;
+            }
+            .detail-avatar {
+                width: 100px;
+                height: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header-top">
+        
+        <h1 class="page-title">怪物机制</h1>
+    </div>
+    <div class="search-filter-bar">
+        <div class="filter-group">
+            <div class="filter-tag" data-type="abyss">深渊</div>
+            <div class="filter-tag" data-type="realm">幽境</div>
+            <div class="filter-tag" data-type="drama">剧诗</div>
+        </div>
+        <div class="search-box-wrap">
+            <input class="search-input" placeholder="搜索怪物">
+            <button class="clear-btn">搜索</button>
+        </div>
+    </div>
+    <div class="monster-grid" id="monsterContainer"></div>
+    <!-- 详情弹窗 单页面内置，不新建html -->
+    <div class="detail-mask" id="detailMask">
+        <div class="detail-wrap">
+            <button class="close-detail" id="closeDetailBtn">×</button>
+            <div class="detail-header">
+                <img class="detail-avatar" id="detailImg" alt="">
+                <div class="detail-title">
+                    <h2 id="detailName"></h2>
+                    <span class="detail-type-tag" id="detailType"></span>
+                </div>
+            </div>
+            <div class="detail-content" id="detailDesc">
+                <!-- 怪物详情描述区域 -->
+            </div>
+        </div>
+    </div>
+    <script>
+        // ========== 图片路径统一等号赋值，修改图片只改这里 ==========
+        const imgQianHeShi = "./1.png";
+        const imgFengYiRen = "./2.png";
+        const imgZhongJiaYa = "./3.png";
+
+        // 新增3只怪物图片变量
+        const imgXianQuYuan = "./超导锅.png";
+        const imgShenAnYu = "./黑狗.png";
+        const imgMiYuanJiBing = "./机兵.png";
+
+        // 怪物数据：图片直接引用上面等号定义的变量
+        const monsterList = [
+            {
+                id:1,
+                name:'嵌合阖寂狮·摧枯伟力',
+                img: imgQianHeShi,
+                type:'realm',
+                typeText:'幽境',
+                desc:`N5：10748446 -------------- N6：23349702 
+
+
+强效开局会展开40U雷元素护盾，若强敌正处于雷能聚敛效果的影响之下，在强效准备阶段雷元素冲击将扣除16U护盾，并掉落6个雷元素微粒。破盾时，会以破盾过程中所受到的100%雷元素伤害+30%其他伤害，对强敌造成真实伤害，并使其瘫痪13s。
+此时强敌失去外部风属性抗性，并将风属性抗性-120%，其余抗性-60%。
+此后，强效会收缩雷网，尝试牵引并吸收场上的5个风能量球以恢复大量能量；
+风能量球可被火/雷/冰元素伤害破坏，亦可通过令强敌陷入碎裂禁锢的影响，使其无法吸收风能量球。此时将掉落6个风元素微粒。若风能量球时段被强敌吸收3个风能量球，他将进入暴爽状态。
+首领特性
+唤雷·坠雷
+受到敌能的影响，战斗开始时，强敌将以雷元素之力为引，生成坚韧的雷元素大阵保护自身。
+每间隔一段时间，强敌释放雷能，将风元素之力灌注于雷元素大阵之中，释放大范围的雷罚；此时，若强敌正处于雷能聚敛的影响之下，则将力量灌注进雷罚风暴，使护罩受损，通过元素反应破盾后，根据所受的伤害停止攻击，期间，敌人冰元素和雷元素抗性将大幅降低，并吸收野外的风能量球，受到每一次风元素伤害时，极强反应会提高护盾被破除后受到的伤害。
+驭风·狂袭
+受到敌能的影响，战斗中，强敌将以自身的百风之力，飞掠空中急速突进，发射风刃攻击玩家；破盾后，强敌将释放风涌的能量涡流，尝试引收集场上风能量球以恢复自身的能量，期间可通过元素攻击、禁锢打断其吸收；
+风能量球可被火/雷/冰元素伤害破坏；亦可通过令强敌陷入碎裂禁锢的影响，使其无法吸收野外的风能量球。若强敌成功吸收3颗风能量球，将立刻踏入暴爽状态，受到额外的雷元素和风元素持续性大量伤害。
+生物概念的产物，是被界面的合成威能之一。在强效释放雷罚的过程中，其雷轰元素的威能爆发蔓延——雷电与风暴在它的控制下齐啸嘶吼，所过之处寸草不生。`
+            },
+            {
+                id:2,
+                name:'历经百战的风役人·谵谙芒锋',
+                img: imgFengYiRen,
+                type:'realm',
+                typeText:'幽境',
+                desc:`N5：8068956 -------------- N6：17506996
+赤练抵抗90%，执打断能力全面增强，无法被角色施加硬直，且拥有大量快速位移技能。
+没有护盾时，施放【猛毒】并生成护盾；等同于22.5%生命值，被破除时损失等量生命值。对于具有生命之契的角色，生成的生命之契存在时持续受到伤害。
+护盾生成时，为全体角色施加27100/29028生命之契，且存在期间每秒额外施加8130/8708生命之契（N5/N6）
+首领特性
+讯疾猎杀
+战斗中，会消耗一定比例的生命，进行【猎杀】；命中角色时，该敌人自身恢复一定比例的生命值，并使角色的生命值阈值持续降低，在生命之契存在时持续受到伤害。生命值归零的角色，会触发该敌人的治疗效果。
+洋色沧溟·极渊
+护盾破除后，该敌人的冲刺与斩击能力大幅提升，且可在空中突袭地面生成可追击的冲击波，准备蓄力斩击；若角色被【流血追猎】击中：生成护盾保护自身，护盾存在期间，该敌人持续向所有角色施加生命之契，护盾破坏后，该敌人会受到大量伤害。
+黑众当中精悍的特务，依靠命令与任务的内容，她们既可以与士兵协同，也独自完成艰苦的任务；对于一部分人而言，风役人的冲锋，是令众神畏惧的残酷征伐。遗憾的是，在风驰电掣的意象中，队友的自我被混乱的执念所吞噬，徒留一具久经厮杀的空壳，执杖本能，向一切来犯者展露锋芒。`
+            },
+            {
+                id:3,
+                name:'重拳出击鸭·重甲武库',
+                img: imgZhongJiaYa,
+                type:'realm',
+                typeText:'幽境',
+                desc:`N5：13114774 -------------- N6：25925713
+
+冲鸭机关存在期间，自身全部抗性+210%，每个冲鸭机关具有强效25%最大生命值，全抗10%
+冲鸭机关无法被塞露，也不会被击飞。受到感电/引爆电感伤害+150%（增伤区）。对单个冲鸭机关造成20次感电或引爆电感伤害可将其直接击破；冲鸭机关记录的伤害不会超过其最大生命值的50%，全部击破后首领获得冲鸭、进入12s瘫痪，瘫痪期间首领全部抗性为-50%
+瘫痪结束后，首领全抗为10%，雷元素抗性-50%，约45s后重新展开护罩
+首领特性
+「全装甲鸭甲」模式
+受到电感累积时，战斗开始后，强敌会进入「全装甲鸭甲」模式，进攻欲望上升，通过自身的冲击展开护罩，召唤可收纳的冲鸭机关进行战斗。
+低功耗停机关关
+通过多次感电或电感伤害，或是直接对冲鸭机关造成伤害，可干扰它的运行逻辑，通过这种方式瘫痪机关装置；可对暴露出薄弱的护罩造成一定伤害；进入瘫痪状态后，受电感累积的影响，强敌会退出「全装甲鸭甲」模式，因过载而瘫痪，同时使强敌的雷元素抗性在一段时间内大幅降低。
+构建钢铁要塞
+受到电感累积影响时，冲鸭机关会增加厚度，需要更多电感或电感伤害累积积累的伤害才能使其运行；击破护罩或是冲鸭机关即可中断强敌的蓄能操作，并通过这种方式输出高额伤害，同时电感的冲击还会歼灭所受伤害的总提升。
+由废弃的金属与机关堆砌拼凑而成、造型奇特的力矩相关机关，似乎是因为内部的输气阀被赋予了「鸭子」的外在特征，即便是与愚人众最尖端的战争机器相比，在出力与抗打击能力方面毫不逊色，但依然只是一只会投入重甲出击玩具鸭子。在地脉极端紊乱的状态下，该机关的内部已然为了满载载荷装备与装甲的机动工厂。稍有不慎，蜂拥而至的冲鸭机关便会汹涌得将挑战者淹没。`
+            },
+            {
+                id:4,
+                name:"先驱秘源统辖阵列之影·蜂巢意志",
+                img: imgXianQuYuan,
+                type:"realm",
+                typeText:"幽境",
+                desc:`N5：7541896 -------------- N6：14480438
+
+·战斗开始时，强敌会张开自身最大生命值 100% 的力场能量护盾，开启护盾后，强敌会将除冰元素和雷元素以外的全元素抗性提升至 135% ，并进行持续45s 的蓄力，超导和星超导伤害对护盾造成的伤害提升 150% ，且护盾每次受到超导或星超导伤害时会被额外削减 4% 。此外，击破每个探侦机关也可以削减 12.5% 护盾，护盾被破除后，将对强敌造成持有护盾期间受到 100% 的反噬伤害，最多不超过本体最大生命值的 40%。随后强敌陷入 13s 的瘫痪，期间全抗降低至 -40% ，在破盾后 25-35s 后再次开盾
+
+·每个探侦机关具有 12U 水元素护盾，位于场地边缘，高度3m。受到超导/星超导/碎冰/融化伤害时，将被直接摧毁，强敌收回探侦机关时，会根据回收的机关数量获得 12+6*回收数量 的水元素护盾
+
+·在战斗中，力场能量护盾存在期间，会创造低重力环境，极大减缓角色跳跃动作速度，同时强敌会多次使用快速移动技能，躲避近战攻击
+
+首领特性·镇压力场,能量循环
+战斗开始时，强敌会部署4架受水元素护罩保护的探侦机关，构建特殊的镇压力场。该力场将为强敌生成力场能量护盾，并提高强敌冰元素与雷元素外的所有抗性。力场维持一段时间后，强敌将发动「阿尔法突袭」：造成大范围伤害，同时收回所有探侦机关，并根据回收数量，获得相应吸收量的水元素护罩。若未能回收任何探侦机关，则仅获得少量水元素护罩。
+
+力场能量护盾
+受地脉紊乱影响，强敌的力场能量护盾被破除时，镇压力场将随之瓦解，强敌自身也将受到一次高额反噬伤害，并陷入短暂的瘫痪状态。此外，强敌每次受到超导、星超导反应影响时，均会削减固定量的护盾。而超导，星超导反应伤害不仅对护盾具有更高的破坏效率，还将进一步提高护盾被破除时强敌受到的反噬伤害
+
+探侦机关+冲压构性
+探侦机关在水元素护罩被破除或陷入冻结状态后受到碎冰或融化等元素反应伤害时将被摧毁。受地脉紊乱影响，每当一架探侦机关被摧毁时，都会使强敌的护罩受损。
+
+原本只是为了辅助进行月球研究的工作而研发出的协作机关，却在日后被赋予了远超其设计初衷的感能与重任。
+在地脉乱象长久的扭曲与侵蚀下，其核心与探侦机关已被彻底覆写。昔日的设计初衷荡然无存，如今驱动它的，唯有命令无尽机群淹没一切生灵的毁灭意志`
+            },
+            {
+                id:5,
+                name:"深黯魇语之主·袭掠锋刃",
+                img: imgShenAnYu,
+                type:"realm",
+                typeText:"幽境",
+                desc:`N5：12437830 -------------- N6：23658108
+
+·会展开 45% 生命值的「深障炉盾」，其受到的月曜反应伤害为原伤害的300% ，但免疫物理伤害，首次受到月曜反应伤害时，产生等同于 36 能量的元素晶球
+·护盾破除时，损失 20% 生命值并虚弱一段时间，期间全部抗性变为 -60%
+·蓄力终结技时会召唤深黯钓客（每个 18% 生命值），每击败一个召唤物，护盾损失 25%
+
+首领特性·深黯护盾·沉疴
+受到地脉紊乱的影响，深黯魇语之主会凝聚深渊之力结成极为坚韧的护盾保护自身。使用月曜反应伤害可以更高效地破坏该护盾。强敌在展开护盾后，其护盾首次承受月曜反应伤害时，会产生额外的元素晶球。护盾被破坏后，深黯魇语之主将受到一次高额伤害，并陷入一段时间的虚弱状态。
+
+陵强袭
+受到地脉紊乱的影响，战斗中，深黯魇语之主会进行长时间的蓄力，同时召唤数名深黯钓客。蓄力完成后，将造成大范围伤害，并吞噬所有深黯钓客。蓄力期间，通过击败深黯钓客破坏护盾，即可打断深黯魇语之主的蓄力。
+
+伏行于深黯的裂隙，窥伺此世的深渊魔物。据说那怪异、亵渎的无面形貌不过是投射于世界上的影像，其真实姿态乃是以纯粹深渊能量形式存在的无形之物
+在地脉乱象狂乱的裹挟中，它疯狂与谵妄的低语被锻成了锐不可当的刀锋，誓要将此世的安稳秩序撕碎...`
+            },
+            {
+                id:6,
+                name:"秘源机兵构型械·裂解剪钳",
+                img: imgMiYuanJiBing,
+                type:"realm",
+                typeText:"幽境",
+                desc:`N5：11229712 -------------- N6：25547593
+
+·强敌的护盾血量为其生命值的 200%，也可以通过积攒 100% 「应战对策」破除（可以对其打出伤害数字），持有护盾期间具有 110% 全抗，破除护盾后扣除持有护盾期间受到的 50% 全伤害，不超过本体最大生命值的 50% 。强敌自身每秒积累 1% 进度，角色进入夜魂状态时，立刻积累 2.5% 进度，且夜魂期间每秒额外积累 1.5% 进度，队伍后台角色的夜魂状态会被加算
+·强敌进度积累满后将切换状态，首次切换状态时，将永久失去护盾和抗性提升效果
+·破除护盾后，强敌会开掘出 2 块固态燃素，以准备「球状雷炮」。在一定时间内击破固态燃素上方的「汲聚械」（必须通过爬上固态燃素顶端攻击击破），即可打断「球状雷炮」的蓄能，使强敌损失 15% 生命值并陷入 15s 瘫痪，期间全抗降低至 -30%
+
+首领特性·应战对策·冷启动
+战斗开始时，强敌将受强力的护盾保护，并获得较高的所有元素抗性与物理抗性。在角色进入和维持「夜魂加持」状态时，强敌会积累「应战对策」的进度。受地脉紊乱影响，强敌首次完成「应战对策」的积累时，将损失战斗开始时获得的所有抗性，其护盾也将随之破除，并根据护盾已吸收的伤害量，受到反噬伤害
+
+球状雷炮-高压塞泵
+在「应战对策」进度积累满后，强敌将启动「汲聚械」，开掘出2块固态燃素并汲取其中的能量，以准备「球状雷炮」。「汲聚械」会产生力场保护自身，需要先攀上固态燃素进入力场内，才能将其破坏。破坏所有「汲聚械」后，即可打断「球状雷炮」的蓄能，并使强敌在陷入瘫痪的同时受到反噬伤害。受地脉紊乱影响，「应战对策」进度会随时间推进积累，但触发「球状雷炮」所需的进度阈值也会提升
+
+深古遗迹的制造用机械体、远古遗迹的主人们用这种会改变形态的机器进行各种制造的工作，
+在地脉洪流的错乱重构下,其抵御熔岩的外壳化作了盔甲，构筑庞然巨城的作力铸成了巨钳，曾经的「制造」指令被篡改为「毁灭」的意志，正驱使着它无休止地践行着将一切化为废墟的「伟大事业」`
+            }
+        ]
+        // DOM元素
+        const container = document.getElementById('monsterContainer');
+        const filterTags = document.querySelectorAll('.filter-tag');
+        const searchInput = document.querySelector('.search-input');
+        const clearBtn = document.querySelector('.clear-btn');
+        const detailMask = document.getElementById('detailMask');
+        const closeDetailBtn = document.getElementById('closeDetailBtn');
+        const detailImg = document.getElementById('detailImg');
+        const detailName = document.getElementById('detailName');
+        const detailType = document.getElementById('detailType');
+        const detailDesc = document.getElementById('detailDesc');
+        let currentFilter = null;
+        let searchKey = '';
+        // 渲染怪物列表
+        function renderList(){
+            let data = [...monsterList];
+            if(currentFilter) data = data.filter(item=>item.type===currentFilter);
+            if(searchKey) data = data.filter(item=>item.name.includes(searchKey));
+            container.innerHTML = '';
+            data.forEach(monster=>{
+                const card = document.createElement('div');
+                card.className = 'monster-card';
+                card.innerHTML = `
+                    <img class="monster-avatar" src="${monster.img}" alt="${monster.name}">
+                    <div class="monster-name">${monster.name}</div>
+                `
+                // 点击卡片打开弹窗详情
+                card.addEventListener('click',()=>openDetail(monster));
+                container.appendChild(card);
+            })
+        }
+        // 打开详情弹窗（单页面弹窗，不跳转新HTML）
+        function openDetail(monster){
+            detailImg.src = monster.img;
+            detailName.innerText = monster.name;
+            detailType.innerText = monster.typeText;
+            detailDesc.innerText = monster.desc;
+            detailMask.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        // 关闭弹窗
+        function closeDetail(){
+            detailMask.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+        closeDetailBtn.addEventListener('click', closeDetail);
+        detailMask.addEventListener('click', (e)=>{
+            if(e.target === detailMask) closeDetail();
+        })
+        // 筛选切换逻辑
+        filterTags.forEach(tag=>{
+            tag.addEventListener('click',()=>{
+                const type = tag.dataset.type;
+                if(currentFilter === type){
+                    currentFilter = null;
+                    tag.classList.remove('active');
+                }else{
+                    filterTags.forEach(t=>t.classList.remove('active'));
+                    currentFilter = type;
+                    tag.classList.add('active');
+                }
+                renderList();
+            })
+        })
+        // 实时搜索
+        searchInput.addEventListener('input',e=>{
+            searchKey = e.target.value.trim();
+            renderList();
+        })
+        // 清空搜索按钮
+        clearBtn.addEventListener('click',()=>{
+            searchInput.value = '';
+            searchKey = '';
+            renderList();
+        })
+        // 页面初始化渲染
+        renderList();
+    </script>
+</body>
+</html>
