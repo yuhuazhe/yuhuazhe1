@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>怪物机制</title>
-    <!-- 引入html2canvas CDN，用于DOM转图片 -->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <style>
         * {
@@ -24,20 +23,6 @@
             align-items: center;
             gap: 12px;
             margin-bottom: 24px;
-        }
-        .back-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 6px;
-            background: #1a1a24;
-            border: none;
-            color: #fff;
-            font-size: 18px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .back-btn:hover {
-            background: #272738;
         }
         .page-title {
             font-size: 28px;
@@ -168,7 +153,6 @@
         .close-detail:hover {
             background: #382246;
         }
-        /* 新增下载按钮样式 */
         .download-btn {
             position: absolute;
             top: 16px;
@@ -258,11 +242,10 @@
     <div class="monster-grid" id="monsterContainer"></div>
     <div class="detail-mask" id="detailMask">
         <div class="detail-wrap" id="captureBox">
-            <!-- 新增下载按钮 -->
             <button class="download-btn" id="downloadDetailBtn">下载详情图</button>
             <button class="close-detail" id="closeDetailBtn">×</button>
             <div class="detail-header">
-                <img class="detail-avatar" id="detailImg" alt="">
+                <img class="detail-avatar" id="detailImg" alt="" crossorigin="anonymous">
                 <div class="detail-title">
                     <h2 id="detailName"></h2>
                     <span class="detail-type-tag" id="detailType"></span>
@@ -297,9 +280,7 @@
         const imghuoguo = "./huoguo.png";
         const imgshuangyiren = "./shuangyiren.png";
         
-        
         const monsterList = [
-            // 原有6只怪物完整保留
             {
                 id:1,
                 name:'嵌合阖寂狮·摧枯伟力',
@@ -423,7 +404,6 @@
 深古遗迹的制造用机械体、远古遗迹的主人们用这种会改变形态的机器进行各种制造的工作，
 在地脉洪流的错乱重构下,其抵御熔岩的外壳化作了盔甲，构筑庞然巨城的作力铸成了巨钳，曾经的「制造」指令被篡改为「毁灭」的意志，正驱使着它无休止地践行着将一切化为废墟的「伟大事业」`
             },
-          
             {
                 id:7,
                 name:"霜夜巡天灵主·惊惘愔愤",
@@ -507,7 +487,7 @@
                 typeText:"幽境",
                 desc:`N5：6459516--------------N6：11896648
 1.初始处于活化聚合态，具有 300% 的额外抗性，活化能量条自然衰减需 38s；受到雷元素或原元素伤害时，活化能量条衰减加速 0.25，若本次伤害具有元素附着，则额外加速 1s
-2.聚合状态结束时会进入分裂态，分裂为 10 个散开的孢子，每个孢子具有本体最大生命值 10%，分裂持续约 22s；且聚合时强散会基于孢子受到伤害总值的一定比例受到高额伤害
+2.聚合状态结束时会进入分裂态，分裂为 10 个孢子，每个孢子具有本体最大生命值 10%，分裂持续约 22s；且聚合时强散会基于孢子受到伤害总值的一定比例受到高额伤害
 3.若在分裂期间至少消灭 8 个孢子，则聚合后，强散会进入脆性聚合：失去额外抗性；若提前消灭了全部孢子，那么强散会提前结束聚合；分裂态、脆性聚合期间：风元素抗性为 90%
 首领特性
 强效聚合状态
@@ -519,8 +499,7 @@
 另外，若「分裂状态」产生出的所有孢子均被击毁，则强散会提前退出「分裂状态」，并转变为「脆性聚合状态」。
 空洞结构
 受到地脉紊乱的影响，强散处于「分裂状态」或「脆性聚合状态」时，风元素抗性大幅降低。`
-            }
-            ,
+            },
             {
                 id:12,
                 name:"历经百战的火刃突击队员·决死武装",
@@ -533,8 +512,7 @@
 3.在一定时间内破除护盾，使敌人虚弱：所有抗性降低 50%，恢复后雷元素抗性降低 60%
 4.每层护盾被破坏时，损失 6% 生命值，且产生晶球：雷元素能量恢复 18 点，其他元素恢复 6 点
 `
-            }
-             ,
+            },
             {
                 id:13,
                 name:"铁甲熔火帝皇·敕命远征",
@@ -545,8 +523,7 @@
 1.具有 64U 火元素器官「熔火双角」，使全部抗性提升 150%，破坏后损失 10% 生命值
 2.会召唤「坚盾重甲蟹」，其具有 12U 火元素，火元素被耗尽时将失控撞向首领，使其损失 12U 火元素
 3.首领被撞时还会基于「坚盾重甲蟹」受到的伤害损失生命值，等同于其受到的 60% 水元素伤害 + 10% 非水元素伤害，不超过首领 15% 生命值`
-            }
-             ,
+            },
             {
                 id:14,
                 name:"深罪浸礼者·肃烈狂音",
@@ -557,8 +534,7 @@
 1.会依次展开雷元素、火元素、水元素护盾，每次破除时将损失生命值，全部破除后敌人将瘫痪一段时间
 2.护盾量：12U / 18U / 18U（大世界的 150%）
 3.损失生命值：50% 护盾受到的伤害，不超过 12.5% 生命值，不计入护盾自身元素`
-            }
-            ,
+            },
             {
                 id:15,
                 name:"历经百战的暝视龙·霜雪苛念",
@@ -571,8 +547,7 @@
 3.会出现可以被牵引的「扰乱风涡」，命中敌人时降低 15% 风元素抗性，可叠加 10 层
 4.护盾量：24U，物件 16U ，破坏削减 9.6U 护盾
 5.损失生命值：10% 生命值 + 50% 护盾受到的伤害，不超过 22.5% 生命值`
-            }
-            ,
+            },
             {
                 id:16,
                 name:"实验性场力发生装置·极端势能",
@@ -582,8 +557,7 @@
                 desc:`N5：13231421--------------N6：23020735
 1.会展开「重力削减力场」使跳跃能力大幅提升，同时在地面展开极为猛烈的、无法闪避的攻势，且每 5s 使自身的威力获得一层大幅强化
 2.角色跳跃至一定高度时，使接下来的 1.5s 内自身攻击力提升 600% ，且下落攻击命中敌人后将降低敌人的一层威力强化`
-            }
-            ,
+            },
             {
                 id:17,
                 name:"历经百战的执灯人·哀恸回响",
@@ -595,8 +569,7 @@
 2.狂猎：生命值削减至 0 后，或角色施放满辉（二级月兆）强化的技能后，进入临界状态，并在一段时间后恢复至【生命上限】
 3.临界状态：受到伤害时，基于队伍是否为满辉，会以 65% / 90% 比例削减【生命上限】，降至 0 时被击败
 4.场上会出现狂猎幽魂；一段时间后，首领将猎杀场上的全部狂猎幽魂，并基于猎物的剩余生命值治疗自身`
-            }
-            ,
+            },
             {
                 id:18,
                 name:"兆载永劫龙兽·歼灭构型",
@@ -613,8 +586,7 @@
 受到地脉紊乱的影响，初始会以地面状态开始战斗。如果长时间未释放能量洪流，就会切换到升空状态进行战斗。
 核心装甲隔绝
 受到地脉紊乱的影响，身体的诸多核心都被保护了起来，不再会因为核心受到攻击而瘫痪，也不会因此而清除已有的元素抗性。`
-            }
-            ,
+            },
             {
                 id:19,
                 name:"历经百战的岩居蟹·百万爆轰",
@@ -632,21 +604,18 @@
 伟大岩临轰袭
 受到地脉紊乱的影响，战斗开始后，岩居蟹会升空，散布大量「岩居之种」后开始蓄力，并在蓄力完成后引爆「岩居之种」，造成大范围伤害使我方当前场上的角色直接倒下，并使自身所有抗性在一段时间内大幅提升。
 蓄力期间，岩居蟹将展开护盾，通过转化一定数量的「岩居之种」破坏护盾，即可打断岩居蟹的蓄力并使其瘫痪。`
-            }
-            ,
+            },
             {
                 id:20,
                 name:"历经百战的玳龟·坚盾轰霆",
                 img: imgleipangxie,
                 type:"realm",
-                typeText:"幽境",
                 desc:`N5：6350005--------------N6：13283708
 雷棘护罩
 受到一定次数的攻击后，会展开「雷棘护罩」：护罩存在期间受到攻击时，会对附近的角色造成反震伤害；通过元素反应耗尽护罩的雷元素，才能破除护罩。
 久续之霆
 受到地脉紊乱的影响，每次受到攻击时，该敌人展开「雷棘护罩」的进度将以更高的幅度累积，但进度将随着时间流逝缓慢回退；此外，破除「雷棘护罩」所需的元素将显著增加。`
-            }
-            ,
+            },
             {
                 id:21,
                 name:"历经百战的皮皮潘偶像·百诈瞬变",
@@ -665,8 +634,7 @@
 帽子被破坏时本体所受到的伤害，会基于帽子受到水元素伤害、雷元素伤害、感电或月感电伤害而提高。
 帽子拒绝
 受到地脉紊乱的影响，该敌人会发动强力的「帽子拒绝」攻击：持续投掷能够造成高额雷元素伤害的帽子，且帽子具有强大打断效果。`
-            }
-            ,
+            },
             {
                 id:22,
                 name:"水形幻人·极旋湍流",
@@ -676,7 +644,7 @@
                 desc:`N5：7658830--------------N6：17260005
 1.入战后，以及每损耗 30% 血，会召唤 2 个半人；具有 8.5% 血量和 12U 水盾（= 水罩循环），但被击破会直接死亡
 2.若成功吸收半人，便进入 15s~25s 的狂暴：全抗提升 + 200%，并恢复 12.5% 生命值
-3.非狂暴时，蓄力能力积攒：获得 8.85% 生命的护盾，清空我方全部的 EQ 冷却，积攒全部元素能量和元素球
+3.非狂暴时，蓄力能力积攒：获得 8.85% 生命的护盾，清空我方全部 EQ 冷却，积攒全部元素能量和元素球
 4.蓄力完成后，若未能破除护盾，则直接消灭场上所有角色
 首领特性
 双重半幻人
@@ -685,8 +653,7 @@
 闭环环伺
 受到地脉紊乱的影响，战斗中，水形幻人将蓄能，并可以积攒能量释放「闭环环伺」。如果「闭环环伺」释放，将把我方当前场上的角色直接击倒。
 水形人展开护盾时，将开始吞噬所有残血的半幻人来恢复自身血量，且持续积攒攻击所需要的能量。在水形人蓄能期间持续攻击，即可打断「闭环环伺」的释放。`
-            }
-            ,
+            },
             {
                 id:23,
                 name:"熔岩辉龙像·炽烈流焰",
@@ -706,14 +673,12 @@
 燥热熔化
 受到地脉紊乱的影响，强敌的所有抗性进一步提升，并且致使其所需积攒的火元素伤害数值增加。
 能够自身持续产生热量，以维持灼热状态的运转。`
-            }
-            ,
+            },
             {
                 id:24,
                 name:"历经百战的霜役人·涉血芒锋",
                 img: imgshuangyiren,
                 type:"realm",
-                typeText:"幽境",
                 desc:`N5：7135813--------------N6：13969549
 1.冻结抵抗 90%，抗打断能力全面增强，无法被角色技能打断，且具有大量快速位移技能
 2.没有「护盾」时，会消耗 5% 生命值施放「猎杀」并生成「护盾」，若命中角色则恢复 10% 生命值
@@ -735,7 +700,7 @@
         const detailDesc = document.getElementById('detailDesc');
         let currentFilter = null;
         let searchKey = '';
-        let currentMonster = null; // 缓存当前打开的怪物数据
+        let currentMonster = null;
 
         function renderList(){
             let data = [...monsterList];
@@ -746,48 +711,84 @@
                 const card = document.createElement('div');
                 card.className = 'monster-card';
                 card.innerHTML = `
-                    <img class="monster-avatar" src="${monster.img}" alt="${monster.name}">
+                    <img class="monster-avatar" src="${monster.img}" alt="${monster.name}" crossorigin="anonymous">
                     <div class="monster-name">${monster.name}</div>
                 `
                 card.addEventListener('click',()=>openDetail(monster));
                 container.appendChild(card);
             })
         }
+
         function openDetail(monster){
             currentMonster = monster;
-            detailImg.src = monster.img;
+            const img = document.getElementById('detailImg');
+            img.crossOrigin = "anonymous";
+            img.src = monster.img;
             detailName.innerText = monster.name;
             detailType.innerText = monster.typeText;
             detailDesc.innerText = monster.desc;
             detailMask.style.display = 'flex';
             document.body.style.overflow = 'hidden';
+            captureBox.scrollTop = 0;
         }
+
         function closeDetail(){
             detailMask.style.display = 'none';
             document.body.style.overflow = '';
         }
-        // 新增下载图片函数
-        function downloadDetailImage() {
+
+        async function downloadDetailImage() {
             if (!currentMonster) return;
-            // 使用html2canvas渲染弹窗内容
-            html2canvas(captureBox, {
-                backgroundColor: '#12121b', // 匹配背景色
-                useCORS: true, // 解决本地图片跨域
-                scale: 2 // 2倍高清图片
-            }).then(canvas => {
-                // 创建下载链接
+            const img = document.getElementById('detailImg');
+            img.crossOrigin = "anonymous";
+            const originMaxHeight = captureBox.style.maxHeight;
+            const originOverflow = captureBox.style.overflowY;
+            const originScrollTop = captureBox.scrollTop;
+            captureBox.scrollTop = 0;
+            captureBox.style.maxHeight = 'none';
+            captureBox.style.overflowY = 'visible';
+
+            try {
+                const canvas = await html2canvas(captureBox, {
+                    backgroundColor: '#12121b',
+                    useCORS: true,
+                    allowTaint: false,
+                    scale: window.devicePixelRatio || 2,
+                    logging: false,
+                    letterRendering: true,
+                    scrollX: 0,
+                    scrollY: 0,
+                    width: captureBox.scrollWidth,
+                    height: captureBox.scrollHeight,
+                    onclone(clonedDoc) {
+                        const cloneBox = clonedDoc.getElementById('captureBox');
+                        cloneBox.style.maxHeight = 'none';
+                        cloneBox.style.overflowY = 'visible';
+                        cloneBox.scrollTop = 0;
+                    }
+                });
                 const link = document.createElement('a');
                 link.download = `${currentMonster.name}_怪物详情.png`;
                 link.href = canvas.toDataURL('image/png');
+                document.body.appendChild(link);
                 link.click();
-            });
+                document.body.removeChild(link);
+            } catch (err) {
+                console.error('截图失败：', err);
+                alert('本地直接打开存在图片跨域，上传GitHub Pages后可正常下载完整图片');
+            } finally {
+                captureBox.style.maxHeight = originMaxHeight;
+                captureBox.style.overflowY = originOverflow;
+                captureBox.scrollTop = originScrollTop;
+            }
         }
-        // 绑定下载按钮点击事件
+
         downloadDetailBtn.addEventListener('click', downloadDetailImage);
         closeDetailBtn.addEventListener('click', closeDetail);
         detailMask.addEventListener('click', (e)=>{
             if(e.target === detailMask) closeDetail();
         })
+
         filterTags.forEach(tag=>{
             tag.addEventListener('click',()=>{
                 const type = tag.dataset.type;
@@ -802,15 +803,18 @@
                 renderList();
             })
         })
+
         searchInput.addEventListener('input',e=>{
             searchKey = e.target.value.trim();
             renderList();
         })
+
         clearBtn.addEventListener('click',()=>{
             searchInput.value = '';
             searchKey = '';
             renderList();
         })
+
         renderList();
     </script>
 </body>
