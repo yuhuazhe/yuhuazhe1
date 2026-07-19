@@ -2,7 +2,8 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 修复手机端缩放、截图拉伸问题 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
     <title>怪物机制</title>
     <!-- 引入html2canvas CDN -->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -733,6 +734,26 @@
         let searchKey = '';
         let currentMonster = null;
 
+        // 判断iOS/手机内置浏览器
+        function isMobileNoAutoDownload() {
+            const ua = navigator.userAgent.toLowerCase();
+            const isIOS = /ipad|iphone|ipod/.test(ua) && !window.MSStream;
+            const isWechat = /micromessenger/.test(ua);
+            const isQQ = /qqbrowser/.test(ua);
+            return isIOS || isWechat || isQQ;
+        }
+
+        // 预加载图片
+        function loadImage(src) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = "anonymous";
+                img.onload = () => resolve(img);
+                img.onerror = reject;
+                img.src = src;
+            })
+        }
+
         function renderList(){
             let data = [...monsterList];
             if(currentFilter) data = data.filter(item=>item.type===currentFilter);
@@ -753,7 +774,7 @@
         function openDetail(monster){
             currentMonster = monster;
             detailImg.src = monster.img;
-            detailImg.crossOrigin = "anonymous"; // 图片跨域
+            detailImg.crossOrigin = "anonymous";
             detailName.innerText = monster.name;
             detailType.innerText = monster.typeText;
             detailDesc.innerText = monster.desc;
@@ -766,52 +787,77 @@
             document.body.style.overflow = '';
         }
 
-        // 预加载图片工具函数
-        function loadImage(src) {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.crossOrigin = "anonymous";
-                img.onload = () => resolve(img);
-                img.onerror = reject;
-                img.src = src;
-            })
-        }
-
-        // 修复后的下载函数：解决无响应、截图不全
+        // 下载函数：PC自动下载，手机弹出预览长按保存
         async function downloadDetailImage() {
             if (!currentMonster) return;
             try {
-                // 1.等待详情图片完全加载完成
                 await loadImage(detailImg.src);
-                // 2.临时保存原有滚动样式
+
+                // 保存原有滚动样式，完整截图
                 const originalOverflow = captureBox.style.overflowY;
                 const originalMaxHeight = captureBox.style.maxHeight;
-                // 3.取消滚动限制，完整展示全部内容（解决下载不全）
                 captureBox.style.overflowY = 'visible';
                 captureBox.style.maxHeight = 'unset';
-                // 4.等待DOM重绘
-                await new Promise(resolve => setTimeout(resolve, 200));
-                // 5.执行截图，完善跨域配置
+                await new Promise(resolve => setTimeout(resolve, 300));
+
                 const canvas = await html2canvas(captureBox, {
                     backgroundColor: '#12121b',
                     useCORS: true,
-                    allowTaint: true, // 允许画布污点，绕过本地图片跨域拦截
+                    allowTaint: true,
                     scale: 2,
                     letterRendering: true,
-                    logging: true // 控制台打印日志，方便排查GitHub报错
+                    logging: false
                 });
-                // 6.恢复原有滚动样式
+
+                // 恢复样式
                 captureBox.style.overflowY = originalOverflow;
                 captureBox.style.maxHeight = originalMaxHeight;
-                // 7.生成下载文件
-                const link = document.createElement('a');
-                link.download = `${currentMonster.name}_怪物详情.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-                console.log('下载成功：', currentMonster.name);
+
+                canvas.toBlob(async (blob) => {
+                    if (!blob) throw new Error("图片生成失败");
+                    const blobUrl = URL.createObjectURL(blob);
+                    const fileName = `${currentMonster.name}_怪物详情.png`;
+
+                    // 手机iOS/微信/QQ：弹出预览图，长按保存
+                    if (isMobileNoAutoDownload()) {
+                        const previewMask = document.createElement('div');
+                        previewMask.style.cssText = `
+                            position:fixed;inset:0;background:#000;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;
+                        `;
+                        const tipText = document.createElement('p');
+                        tipText.style.cssText = 'color:#fff;margin-bottom:12px;font-size:14px;text-align:center;';
+                        tipText.innerText = '长按图片保存到相册，点击空白关闭';
+                        const previewImg = new Image();
+                        previewImg.src = blobUrl;
+                        previewImg.style.maxWidth = '100%';
+                        previewImg.style.maxHeight = '85vh';
+                        previewMask.appendChild(tipText);
+                        previewMask.appendChild(previewImg);
+                        previewMask.addEventListener('click', e => {
+                            if (e.target === previewMask) {
+                                document.body.removeChild(previewMask);
+                                URL.revokeObjectURL(blobUrl);
+                            }
+                        })
+                        document.body.appendChild(previewMask);
+                        return;
+                    }
+
+                    // PC/安卓Chrome等正常自动下载
+                    const a = document.createElement('a');
+                    a.href = blobUrl;
+                    a.download = fileName;
+                    document.body.appendChild(a);
+                    a.click();
+                    setTimeout(() => {
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(blobUrl);
+                    }, 400);
+                }, 'image/png', 1);
+
             } catch (err) {
-                console.error('下载失败原因：', err);
-                alert('下载失败，请检查图片文件是否完整上传到仓库！');
+                console.error("下载失败：", err);
+                alert("生成图片失败：\n1.检查图片是否全部上传\n2.微信请复制链接到系统浏览器打开");
             }
         }
 
