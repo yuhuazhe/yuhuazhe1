@@ -1,81 +1,139 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" style="scroll-behavior: smooth;">
 <head>
     <link rel="icon" href="资料库.png">
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+    <title>羽化哲</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+        html, body {
+            width: 100%;
+            overflow-x: hidden;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        /* 全局完全隐藏滚动条 */
+        ::-webkit-scrollbar {
+            display: none !important;
+            width: 0;
+        }
+        html {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
         body {
-            background-color: #000;
-            color: #fff;
+            background: url("zhanshi/1.png") center center / cover no-repeat fixed;
+            color: #f8f8f8;
             font-family: sans-serif;
             padding: 20px;
+            position: relative;
+            min-height: 300vh;
         }
-
-        /* 顶部标题框 */
-        .header-box {
-            border: 2px solid #999;
+        /* 页面遮罩极致淡化，几乎无压暗 */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.01);
+            z-index: -1;
+        }
+        /* 全局玻璃组件：完全无底色，极淡模糊，几乎看不见边框 */
+        .glass-box {
+            background: transparent !important;
+            backdrop-filter: blur(10px) saturate(220%) !important;
+            -webkit-backdrop-filter: blur(10px) saturate(220%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.005) !important;
             border-radius: 16px;
+            box-shadow: none !important;
+            transition: all 0.3s ease;
+        }
+        .glass-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(183, 110, 216, 0.02) !important;
+            border-color: rgba(183, 110, 216, 0.03) !important;
+        }
+        .header-box {
             padding: 20px;
             text-align: center;
-            background-color: rgba(0,0,0,0.6);
             margin-bottom: 40px;
+            background: transparent !important;
+            backdrop-filter: blur(10px) saturate(220%) !important;
+            -webkit-backdrop-filter: blur(10px) saturate(220%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.005) !important;
         }
         .header-title {
             font-size: 40px;
-            color: #b76ed8;
+            color: #c78cdf;
             font-weight: bold;
             margin: 0 0 10px;
         }
         .header-subtitle {
             font-size: 22px;
-            color: #ddd;
+            color: #eee;
             margin: 0 0 10px;
         }
         .header-note {
             font-size: 16px;
-            color: #bbb;
+            color: #ddd;
             line-height: 1.5;
         }
-
-        /* 角色卡片容器 */
+        /* 按钮完全透明，hover仅极淡紫光 */
+        .log-btn {
+            margin-top: 10px;
+            padding: 8px 16px;
+            background: transparent !important;
+            border: 1px solid rgba(183, 110, 216, 0.04) !important;
+            color: #f8f8f8;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+        .log-btn:hover {
+            background: rgba(183, 110, 216, 0.02) !important;
+        }
+        /* 更新日志面板零底色 */
+        #logBox {
+            margin-top: 15px;
+            padding: 16px;
+            line-height: 1.8;
+            color: #eaeaea;
+            overflow: visible;
+            background: transparent !important;
+            backdrop-filter: blur(10px) saturate(220%) !important;
+            -webkit-backdrop-filter: blur(10px) saturate(220%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.005) !important;
+        }
         .card-container {
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 24px;
+            margin-top: 30px;
+            margin-bottom: 200px;
         }
-
-        /* 角色卡片样式 */
         .char-card {
             width: 180px;
-            border: 2px solid #999;
-            border-radius: 12px;
             overflow: hidden;
-            background-color: rgba(0,0,0,0.6);
             text-align: center;
-            text-decoration: none; /* 去掉链接下划线 */
-            color: inherit;       /* 文字颜色继承 */
+            text-decoration: none;
+            color: inherit;
         }
         .char-card img {
             width: 100%;
             aspect-ratio: 1 / 1;
             object-fit: cover;
+            display: block;
         }
         .char-name {
             padding: 10px 0;
             font-size: 18px;
             color: #fff;
         }
-
-        /* ========== 新增倒计时样式 适配本站紫调黑色背景 ========== */
         .count-box {
             display: flex;
             gap: 12px;
@@ -83,30 +141,58 @@
             justify-content: center;
             margin: 20px 0;
         }
+        /* 倒计时格子彻底透明 */
         .time-item {
-            background: rgba(183, 110, 216, 0.15);
-            border: 1px solid #b76ed8;
             width: 110px;
             padding: 20px 8px;
             border-radius: 10px;
+            background: transparent !important;
+            border: 1px solid rgba(183, 110, 216, 0.02) !important;
+            backdrop-filter: blur(10px) saturate(220%) !important;
+            -webkit-backdrop-filter: blur(10px) saturate(220%) !important;
         }
         .num {
             font-size: 2.8rem;
             font-weight: bold;
-            color: #b76ed8;
+            color: #c78cdf;
             line-height: 1;
         }
         .label {
             margin-top: 10px;
             font-size: 0.95rem;
-            color: #ccc;
+            color: #ddd;
         }
         .tip {
             text-align: center;
             font-size: 18px;
-            color: #ff8888;
+            color: #ff9999;
             display: none;
             margin: 10px 0;
+        }
+        /* 回到顶部按钮淡化 */
+        #backTop {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(183, 110, 216, 0.04);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(183, 110, 216, 0.1);
+            color: #c78cdf;
+            font-size: 20px;
+            cursor: pointer;
+            display: none;
+            z-index: 999;
+            transition: 0.3s;
+            text-align: center;
+            line-height: 48px;
+            text-decoration: none;
+        }
+        #backTop:hover {
+            background: rgba(183, 110, 216, 0.08);
+            transform: translateY(-4px);
         }
         @media (max-width: 600px) {
             .time-item {
@@ -116,158 +202,131 @@
             .num {
                 font-size: 1.8rem;
             }
+            .header-title {
+                font-size: 28px;
+            }
+            .header-subtitle {
+                font-size: 18px;
+            }
+            #backTop {
+                width: 40px;
+                height: 40px;
+                bottom: 20px;
+                right: 20px;
+                line-height: 40px;
+            }
         }
     </style>
-
 </head>
-<body>
-    
-    <!-- 顶部标题框 -->
-    <div class="header-box">
+<body id="pageTop">
+    <div class="header-box glass-box">
         <h1 class="header-title">计算数据</h1>
         <p class="header-subtitle">羽化哲 更新至7.0版本V5 最后更新日期：2026.7.23</p>
         <p class="header-note">所涉及的主C及副c均为30词条<br>最终数据请以正式服为准！！！</p>
-   
-      
-
-      
-
- <a href=" https://b23.tv/rDCFTFA" target="_blank">羽化哲主页</a>
-
+        <a href=" https://b23.tv/rDCFTFA" target="_blank" style="color:#c78cdf;">羽化哲主页</a>
         
-<div align="center" style="margin:8px 0;">
-<button class="log-btn" onclick="toggleLog()">展开更新日志</button>
-
-</div>
-
-<!-- ========== 新增倒计时展示区域 ========== -->
- <h2 style="text-align:center;color:#b76ed8;font-size:24px;margin:10px 0 5px;">距离v4数据更新倒计时</h2>
-<div class="count-box">
-    <div class="time-item">
-        <div class="num" id="day">00</div>
-        <div class="label">天</div>
+        <div align="center" style="margin:8px 0;">
+            <button class="log-btn" onclick="toggleLog()">展开更新日志</button>
+        </div>
+        <h2 style="text-align:center;color:#c78cdf;font-size:24px;margin:10px 0 5px;">距离v5数据更新倒计时</h2>
+        <div class="count-box">
+            <div class="time-item glass-box">
+                <div class="num" id="day">00</div>
+                <div class="label">天</div>
+            </div>
+            <div class="time-item glass-box">
+                <div class="num" id="hour">00</div>
+                <div class="label">时</div>
+            </div>
+            <div class="time-item glass-box">
+                <div class="num" id="min">00</div>
+                <div class="label">分</div>
+            </div>
+            <div class="time-item glass-box">
+                <div class="num" id="sec">00</div>
+                <div class="label">秒</div>
+            </div>
+        </div>
+        <div class="tip" id="overTip">数据已更新！</div>
+        <div id="logBox" class="glass-box" style="display:none;">
+            <p>v1.0版添加了桑多涅板块</p>
+            <p>v1.1版添加了数据库板块，添加了木偶v1-v3数据</p>
+            <p>v1.2优化了整体布局，新增更新日志说明</p>
+            <p>v1.3添加了洛恩，尼可及武器相关数据，添加了个人表格使用模块，优化了布局</p>
+            <p>v1.4添加了由b站up主鲷鱼烧烧xxx自主开发的木偶计算程序，资料库寻找</p>
+            <p>v1.5添加了公式板块，自主计算器该up主已完成全面完善</p>
+            <p>v1.6由于星超导机制更改，已完成v1.5的数据更新</p>
+            <p>v1.7添加了dps统计板块，公式板块添加，相应的计算模板</p>
+            <p>v1.8添加了dps数据库/自动计算器/部分公式/优化了整体布局</p>
+            <p>v1.9添加了幽静危站板块，完善了对应怪物的机制说明</p>
+            <p>v2.0添加了面板计算板块，后端建立测试，优化排版</p>
+            <p>v2.1完成木偶v4的计算数据更新，公式全部补充完成，添加了网页计算程序</p>
+            <p>v2.2上传了木偶v5的计算数据以及武器差异，完善了公式</p>
+            <p>v2.3为帮助大家快速了解角色，角色攻略板块正式开始测试</p>
+        </div>
     </div>
-    <div class="time-item">
-        <div class="num" id="hour">00</div>
-        <div class="label">时</div>
+    <div class="card-container">
+        <a href="juese.html" class="char-card glass-box">
+            <img src="sangduonie/youya.png">
+            <div class="char-name">角色</div>
+        </a>
+        <a href="library.html" class="char-card glass-box">
+            <img src="资料.png">
+            <div class="char-name">资料库</div>
+        </a>
+        <a href="gongshi.html" class="char-card glass-box">
+            <img src="资料.png">
+            <div class="char-name">公式</div>
+        </a>
+        <a href="wangyechengxu.html" class="char-card glass-box">
+            <img src="sangduonie/shaon.png">
+            <div class="char-name">网页程序</div>
+        </a>
+        <a href="beijing/怪物解析/youjingweizhantiaozhuan.html" class="char-card glass-box">
+            <img src="beijing/怪物解析/仆人.png">
+            <div class="char-name">幽境危站/怪物机制</div>
+        </a>
     </div>
-    <div class="time-item">
-        <div class="num" id="min">00</div>
-        <div class="label">分</div>
-    </div>
-    <div class="time-item">
-        <div class="num" id="sec">00</div>
-        <div class="label">秒</div>
-    </div>
-</div>
-<div class="tip" id="overTip">倒计时已结束！</div>
 
-
-<!-- 仅把最后两行日志包进隐藏容器，原文字不变 -->
-<div id="logBox" style="display:none;">
-<p>v1.0版添加了桑多涅板块</p>
-<p>v1.1版添加了数据库板块，添加了木偶v1-v3数据</p>
-<p>v1.2优化了整体布局，新增更新日志说明</p>
-<p>v1.3添加了洛恩，尼可及武器相关数据，添加了个人表格使用模块，优化了布局</p>
-<p>v1.4添加了由b站up主鲷鱼烧烧xxx自主开发的木偶计算程序，资料库寻找</p>
-<p>v1.5添加了公式板块，自主计算器该up主已完成全面完善</p>
-<p>v1.6由于星超导机制更改，已完成v1.5的数据更新</p>
-<p>v1.7添加了dps统计板块，公式板块添加，相应的计算模板</p>
-<p>v1.8添加了dps数据库/自动计算器/部分公式/优化了整体布局</p>
-<p>v1.9添加了幽静危站板块，完善了对应怪物的机制说明</p>
-<p>v2.0添加了面板计算板块，后端建立测试，优化排版</p>
-<p>v2.1完成木偶v4的计算数据更新，公式全部补充完成，添加了网页计算程序</p>
-<p>v2.2上传了木偶v5的计算数据以及武器差异，完善了公式</p>
-<p>v2.3为帮助大家快速了解角色，角色攻略板块正式开始测试</p>
-</div>
+    <a href="#pageTop" id="backTop">↑</a>
 
 <script>
 function toggleLog(){
     let box=document.getElementById('logBox')
     box.style.display = box.style.display==='none'?'block':'none'
 }
-
-// ========== 新增倒计时逻辑JS ==========
-// 修改目标时间：年,月-1,日,时,分,秒
 const targetTime = new Date(2026, 6, 20, 18, 0, 0);
-
 function updateCountDown() {
     const now = new Date().getTime();
     const target = targetTime.getTime();
     const diff = target - now;
-
     if (diff <= 0) {
         document.getElementById("overTip").style.display = "block";
         document.querySelectorAll(".num").forEach(el => el.innerText = "00");
         return;
     }
-
     const day = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hour = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const min = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     const sec = Math.floor((diff % (1000 * 60)) / 1000);
-
     const format = n => n < 10 ? "0" + n : n;
-
     document.getElementById("day").innerText = format(day);
     document.getElementById("hour").innerText = format(hour);
     document.getElementById("min").innerText = format(min);
     document.getElementById("sec").innerText = format(sec);
 }
-// 立即执行+每秒刷新
 updateCountDown();
 setInterval(updateCountDown, 1000);
-</script>
 
+const backTopBtn = document.getElementById('backTop');
+window.addEventListener('scroll', () => {
+    if (window.scrollY > 300) {
+        backTopBtn.style.display = 'block';
+    } else {
+        backTopBtn.style.display = 'none';
+    }
+})
 
-
-
-
-
-
-</div>
-    <!-- sangdunie -->
-   <div class="card-container">
-        
-<a href="juese.html" style="display:inline-block;padding:0;background:#222;border:2px solid #ffbbbb;border-radius:12px;overflow:hidden;text-decoration:none;color:#fff;">
-<img src="sangduonie/youya.png" style="width:180px;display:block;">
-<div style="text-align:center;padding:6px;font-size:20px;">角色</div>
-</a>
-
-
-
-
-   
-
-
-
-<a href="library.html" style="display:inline-block;padding:0;background:#222;border:2px solid #fff;border-radius:12px;overflow:hidden;text-decoration:none;color:#fff;">
-<img src="资料.png" style="width:180px;display:block;">
-<div style="text-align:center;padding:6px;font-size:20px;">资料库</div>
-</a>
-
-
-<a href="gongshi.html" style="display:inline-block;padding:0;background:#222;border:2px solid #fff;border-radius:12px;overflow:hidden;text-decoration:none;color:#fff;">
-<img src="资料.png" style="width:180px;display:block;">
-<div style="text-align:center;padding:6px;font-size:20px;">公式
-</div>
-</a>
-
-<a href="wangyechengxu.html" style="display:inline-block;padding:0;background:#222;border:2px solid #fff;border-radius:12px;overflow:hidden;text-decoration:none;color:#fff;">
-<img src="sangduonie/shaon.png" style="width:180px;display:block;">
-<div style="text-align:center;padding:6px;font-size:20px;">网页程序
-</div>
-</a>
-
-<a href="beijing/怪物解析/youjingweizhantiaozhuan.html" style="display:inline-block;padding:0;background:#222;border:2px solid #fff;border-radius:12px;overflow:hidden;text-decoration:none;color:#fff;">
-<img src="beijing/怪物解析/仆人.png" style="width:180px;display:block;">
-<div style="text-align:center;padding:6px;font-size:20px;">幽境危站/怪物机制
-</div>
-</a>
-
-
-
-<script>
 fetch("yuhuazhe-yuhauhze1111-6cvq.vercel.app")
 .then(res=>res.json())
 .then(ret=>{
