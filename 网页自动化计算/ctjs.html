@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>圣遗物词条计算器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", sans-serif;
+        }
+        body {
+            background: url("1.png") center/cover no-repeat fixed;
+            min-height: 100vh;
+            padding: 30px 15px;
+            color: #e0e0e0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(18, 18, 24, 0.75);
+            border: 1px solid rgba(120, 120, 160, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            backdrop-filter: blur(8px);
+        }
+        .title {
+            text-align: center;
+            font-size: 26px;
+            color: #fff;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+        .tip-box {
+            margin-bottom: 20px;
+        }
+        .tip-btn {
+            width: 100%;
+            padding: 12px;
+            background: rgba(40, 40, 60, 0.6);
+            border: 1px solid rgba(150, 150, 200, 0.4);
+            color: #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+        .tip-btn:hover {
+            background: rgba(60, 60, 90, 0.7);
+        }
+        .tip-content {
+            margin-top: 10px;
+            padding: 16px;
+            background: rgba(30, 30, 45, 0.6);
+            border-radius: 8px;
+            line-height: 1.7;
+            display: none;
+            border: 1px solid rgba(100, 100, 140, 0.3);
+        }
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        @media (max-width: 600px) {
+            .row {
+                grid-template-columns: 1fr;
+            }
+        }
+        .form-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        label {
+            font-size: 14px;
+            color: #b8b8d0;
+        }
+        input, select {
+            padding: 10px 12px;
+            background: rgba(25, 25, 36, 0.7);
+            border: 1px solid rgba(100, 100, 140, 0.4);
+            border-radius: 6px;
+            color: #fff;
+            font-size: 15px;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #7a86d8;
+        }
+        .calc-btn {
+            width: 100%;
+            padding: 14px;
+            margin: 20px 0;
+            background: linear-gradient(135deg, #424a96, #2c3063);
+            border: none;
+            color: #fff;
+            font-size: 17px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .calc-btn:hover {
+            opacity: 0.85;
+        }
+        .result-wrap {
+            margin-top: 10px;
+            padding: 18px;
+            background: rgba(22, 22, 35, 0.7);
+            border-radius: 8px;
+            border: 1px solid rgba(90, 90, 130, 0.3);
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(80, 80, 110, 0.25);
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-label {
+            color: #c0c0e0;
+        }
+        .result-value {
+            color: #ffdd77;
+            font-weight: bold;
+            user-select: none;
+            pointer-events: none;
+        }
+        .total-line {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 2px solid rgba(130, 130, 180, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">圣遗物词条计算器</h1>
+
+        <div class="tip-box">
+            <button class="tip-btn" id="toggleTip">使用说明</button>
+            <div class="tip-content" id="tipText">
+                <strong>一、v1测试运行声明</strong><br>
+                1. 打开原神查看圣遗物详情，按照对应板块输入数值<br>
+                2. 选择对应圣遗物佩戴的主属性<br>
+                3. 本计算器将小攻击算在了大攻击的词条数，因此得出大攻击词条数偏高
+                （因实际情况，暂未找到合适的解决办法）<br><br>
+                <strong>二、词条计算公式</strong><br>
+                • 暴击率词条 = (面板暴击率 - 头主属性暴击率) ÷ 0.033<br>
+                • 暴击伤害词条 = (面板暴伤 - 头主属性暴伤) ÷ 0.066<br>
+                • 元素精通词条 = (面板精通 - 主属性精通) ÷ 20<br>
+                • 充能词条 = (面板充能效率 - 沙漏主属性充能) ÷ 0.055<br>
+                • 百分比攻击词条 = (面板总攻击 - 311羽毛固定攻击 - 基础攻击×主攻百分比) ÷ (0.05×基础攻击)<br>
+                • 双爆总词条 = 暴击率词条 + 暴击伤害词条<br>
+                • 总词条数 = 全部词条相加<br><br>
+                <strong>三、词条标准</strong><br>
+                1. 暴击词条：3.3%/条<br>
+                2. 爆伤词条：6.6%/条<br>
+                3. 精通词条：20/条<br>
+                4.充能词条：5.5%/条<br>
+                5.攻击力词条：5%<br>
+
+                <strong>四、版权声明</strong><br>
+                1. 禁止未经作者授权，将该程序用作私自推广<br>
+                2. 本程序仅提供给玩家使用<br>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-item">
+                <label>角色基础攻击</label>
+                <input type="number" id="charAtk" value="" step="1">
+            </div>
+            <div class="form-item">
+                <label>武器基础攻击</label>
+                <input type="number" id="weaponAtk" value="" step="1">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-item">
+                <label>沙漏主属性</label>
+                <select id="sand">
+                    <option value="atk">攻击力百分比</option>
+                    
+                    <option value="em">元素精通</option>
+                    <option value="er">充能效率</option>
+                </select>
+            </div>
+            <div class="form-item">
+                <label>杯子主属性</label>
+                <select id="cup">
+                    <option value="atk">攻击力百分比</option>
+                    <option value="dmg">元素伤害加成</option>
+                    <option value="em">元素精通</option>
+                </select>
+            </div>
+            <div class="form-item">
+                <label>头冠主属性</label>
+                <select id="head">
+                    <option value="cr">暴击率</option>
+                    <option value="cd" selected>暴击伤害</option>
+                    <option value="atk">攻击力百分比</option>
+                    <option value="em">元素精通</option>
+                    
+                </select>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-item">
+                <label>圣遗物暴击率（小数）</label>
+                <input type="number" id="crInput" value="" step="0.001">
+            </div>
+            <div class="form-item">
+                <label>圣遗物暴击伤害（小数）</label>
+                <input type="number" id="cdInput" value="" step="0.001">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-item">
+                <label>圣遗物元素精通</label>
+                <input type="number" id="emInput" value="" step="1">
+            </div>
+            <div class="form-item">
+                <label>圣遗物总攻击力</label>
+                <input type="number" id="atkTotal" value="" step="1">
+            </div>
+        </div>
+
+        <div class="form-item">
+            <label>圣遗物充能效率（小数）</label>
+            <input type="number" id="erInput" value="" step="0.001">
+        </div>
+
+        <button class="calc-btn" id="calcBtn">计算词条</button>
+
+        <div class="result-wrap">
+            <div class="result-item">
+                <span class="result-label">暴击率词条：</span>
+                <span class="result-value" id="crEntry">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">暴击伤害词条：</span>
+                <span class="result-value" id="cdEntry">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">元素精通词条：</span>
+                <span class="result-value" id="emEntry">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">百分比攻击词条：</span>
+                <span class="result-value" id="atkEntry">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">充能效率词条：</span>
+                <span class="result-value" id="erEntry">--</span>
+            </div>
+            <div class="result-item total-line">
+                <span class="result-label">双爆词条总数：</span>
+                <span class="result-value" id="doubleCritTotal">--</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">全部总词条数：</span>
+                <span class="result-value" id="allTotal">--</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const toggleBtn = document.getElementById('toggleTip');
+        const tipText = document.getElementById('tipText');
+        toggleBtn.addEventListener('click', () => {
+            tipText.style.display = tipText.style.display === 'block' ? 'none' : 'block';
+        });
+
+        const calcBtn = document.getElementById('calcBtn');
+        calcBtn.addEventListener('click', function() {
+            const charAtk = Number(document.getElementById('charAtk').value);
+            const weaponAtk = Number(document.getElementById('weaponAtk').value);
+            const sand = document.getElementById('sand').value;
+            const cup = document.getElementById('cup').value;
+            const head = document.getElementById('head').value;
+
+            const crTotal = Number(document.getElementById('crInput').value);
+            const cdTotal = Number(document.getElementById('cdInput').value);
+            const emTotal = Number(document.getElementById('emInput').value);
+            const panelAtk = Number(document.getElementById('atkTotal').value);
+            const erTotal = Number(document.getElementById('erInput').value);
+
+            const baseAtk = charAtk + weaponAtk;
+
+            // 暴击率词条：扣除头主属性暴击率33.1%
+            const crBase = head === 'cr' ? 0.331 : 0;
+            const crEntry = (crTotal - crBase) / 0.033;
+
+            // 暴伤词条：扣除头主属性暴伤66.2%
+            const cdBase = head === 'cd' ? 0.662 : 0;
+            const cdEntry = (cdTotal - cdBase) / 0.066;
+
+            // 精通词条：扣除任意部位主属性精通187
+            const emBase = (sand === 'em' || cup === 'em' || head === 'em') ? 187 : 0;
+            const emEntry = (emTotal - emBase) / 20;
+
+            // 充能词条：扣除沙漏主属性充能51.8%
+            const erBase = sand === 'er' ? 0.518 : 0;
+            const erEntry = (erTotal - erBase) / 0.055;
+
+            // 百分比攻击词条：严格按Excel公式
+            // (总攻击 - 331 - 基础攻击 × 主攻百分比总和) / (0.05 × 基础攻击)
+            let mainAtkPercent = 0;
+            if(sand === 'atk') mainAtkPercent += 0.466;
+            if(cup === 'atk') mainAtkPercent += 0.466;
+            if(head === 'atk') mainAtkPercent += 0.466;
+
+            const atkEntry = (panelAtk - 331 - baseAtk * mainAtkPercent) / (0.05 * baseAtk);
+
+            // 汇总
+            const doubleCritSum = crEntry + cdEntry;
+            const allSum = crEntry + cdEntry + emEntry + atkEntry + erEntry;
+
+            const setVal = (id, num) => {
+                document.getElementById(id).textContent = num.toFixed(2);
+            }
+            setVal('crEntry', crEntry);
+            setVal('cdEntry', cdEntry);
+            setVal('emEntry', emEntry);
+            setVal('atkEntry', atkEntry);
+            setVal('erEntry', erEntry);
+            setVal('doubleCritTotal', doubleCritSum);
+            setVal('allTotal', allSum);
+        })
+    </script>
+</body>
+</html>
