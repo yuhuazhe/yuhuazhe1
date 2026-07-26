@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>原神时间表</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", sans-serif;
+        }
+        body {
+            /* 背景底图位置，替换为你的图片 */
+            background: url("1.png") center/cover no-repeat fixed;
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #f0f0f0;
+        }
+        .main-title {
+            text-align: center;
+            font-size: 32px;
+            color: #89b4fa;
+            margin-bottom: 24px;
+            letter-spacing: 3px;
+        }
+        .time-axis-wrap {
+            max-width: 680px;
+            margin: 0 auto;
+            background: rgba(12,12,18,0.65);
+            padding: 30px;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        /* 贡献者总容器 */
+        .contributor-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 24px;
+            width: 100%;
+        }
+        .contributor-label {
+            font-size: 18px;
+            color: #ddd;
+            text-align: center;
+        }
+        /* 两个人横向排列，间距拉大 */
+        .contributor-row {
+            display: flex;
+            gap: 60px;
+            justify-content: center;
+        }
+        /* 单人单元：头像在上，名字在下，各自居中对齐 */
+        .person-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.25);
+            object-fit: cover;
+        }
+        .person-name {
+            font-size: 17px;
+            color: #ddd;
+            text-align: center;
+        }
+        .person-name span {
+            color: #89b4fa;
+        }
+        .btn-desc {
+            display: block;
+            margin: 0 auto 24px;
+            padding: 8px 22px;
+            background: rgba(60,100,180,0.3);
+            border: 1px solid rgba(137,180,250,0.4);
+            border-radius: 8px;
+            color: #b8d1f8;
+            cursor: pointer;
+            font-size: 15px;
+            transition: all 0.2s;
+        }
+        .btn-desc:hover {
+            background: rgba(60,100,180,0.5);
+        }
+        .countdown-box {
+            text-align: center;
+            padding: 16px;
+            background: rgba(30,30,45,0.5);
+            border-radius: 10px;
+            margin-bottom: 28px;
+        }
+        .countdown-title {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #ccc;
+        }
+        .countdown-text {
+            font-size: 24px;
+            color: #89b4fa;
+            letter-spacing: 2px;
+        }
+        .timeline-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .timeline-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: rgba(25,25,38,0.45);
+            border-radius: 8px;
+            border-left: 3px solid rgba(137,180,250,0.5);
+        }
+        .timeline-name {
+            font-size: 15px;
+            color: #eee;
+        }
+        .timeline-date {
+            font-size: 15px;
+            color: #a0b8e0;
+        }
+        .modal-mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.75);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+        .modal-box {
+            width: 90%;
+            max-width: 520px;
+            background: rgba(15,15,22,0.92);
+            padding: 26px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.12);
+        }
+        .modal-title {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: #89b4fa;
+        }
+        .modal-content {
+            font-size: 15px;
+            line-height: 1.7;
+            color: #ddd;
+        }
+        .modal-close {
+            margin-top: 20px;
+            padding: 7px 20px;
+            background: rgba(80,80,100,0.4);
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 6px;
+            color: #eee;
+            cursor: pointer;
+        }
+        /* 移动端适配 */
+        @media screen and (max-width: 600px) {
+            body {
+                padding: 20px 12px;
+            }
+            .main-title {
+                font-size: 24px;
+                margin-bottom: 16px;
+            }
+            .time-axis-wrap {
+                padding: 20px 14px;
+            }
+            .avatar {
+                width: 36px;
+                height: 36px;
+            }
+            .contributor-label {
+                font-size: 16px;
+            }
+            .person-name {
+                font-size: 15px;
+            }
+            .contributor-row {
+                gap: 40px;
+            }
+            .countdown-title {
+                font-size: 14px;
+            }
+            .countdown-text {
+                font-size: 18px;
+            }
+            .timeline-item {
+                padding: 10px 12px;
+                flex-direction: column;
+                gap: 4px;
+            }
+            .timeline-name, .timeline-date {
+                font-size: 14px;
+            }
+            .modal-box {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1 class="main-title">原神时间表</h1>
+    <div class="time-axis-wrap">
+        <!-- 贡献者区域：单独头像对应单独名字，上下对齐 -->
+        <div class="contributor-block">
+            <div class="contributor-label">贡献者</div>
+            <div class="contributor-row">
+                <div class="person-card">
+                    <img class="avatar" src="zj.png" alt="班长头像">
+                    <div class="person-name"><span>幼儿园大班班长</span></div>
+                </div>
+                <div class="person-card">
+                    <img class="avatar" src="jy.png" alt="金鱼头像">
+                    <div class="person-name"><span>金鱼</span></div>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-desc" id="openModalBtn">查看说明</button>
+
+        <div class="countdown-box">
+            <div class="countdown-title">距离下一版本时间点倒计时</div>
+            <div class="countdown-text" id="countdownDom">加载中...</div>
+        </div>
+
+        <div class="timeline-list" id="timelineList"></div>
+    </div>
+
+    <!-- 说明弹窗 -->
+    <div class="modal-mask" id="descModal">
+        <div class="modal-box">
+            <h3 class="modal-title">时间轴说明</h3>
+            <div class="modal-content">
+                1. 本时间轴为原神7.0~7.8全部版本测试、前瞻、创体、开服时间节点<br>
+                2. 倒计时仅反映到达该天凌晨的剩余时间，而非到达具体的开启时间<br>
+                3. 以上时间为按照以往来做的推算，若有特殊变动，请以变动为准<br>
+                4. 若该角色无v5测试版本，则v4则会在v3的同周的周四进行<br>
+                5. 在此感谢金鱼提供的帮助
+            </div>
+            <button class="modal-close" id="closeModalBtn">关闭</button>
+        </div>
+    </div>
+
+    <script>
+        const timeNodeList = [
+            {name:"7.0版本前瞻", date:"2026-07-31"},
+            {name:"7.0版本创体", date:"2026-08-07"},
+            {name:"7.0版本开启", date:"2026-08-12"},
+            {name:"7.1版本v1测试", date:"2026-08-12"},
+            {name:"7.1版本v2测试", date:"2026-08-17"},
+            {name:"7.1版本v3测试", date:"2026-08-24"},
+            {name:"7.1版本v4测试", date:"2026-08-31"},
+            {name:"7.1版本v5测试", date:"2026-09-03"},
+            {name:"7.1版本前瞻", date:"2026-09-11"},
+            {name:"7.1版本创体", date:"2026-09-18"},
+            {name:"7.1版本开启", date:"2026-09-23"},
+            {name:"7.2版本v1测试", date:"2026-09-23"},
+            {name:"7.2版本v2测试", date:"2026-09-28"},
+            {name:"7.2版本v3测试", date:"2026-10-05"},
+            {name:"7.2版本v4测试", date:"2026-10-12"},
+            {name:"7.2版本v5测试", date:"2026-10-15"},
+            {name:"7.2版本前瞻", date:"2026-10-23"},
+            {name:"7.2版本创体", date:"2026-10-30"},
+            {name:"7.2版本开启", date:"2026-11-04"},
+            {name:"7.3版本v1测试", date:"2026-11-04"},
+            {name:"7.3版本v2测试", date:"2026-11-09"},
+            {name:"7.3版本v3测试", date:"2026-11-16"},
+            {name:"7.3版本v4测试", date:"2026-11-23"},
+            {name:"7.3版本v5测试", date:"2026-11-26"},
+            {name:"7.3版本前瞻", date:"2026-12-04"},
+            {name:"7.3版本创体", date:"2026-12-11"},
+            {name:"7.3版本开启", date:"2026-12-16"},
+            {name:"7.4版本v1测试", date:"2026-12-16"},
+            {name:"7.4版本v2测试", date:"2026-12-21"},
+            {name:"7.4版本v3测试", date:"2026-12-28"},
+            {name:"7.4版本v4测试", date:"2027-01-04"},
+            {name:"7.4版本v5测试", date:"2027-01-07"},
+            {name:"7.4版本前瞻", date:"2027-01-15"},
+            {name:"7.4版本创体", date:"2027-01-22"},
+            {name:"7.4版本开启", date:"2027-01-27"},
+            {name:"7.5版本v1测试", date:"2027-01-27"},
+            {name:"7.5版本v2测试", date:"2027-02-01"},
+            {name:"7.5版本v3测试", date:"2027-02-08"},
+            {name:"7.5版本v4测试", date:"2027-02-15"},
+            {name:"7.5版本v5测试", date:"2027-02-18"},
+            {name:"7.5版本前瞻", date:"2027-02-26"},
+            {name:"7.5版本创体", date:"2027-03-05"},
+            {name:"7.5版本开启", date:"2027-03-10"},
+            {name:"7.6版本v1测试", date:"2027-03-10"},
+            {name:"7.6版本v2测试", date:"2027-03-15"},
+            {name:"7.6版本v3测试", date:"2027-03-22"},
+            {name:"7.6版本v4测试", date:"2027-03-29"},
+            {name:"7.6版本v5测试", date:"2027-04-01"},
+            {name:"7.6版本前瞻", date:"2027-04-09"},
+            {name:"7.6版本创体", date:"2027-04-16"},
+            {name:"7.6版本开启", date:"2027-04-21"},
+            {name:"7.7版本v1测试", date:"2027-04-21"},
+            {name:"7.7版本v2测试", date:"2027-04-26"},
+            {name:"7.7版本v3测试", date:"2027-05-03"},
+            {name:"7.7版本v4测试", date:"2027-05-10"},
+            {name:"7.7版本v5测试", date:"2027-05-13"},
+            {name:"7.7版本前瞻", date:"2027-05-21"},
+            {name:"7.7版本创体", date:"2027-05-28"},
+            {name:"7.7版本开启", date:"2027-06-02"},
+            {name:"7.8版本v1测试", date:"2027-06-02"},
+            {name:"7.8版本v2测试", date:"2027-06-07"},
+            {name:"7.8版本v3测试", date:"2027-06-14"},
+            {name:"7.8版本v4测试", date:"2027-06-21"},
+            {name:"7.8版本v5测试", date:"2027-06-24"},
+            {name:"7.8版本前瞻", date:"2027-07-02"},
+            {name:"7.8版本创体", date:"2027-07-09"},
+            {name:"7.8版本开启", date:"2027-07-14"}
+        ];
+        const timelineWrap = document.getElementById("timelineList");
+        function renderTimeline(){
+            let htmlStr = "";
+            timeNodeList.forEach(item=>{
+                htmlStr += `
+                    <div class="timeline-item">
+                        <div class="timeline-name">${item.name}</div>
+                        <div class="timeline-date">${item.date}</div>
+                    </div>
+                `;
+            })
+            timelineWrap.innerHTML = htmlStr;
+        }
+        renderTimeline();
+        // 弹窗控制
+        const modal = document.getElementById("descModal");
+        document.getElementById("openModalBtn").addEventListener("click",()=>{
+            modal.style.display = "flex";
+        })
+        document.getElementById("closeModalBtn").addEventListener("click",()=>{
+            modal.style.display = "none";
+        })
+        modal.addEventListener("click",(e)=>{
+            if(e.target === modal) modal.style.display = "none";
+        })
+        // 倒计时逻辑
+        const countdownDom = document.getElementById("countdownDom");
+        function getNextTargetTime(){
+            const nowTime = new Date().getTime();
+            const futureNodes = timeNodeList.filter(item=>{
+                const target = new Date(item.date).getTime();
+                return target > nowTime;
+            })
+            if(futureNodes.length === 0) return null;
+            return futureNodes[0];
+        }
+        function updateCountdown(){
+            const targetNode = getNextTargetTime();
+            if(!targetNode){
+                countdownDom.innerText = "所有时间节点已全部过期";
+                return;
+            }
+            const now = new Date().getTime();
+            const targetTime = new Date(targetNode.date).getTime();
+            let diff = targetTime - now;
+            const day = Math.floor(diff / (1000 * 60 * 60 * 24));
+            diff = diff % (1000 * 60 * 60 * 24);
+            const hour = Math.floor(diff / (1000 * 60 * 60));
+            diff = diff % (1000 * 60 * 60);
+            const minute = Math.floor(diff / (1000 * 60));
+            diff = diff % (1000 * 60);
+            const second = Math.floor(diff / 1000);
+            countdownDom.innerText = `${targetNode.name} | ${day}天 ${hour}时 ${minute}分 ${second}秒`;
+        }
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+    </script>
+</body>
+</html>
