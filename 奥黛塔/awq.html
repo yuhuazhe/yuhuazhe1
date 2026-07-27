@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>羽化哲</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            width: 100vw;
+            height: auto;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background: rgb(0, 0, 0);
+            position: relative;
+            padding-bottom: 120px;
+        }
+        /* 底图占位区域 完全保留不变 */
+        .bg-layer {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            background-image: url('1.1.png');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.22;
+        }
+        /* 全屏羽化哲水印 完全保留不变 */
+        .watermark-box {
+            position: fixed;
+            inset: 0;
+            z-index: 9;
+            pointer-events: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="240" height="150"><text x="15" y="75" font-size="30" fill="rgba(200,200,200,0.1)" font-family="Microsoft YaHei">羽化哲</text></svg>');
+            background-repeat: repeat;
+        }
+        /* 顶部主标题预留区域 完全保留不变 */
+        .title-box {
+            position: relative;
+            top: 20px;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .main-title {
+            font-size: 32px;
+            color: #ca6a6a;
+            letter-spacing: 4px;
+            text-shadow: 0 0 12px rgba(255, 163, 163, 0.3);
+        }
+        /* 图表外层包裹容器，用来承载备注 */
+        .chart-wrapper {
+            position: relative;
+            width: 70%;
+            height: 68vh;
+            margin: 30px auto 80px;
+        }
+        .chart-wrapper-2 {
+            position: relative;
+            width: 70%;
+            height: 68vh;
+            margin: 0 auto;
+        }
+        /* 图表画布容器 */
+        #chart-wrap, #chart-wrap-2 {
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            z-index: 5;
+        }
+        
+        .chart-note {
+            position: absolute;
+            top: 5px;
+            right: 120px;
+            z-index: 9999;
+            width: 200px;
+            padding: 10px 14px;
+            background: rgba(107, 120, 135, 0.75);
+            border: 1px solid rgba(103, 103, 197, 0.3);
+            border-radius: 6px;
+        }
+        .note-title {
+            font-size: 14px;
+            color: #e0e0e0;
+            margin-bottom: 6px;
+            border-bottom: 1px solid rgba(147, 142, 193, 0.25);
+            padding-bottom: 4px;
+        }
+        .note-text {
+            font-size: 12px;
+            color: #cccccc;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-layer"></div>
+    <div class="watermark-box"></div>
+
+    <div class="title-box">
+        <div class="main-title">奥黛塔武器差距对比</div>
+    </div>
+
+    <!-- 图一外层包裹：备注 + 图表容器分离，不会被清空 -->
+    <div class="chart-wrapper">
+        <div id="chart-wrap"></div>
+        <div class="chart-note">
+            <div class="note-title">备注</div>
+            <div class="note-text">
+                计算队伍：01桑01奥10八6阿<br>
+                非八重队伍差距扩大1.5%-3%<br>
+                数据仅供参考！！！
+            </div>
+        </div>
+    </div>
+
+    <!-- 图二外层包裹 -->
+    <div class="chart-wrapper-2">
+        <div id="chart-wrap-2"></div>
+        <div class="chart-note">
+            <div class="note-title">备注</div>
+            <div class="note-text">
+                计算队伍：01木21奥10八c6阿<br>
+                非八重队伍差距扩大1.5%-3%<br>
+                数据仅供参考！！！
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ====================== 第一幅图表数据 ======================
+        const dataList = [
+            {name:"白湖冬羽 r1", single:100, team:100},
+            {name:"攀岩结绿 r1", single:97.72, team:99.64},
+            {name:"裁叶萃光 r1", single:90.57, team:98.51},
+            {name:"雾切之回光 r1", single:90.31, team:98.46},
+            {name:"星峰剑 r1", single:89.86, team:98.39},
+            {name:"引火之源 r5", single:87.71, team:98.05},
+            {name:"引火之源 r1", single:79.30, team:96.72},
+            {name:"海渊终曲 r5", single:85.29, team:97.67},
+            {name:"海渊终曲 r1", single:81.20, team:97.02},
+            {name:"狼牙 r5", single:78.19, team:96.54},
+            {name:"狼牙 r1", single:77.02, team:96.36},
+            {name:"熔猎异端之刃 r1", single:75.86, team:96.17},
+            {name:"西风 r5", single:59.58, team:93.59}
+        ];
+        const weaponNames = dataList.map(item=>item.name);
+        const singleData = dataList.map(item=>item.single);
+        const teamData = dataList.map(item=>item.team);
+        const chartDom = document.getElementById('chart-wrap');
+        const myChart = echarts.init(chartDom, null, {
+            renderer: 'canvas',
+            backgroundColor: 'transparent'
+        });
+        const hatchPattern = {
+            image: 'data:image/svg+xml;utf8,<svg width="10" height="10" xmlns="http://www.w3.org/2000/svg"><line x1="0" y1="10" x2="10" y2="0" stroke="%23666" stroke-width="1.2" /></svg>',
+            repeat: 'repeat'
+        };
+        const option = {
+            backgroundColor: 'transparent',
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {type:'shadow'},
+                backgroundColor: 'rgba(12,12,20,0.82)',
+                borderColor: 'rgba(180,180,180,0.3)',
+                borderWidth: 1,
+                textStyle: {color:'#f2f2f2', fontSize:13},
+                formatter(params){
+                    return `${params[0].axisValue}<br />单人差距：${params[0].data}%<br />全队差距：${params[1].data}%`
+                }
+            },
+            legend: {
+                data: [
+                    {
+                        name: '单人差距%',
+                        itemStyle: {
+                            color: hatchPattern,
+                            borderColor: '#666666',
+                            borderWidth:1.5
+                        }
+                    },
+                    {
+                        name: '全队差距%',
+                        itemStyle: {
+                            color: 'transparent',
+                            borderColor: '#cccccc',
+                            borderWidth:1.5
+                        }
+                    }
+                ],
+                top:8,
+                left:'center',
+                textStyle:{color:'#e2e2e2', fontSize:14},
+                itemWidth:18,
+                itemHeight:10
+            },
+            grid: {
+                left: '10%',
+                right: '10%',
+                top: '20%',
+                bottom: '18%',
+                backgroundColor: 'transparent',
+                borderColor: 'transparent'
+            },
+            xAxis: {
+                type: 'category',
+                data: weaponNames,
+                axisLabel: {
+                    color: '#cccccc',
+                    rotate: 42,
+                    fontSize:10.5
+                },
+                axisLine: {lineStyle:{color:'rgba(0,0,0,0)'}},
+                splitLine: {show:false},
+                axisTick: {lineStyle:{color:'rgba(0,0,0,0)'}}
+            },
+            yAxis: {
+                type: 'value',
+                name: '伤害差距百分比 %',
+                nameTextStyle: {color:'#bbbbbb', fontSize:13},
+                max:105,
+                axisLine: {lineStyle:{color:'rgba(0,0,0,0)'}},
+                splitLine: {
+                    show: true,
+                    lineStyle:{color:'rgba(0,0,0,0)', width:1}
+                },
+                axisLabel: {color:'#bbbbbb', fontSize:11},
+                axisTick: {lineStyle:{color:'rgba(0,0,0,0)'}}
+            },
+            series: [
+                {
+                    name: '单人差距%',
+                    type: 'bar',
+                    data: singleData,
+                    barWidth: '36%',
+                    barGap: '12%',
+                    itemStyle: {
+                        borderRadius: [4,4,0,0],
+                        color: hatchPattern,
+                        borderColor: '#666666',
+                        borderWidth: 1.5,
+                        shadowBlur: 0
+                    },
+                    label: {
+                        show:true,
+                        position:'top',
+                        color:'#e8e8e8',
+                        fontSize:10,
+                        formatter:'{c}%',
+                        textShadowColor:'rgba(0,0,0,0.6)',
+                        textShadowBlur:2
+                    }
+                },
+                {
+                    name: '全队差距%',
+                    type: 'bar',
+                    data: teamData,
+                    barWidth: '36%',
+                    itemStyle: {
+                        borderRadius: [4,4,0,0],
+                        color: 'transparent',
+                        borderColor: '#cccccc',
+                        borderWidth: 1.5,
+                        shadowBlur: 0
+                    },
+                    label: {
+                        show:true,
+                        position:'top',
+                        color:'#f5f5f5',
+                        fontSize:10,
+                        formatter:'{c}%',
+                        textShadowColor:'rgba(0,0,0,0.6)',
+                        textShadowBlur:2
+                    }
+                }
+            ]
+        };
+        myChart.setOption(option);
+
+        // ====================== 第二幅图表数据 ======================
+        const dataList2 = [
+            {name:"白湖冬羽r1", team:100, single:100},
+            {name:"攀岩结绿r1", team:99.36, single:96.94},
+            {name:"裁叶萃光r1", team:98.15, single:91.10},
+            {name:"星峰剑r1", team:98.05, single:90.59},
+            {name:"雾切之回光r1", team:97.90, single:89.86},
+            {name:"引火之源r5", team:97.04, single:85.73},
+            {name:"海渊终曲r5", team:96.10, single:81.19},
+            {name:"海渊终曲r1", team:95.56, single:78.59},
+            {name:"狼牙r5", team:95.53, single:78.46},
+            {name:"引火之源r1", team:95.49, single:78.28},
+            {name:"狼牙r1", team:95.31, single:77.42},
+            {name:"熔猎异端之刃r1", team:95.07, single:76.26},
+            {name:"西风r5", team:91.52, single:59.17}
+        ];
+        const weaponNames2 = dataList2.map(item=>item.name);
+        const singleData2 = dataList2.map(item=>item.single);
+        const teamData2 = dataList2.map(item=>item.team);
+        const chartDom2 = document.getElementById('chart-wrap-2');
+        const myChart2 = echarts.init(chartDom2, null, {
+            renderer: 'canvas',
+            backgroundColor: 'transparent'
+        });
+        const option2 = JSON.parse(JSON.stringify(option));
+        option2.xAxis.data = weaponNames2;
+        option2.series[0].data = singleData2;
+        option2.series[1].data = teamData2;
+        myChart2.setOption(option2);
+
+        // 窗口自适应
+        window.addEventListener('resize',()=>{
+            myChart.resize();
+            myChart2.resize();
+        });
+    </script>
+</body>
+</html>
