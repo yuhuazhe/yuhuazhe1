@@ -2,40 +2,45 @@
 <html lang="zh-CN">
 <head>
     <link rel="icon" href="资料库.png">
-
-    <!-- 前端预连接、预加载，纯代码提速，无需配置文件 -->
     <link rel="preconnect" href="https://yuhuazhe.github.io" crossorigin>
     <link rel="dns-prefetch" href="https://yuhuazhe.github.io">
-    <link rel="preload" href="zhanshi/1.0.jpg" as="image" type="image/jpeg">
+    <!-- 修正preload：png图片对应image/png，仅保留1条 -->
+    <link rel="preload" href="1.1.png" as="image" type="image/png">
     
     <meta charset="UTF-8">
-    <!--手机自适应必备-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>详情页面</title>
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
         body{
-            background:#000;
+            /* 核心：底色透明 + 全屏固定底图 */
+            background: transparent url("1.1.png") center / cover fixed;
             color:#eee;
-            max-width:1050px; /*电脑大屏限制最大宽度，不会拉太宽*/
+            max-width:1050px;
             margin:0 auto;
             padding:30px 20px;
         }
         h1{
-            color:#ffd700;
+            color:#decb60;
             font-size:32px;
             text-align:center;
         }
         h3{
-            color:#66ccff;
+            color:#d6f1ff;
             font-size:20px;
             text-align:center;
             margin-bottom:40px;
         }
         .item{
             width:85%;
-            max-width:800px;/*电脑端单块最大宽度，防止大图无限拉长*/
+            max-width:800px;
             margin:0 auto 45px;
             text-align:center;
+            background: transparent;
         }
         img{
             width:100%;
@@ -45,7 +50,7 @@
         }
         .fold-btn{
             background:#222;
-            color:#ffd700;
+            color:#dcd9c5;
             border:1px solid #ffd700;
             padding:6px 12px;
             cursor:pointer;
@@ -59,201 +64,369 @@
             margin:8px auto 0;
             width:100%;
             text-align:left;
+            background: rgba(0,0,0,0.25);
         }
         p{
             line-height:1.8;
             font-size:16px;
         }
-        h4{
-            color:#d2f0ff;
-            font-size:20px;
-            text-align:center;
-            margin-bottom:40px;
+        h4, h5, h6 {
+            color: #ffffff !important;
+            font-size: 20px;
+            text-align: center;
+            margin: 0 0 4px 0 !important;
         }
-        h5{
-            color:#d2f0ff;
-            font-size:20px;
-            text-align:center;
-            margin-bottom:40px;
+        small.title-desc {
+            display: block;
+            font-size: 14px;
+            color: #a0c8e8;
+            opacity: 0.75;
+            text-align: center;
+            margin: 0 auto 40px;
         }
-        h6{
-            color:#d2f0ff;
-            font-size:20px;
-            text-align:center;
-            margin-bottom:40px;
+        .nav-wrap {
+            width: 90%;
+            max-width: 700px;
+            margin: 0 auto 50px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: transparent;
         }
-        h6{
-            color:#d2f0ff;
-            font-size:20px;
-            text-align:center;
-            margin-bottom:40px;
+        .nav-bar {
+            width: 100%;
+            padding: 14px;
+            text-align: center;
+            font-size: 18px;
+            color: #ffd700;
+            border: 1px solid rgba(255,215,0,0.4);
+            border-radius: 8px;
+            background: rgba(40,40,40,0.35);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            cursor: pointer;
+            transition: 0.2s;
         }
-
-
-
-
-
+        .nav-bar:hover {
+            background: rgba(60,60,60,0.45);
+        }
+        .mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            display: none;
+            z-index: 999;
+            overflow-y: auto;
+            padding: 40px 20px;
+        }
+        .popup-box {
+            width: 90%;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(102,204,255,0.3);
+            background: rgba(20,20,20,0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .close-pop {
+            display: block;
+            margin: 0 auto 30px;
+            padding: 8px 20px;
+            color: #ffd700;
+            border: 1px solid #ffd700;
+            background: rgba(30,30,30,0.4);
+            backdrop-filter: blur(6px);
+            cursor: pointer;
+            border-radius: 6px;
+        }
+        a {
+            color: #66ccff;
+        }
+        .down-btn {
+            color: #ffd700;
+        }
+        /* 新增表格专用样式，适配暗黑透明页面 */
+        table{
+            width:100%;
+            border-collapse: collapse;
+            margin:20px 0 40px;
+            font-size:14px;
+        }
+        th,td{
+            border:1px solid rgba(255,255,255,0.2);
+            padding:10px 6px;
+            text-align:center;
+        }
+        th{
+            background:rgba(255,255,255,0.1);
+            color:#decb60;
+        }
+        td{
+            background:rgba(0,0,0,0.15);
+        }
+        .table-title{
+            font-size:18px;
+            color:#d6f1ff;
+            margin:30px 0 10px;
+            text-align:center;
+        }
     </style>
 </head>
 <body>
     <h1>奥黛塔</h1>
-    <h3>更新日期：7.27  b站羽化哲
-        bug/报错反馈请找up主
-    </h3>
+    <h3>bug/报错反馈请找up主</h3>
+    <div class="nav-wrap">
+        <div class="nav-bar" onclick="openCalcPopup()">角色计算数据</div>
+        <div class="nav-bar" onclick="location.href='awq.html'">武器差距</div>
+        <div class="nav-bar" onclick="openMechanicPopup()">角色机制</div>
+    </div>
 
+    <div class="mask" id="calcMask">
+        <div class="popup-box">
+            <button class="close-pop" onclick="closeCalcPopup()">关闭计算数据</button>
+            <h6 style="color:#fff;">奥黛塔v5计算数据</h6>
+            <small class="title-desc">版本v5全武器伤害对比测算图表</small>
+            <div class="item">
+                <img src="v5.1.png">
+                <img src="v5.2.png">
+                <img src="v5.3.png">
+                <img src="v5.4.png">
+                <img src="v5.5.png">
+                <button class="fold-btn" onclick="toggle5()">展开v5介绍</button>
+                <div class="fold-content" id="txt5">
+                    <p>锻造武器后面会联系创体做核查</p>
+                    <p>详情内容请去参考视频</p>
+                </div>
+                <div style="text-align:center;margin-top:10px;">
+                    <a href="https://b23.tv/rDCFTFA" target="_blank">羽化哲主页</a>
+                </div>
+            </div>
 
-    <h6>奥黛塔最终计算数据</h6>
-    <div class="item">
-        <img src="dps库/v6.png">
-        <img src="dps库/最终版八重.png">
-       
+            <h6 style="color:#fff;">奥黛塔v4计算数据</h6>
+            <small class="title-desc"></small>
+            <div class="item">
+                <img src="v4.1.png">
+                <img src="v4.2.png">
+                <img src="v4.3.png">
+                <button class="fold-btn" onclick="toggle1()">展开v4介绍</button>
+                <div class="fold-content" id="txt1">
+                    <p>详情内容请去参考视频</p>
+                </div>
+                <div style="text-align:center;margin-top:10px;">
+                    <a href="计算表格/v1.5自用.xlsx" download class="down-btn">自用计算表</a>
+                </div>
+            </div>
 
-        <button class="fold-btn" onclick="toggle6()">展开最终各队伍介绍</button>
-        <div class="fold-content" id="txt6">
-            <p></p>
-            <p></p>
-            
-           
-            <p></p>
-            <p></p>
-            <p></p>
+            <h4 style="color:#fff;">奥黛塔v3计算数据</h4>
+            <small class="title-desc"></small>
+            <div class="item">
+                <img src="v310.png">
+                <img src="v320.png">
+                <img src="v361.png">
+                <img src="v3xi.png">
+                <img src="v3sha.png">
+                <button class="fold-btn" onclick="toggle2()">展开v3介绍</button>
+                <div class="fold-content" id="txt2">
+                    <p>锻造武器后面会联系创体做核查</p>
+                    <p>以上数据仅供参考，请以正式服上线为准</p>
+                </div>
+                <div style="text-align:center;margin-top:10px;">
+                    <a href="计算表格/v3自用.xlsx" download class="down-btn">自用计算表</a>
+                </div>
+            </div>
 
+            <h5 style="color:#fff;">奥黛塔v2计算数据</h5>
+            <small class="title-desc"></small>
+            <div class="item">
+                <img src="aov2.png">
+                <button class="fold-btn" onclick="toggle3()">展开v2介绍</button>
+                <div class="fold-content" id="txt3">
+                    <p>由于v2无改动。本计算主要是优化流程，补充部分数据</p>
+                </div>
+            </div>
 
-
-            
-           
-
-            <p></p>
-        </div>
-         <div style="text-align:center;margin-top:10px;">
-<a href="计算表格/v1.5自用.xlsx" download class="down-btn">自用计算表</a>
-
-
-
+            <h6 style="color:#fff;">奥黛塔v1计算数据</h6>
+            <small class="title-desc"></small>
+            <div class="item">
+                <img src="奥黛塔v1.png">
+                <button class="fold-btn" onclick="toggle4()">展开v1介绍</button>
+                <div class="fold-content" id="txt4">
+                    <p>计算队伍：桑多涅，奥黛塔，八重，c6小狼人</p>
+                    <p>圣遗物选择：新超导套，新辅助，新超导，宗室/与上面角色对应</p>
+                    <p>30词条，流程奥ee八eee狼eq木zeqzez/zeqz</p>
+                    <p>以上数据仅供参考，请以正式服上线为准</p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <h6>奥黛塔v5武器差距对比</h6>
-    <div class="item">
-        <img src="1.1.png">
+    <div class="mask" id="mechanicMask">
+        <div class="popup-box">
+            <button class="close-pop" onclick="closeMechanicPopup()">关闭机制介绍</button>
+            <h2 style="color:#fff;text-align:center;margin:0;">奥黛塔 角色机制</h2>
+            <small class="title-desc"><em></em></em></small>
+            <div style="padding:10px;text-align:left;line-height:2;">
+                <p>E技能：<br>
+                产球：5 <br>   概率：100% <br>  CD：12s</p>
+            </div>
+
+            <!-- 第一张表格：大招&命座伤害附着表 -->
+            <div class="table-title">附着明细</div>
+            <table>
+                <tr>
+                    <th>名称</th>
+                    <th>元素类型</th>
+                    <th>元素附着量（单位U）</th>
+                    <th>削韧(LV)/抗打断数值</th>
+                    <th>附着冷却规则</th>
+                    <th>伤害分类标签</th>
+                </tr>
+                <tr>
+                    <td>疾板·苍羽一梦<br>元素爆发</td>
+                    <td>冰</td>
+                    <td>1U</td>
+                    <td>LV2/30</td>
+                    <td>独立冷却</td>
+                    <td>元素爆发伤害</td>
+                </tr>
+                <tr>
+                    <td>C1：「不曾起舞的清晨，她望向倒影」(超导)<br>一命效果</td>
+                    <td>冰</td>
+                    <td>0U</td>
+                    <td>LV5/40</td>
+                    <td>独立冷却</td>
+                    <td>超导冰伤</td>
+                </tr>
+                <tr>
+                    <td>C1：「不曾起舞的清晨，她望向倒影」<br>一命效果</td>
+                    <td>冰</td>
+                    <td>0U</td>
+                    <td>LV5/40</td>
+                    <td>独立冷却</td>
+                    <td>冰元素扩散伤害</td>
+                </tr>
+                <tr>
+                    <td>C4：「向上，坠往恍惚、燃烧的蓝空」(超导)<br>四命效果</td>
+                    <td>冰</td>
+                    <td>0U</td>
+                    <td>LV2/20</td>
+                    <td>独立冷却</td>
+                    <td>超导冰伤</td>
+                </tr>
+                <tr>
+                    <td>C4：「向上，坠往恍惚、燃烧的蓝空」<br>四命效果</td>
+                    <td>冰</td>
+                    <td>0U</td>
+                    <td>LV2/20</td>
+                    <td>独立冷却</td>
+                    <td>冰元素扩散伤害</td>
+                </tr>
+            </table>
+
+            <!-- 第二张表格：元素战技全伤害附着表 -->
         
-
-        
-        
-         <div style="text-align:center;margin-top:10px;">
-<a href="awq.html" class="char-card glass-box">
-           
-            <div class="char-name">点击查看武器详情</div>
-
-
+            <table>
+                <tr>
+                    <th>名称</th>
+                    <th>元素类型</th>
+                    <th>元素附着量（单位U）</th>
+                    <th>削韧(LV)/抗打断数值</th>
+                    <th>附着冷却规则</th>
+                    <th>伤害分类标签</th>
+                </tr>
+                <tr>
+                    <td>雪鹊变奏(下落攻击)<br>下落攻击</td>
+                    <td>物理</td>
+                    <td>0U</td>
+                    <td>LV2/25</td>
+                    <td>独立冷却</td>
+                    <td>下落攻击</td>
+                </tr>
+                <tr>
+                    <td>雪鹊变奏(下落攻击)<br>下落攻击</td>
+                    <td>物理</td>
+                    <td>1U</td>
+                    <td>LV4/100</td>
+                    <td>独立冷却</td>
+                    <td>下落攻击</td>
+                </tr>
+                <tr>
+                    <td>柔板·幻灵夜舞(超导)<br>元素战技</td>
+                    <td>冰</td>
+                    <td>0U</td>
+                    <td>LV7/35</td>
+                    <td>独立冷却</td>
+                    <td>超导冰伤</td>
+                </tr>
+                <tr>
+                    <td>柔板·幻灵夜舞<br>元素战技</td>
+                    <td>冰</td>
+                    <td>0U</td>
+                    <td>LV7/35</td>
+                    <td>独立冷却</td>
+                    <td>冰元素扩散伤害</td>
+                </tr>
+                <tr>
+                    <td>柔板·幻灵夜舞 双舞判定<br>元素战技</td>
+                    <td>冰</td>
+                    <td>1U</td>
+                    <td>LV2/15</td>
+                    <td>3秒内4次附着上限</td>
+                    <td>奥黛塔E双舞伤害</td>
+                </tr>
+                <tr>
+                    <td>柔板·幻灵夜舞 本体攻击<br>元素战技</td>
+                    <td>冰</td>
+                    <td>1U</td>
+                    <td>LV1/20</td>
+                    <td>独立冷却</td>
+                    <td>元素战技伤害</td>
+                </tr>
+                <tr>
+                    <td>雪鹊变奏(召唤物)<br>召唤协同攻击</td>
+                    <td>冰</td>
+                    <td>1U</td>
+                    <td>LV2/15</td>
+                    <td>3秒内4次附着上限</td>
+                    <td>奥黛塔E双舞伤害</td>
+                </tr>
+                <tr>
+                    <td>柔板·幻灵夜舞 协同攻击<br>元素战技协同</td>
+                    <td>冰</td>
+                    <td>1U</td>
+                    <td>LV2/15</td>
+                    <td>独立冷却</td>
+                    <td>元素战技协同伤害</td>
+                </tr>
+                <tr>
+                    <td>柔板·幻灵夜舞(超导) 协同攻击<br>元素战技协同</td>
+                    <td>冰</td>
+                    <td>0U</td>
+                    <td>LV2/10</td>
+                    <td>独立冷却</td>
+                    <td>超导冰伤</td>
+                </tr>
+                <tr>
+                    <td>柔板·幻灵夜舞 协同攻击<br>元素战技协同</td>
+                    <td>冰</td>
+                    <td>0U</td>
+                    <td>LV2/10</td>
+                    <td>独立冷却</td>
+                    <td>冰元素扩散伤害</td>
+                </tr>
+            </table>
         </div>
     </div>
 
-
-
-
-<h6>奥黛塔v5计算数据</h6>
-    <div class="item">
-        <img src="v5.1.png">
-        <img src="v5.2.png">
-        <img src="v5.3.png">
-        <img src="v5.4.png">
-        <img src="v5.5.png">
-        <button class="fold-btn" onclick="toggle5()">展开v5介绍</button>
-        <div class="fold-content" id="txt5">
-            <p>锻造武器后面会联系创体做核查</p>
-            <p>详情内容请去参考视频</p>
-            <p></p>
-            <p></p>
-            <p></p>
-        </div>
-         <div style="text-align:center;margin-top:10px;">
- <a href=" https://b23.tv/rDCFTFA" target="_blank">羽化哲主页</a>
-
-
-
-        </div>
-    </div>
-
-
-
-
-<h6>奥黛塔v4计算数据</h6>
-    <div class="item">
-        <img src="v4.1.png">
-        <img src="v4.2.png">
-        <img src="v4.3.png">
-        <button class="fold-btn" onclick="toggle1()">展开v4介绍</button>
-        <div class="fold-content" id="txt1">
-            <p>详情内容请去参考视频</p>
-            <p></p>
-            <p></p>
-            <p></p>
-            <p></p>
-        </div>
-         <div style="text-align:center;margin-top:10px;">
-<a href="计算表格/v1.5自用.xlsx" download class="down-btn">自用计算表</a>
-
-
-
-        </div>
-    </div>
-
-
-
-
-
-    <h4>奥黛塔v3计算数据</h4>
-    <div class="item">
-        <img src="v310.png">
-        <img src="v320.png">
-        <img src="v361.png">
-        <img src="v3xi.png">
-        <img src="v3sha.png">
-        <button class="fold-btn" onclick="toggle2()">展开v3介绍</button>
-        <div class="fold-content" id="txt2">
-            <p>锻造武器后面会联系创体做核查</p>
-            <p>以上数据仅供参考，请以正式服上线为准</p>
-            <p></p>
-            <p></p>
-        </div>
-         <div style="text-align:center;margin-top:10px;">
-<a href="计算表格/v3自用.xlsx" download class="down-btn">自用计算表</a>
-
-
-
-        </div>
-    </div>
-
-
-    <h5>奥黛塔v2计算数据</h5>
-    <div class="item">
-        <img src="aov2.png">
-        <button class="fold-btn" onclick="toggle3()">展开v2介绍</button>
-        <div class="fold-content" id="txt3">
-            
-            <p>由于v2无改动。本计算主要是优化流程，补充部分数据</p>
-            <p></p>
-            <p></p>
-            <p></p>
-
-        </div>
-    </div>
-
-
-    <h6>奥黛塔v1计算数据</h6>
-    <div class="item">
-        <img src="奥黛塔v1.png">
-        <button class="fold-btn" onclick="toggle4()">展开v1介绍</button>
-        <div class="fold-content" id="txt4">
-            
-            <p>计算队伍：桑多涅，奥黛塔，八重，c6小狼人</p>
-
-           
-            <p>圣遗物选择：新超导套，新辅助，新超导，宗室/与上面角色对应</p>
-            <p>30词条，流程奥ee八eee狼eq木zeqzez/zeqz</p>
-            <p>以上数据仅供参考，请以正式服上线为准</p>
-        </div>
+    <div style="text-align:center;margin-top:60px;opacity:0.3;">
+        <p>旧版武器对比入口：<a href="awq.html">点击查看武器详情</a></p>
     </div>
 
 <script>
@@ -277,17 +450,24 @@ function toggle5(){
     let d=document.getElementById('txt5');
     d.style.display=d.style.display==='none'?'block':'none';
 }
-function toggle6(){
-    let d=document.getElementById('txt6');
-    d.style.display=d.style.display==='none'?'block':'none';
+function openCalcPopup(){
+    document.getElementById('calcMask').style.display = 'block';
 }
-function toggle7(){
-    let d=document.getElementById('txt7');
-    d.style.display=d.style.display==='none'?'block':'none';
+function closeCalcPopup(){
+    document.getElementById('calcMask').style.display = 'none';
 }
-
-
-
+function openMechanicPopup(){
+    document.getElementById('mechanicMask').style.display = 'block';
+}
+function closeMechanicPopup(){
+    document.getElementById('mechanicMask').style.display = 'none';
+}
+document.getElementById('calcMask').addEventListener('click', function(e){
+    if(e.target === this) this.style.display = 'none';
+})
+document.getElementById('mechanicMask').addEventListener('click', function(e){
+    if(e.target === this) this.style.display = 'none';
+})
 </script>
 </body>
 </html>

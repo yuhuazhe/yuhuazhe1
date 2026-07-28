@@ -2,6 +2,8 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <!-- 移动端视口关键标签 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>羽化哲</title>
     <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
     <style>
@@ -52,8 +54,8 @@
         }
         .main-title {
             font-size: 32px;
-            color: #ca6a6a;
             letter-spacing: 4px;
+            color: #ca6a6a;
             text-shadow: 0 0 12px rgba(255, 163, 163, 0.3);
         }
         /* 图表外层包裹容器，用来承载备注 */
@@ -61,12 +63,14 @@
             position: relative;
             width: 70%;
             height: 68vh;
+            min-height: 420px;
             margin: 30px auto 80px;
         }
         .chart-wrapper-2 {
             position: relative;
             width: 70%;
             height: 68vh;
+            min-height: 420px;
             margin: 0 auto;
         }
         /* 图表画布容器 */
@@ -100,16 +104,46 @@
             color: #cccccc;
             line-height: 1.6;
         }
+
+        /* ========== 手机端自适应媒体查询 ========== */
+        @media screen and (max-width: 768px) {
+            .title-box {
+                height: 60px;
+                top: 10px;
+            }
+            .main-title {
+                font-size: 20px;
+                letter-spacing: 2px;
+            }
+            .chart-wrapper,
+            .chart-wrapper-2 {
+                width: 94%;
+                height: 52vh;
+                min-height: 320px;
+                margin: 20px auto 50px;
+            }
+            .chart-note {
+                right: 8px;
+                width: 140px;
+                padding: 6px 10px;
+            }
+            .note-title {
+                font-size: 12px;
+                margin-bottom: 3px;
+            }
+            .note-text {
+                font-size: 10px;
+                line-height: 1.4;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="bg-layer"></div>
     <div class="watermark-box"></div>
-
     <div class="title-box">
         <div class="main-title">奥黛塔武器差距对比</div>
     </div>
-
     <!-- 图一外层包裹：备注 + 图表容器分离，不会被清空 -->
     <div class="chart-wrapper">
         <div id="chart-wrap"></div>
@@ -122,7 +156,6 @@
             </div>
         </div>
     </div>
-
     <!-- 图二外层包裹 -->
     <div class="chart-wrapper-2">
         <div id="chart-wrap-2"></div>
@@ -135,7 +168,6 @@
             </div>
         </div>
     </div>
-
     <script>
         // ====================== 第一幅图表数据 ======================
         const dataList = [
@@ -165,125 +197,131 @@
             image: 'data:image/svg+xml;utf8,<svg width="10" height="10" xmlns="http://www.w3.org/2000/svg"><line x1="0" y1="10" x2="10" y2="0" stroke="%23666" stroke-width="1.2" /></svg>',
             repeat: 'repeat'
         };
-        const option = {
-            backgroundColor: 'transparent',
-            tooltip: {
-                trigger: 'axis',
-                axisPointer: {type:'shadow'},
-                backgroundColor: 'rgba(12,12,20,0.82)',
-                borderColor: 'rgba(180,180,180,0.3)',
-                borderWidth: 1,
-                textStyle: {color:'#f2f2f2', fontSize:13},
-                formatter(params){
-                    return `${params[0].axisValue}<br />单人差距：${params[0].data}%<br />全队差距：${params[1].data}%`
-                }
-            },
-            legend: {
-                data: [
+        // 动态判断手机/电脑，切换图表配置
+        function getChartBaseOption() {
+            const isMobile = window.innerWidth <= 768;
+            return {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {type:'shadow'},
+                    backgroundColor: 'rgba(12,12,20,0.82)',
+                    borderColor: 'rgba(180,180,180,0.3)',
+                    borderWidth: 1,
+                    textStyle: {color:'#f2f2f2', fontSize: isMobile ? 11 : 13},
+                    formatter(params){
+                        return `${params[0].axisValue}<br />单人差距：${params[0].data}%<br />全队差距：${params[1].data}%`
+                    }
+                },
+                legend: {
+                    data: [
+                        {
+                            name: '单人差距%',
+                            itemStyle: {
+                                color: hatchPattern,
+                                borderColor: '#666666',
+                                borderWidth:1.5
+                            }
+                        },
+                        {
+                            name: '全队差距%',
+                            itemStyle: {
+                                color: 'transparent',
+                                borderColor: '#cccccc',
+                                borderWidth:1.5
+                            }
+                        }
+                    ],
+                    top: isMobile ? 4 : 8,
+                    left:'center',
+                    textStyle:{color:'#e2e2e2', fontSize: isMobile ? 12 : 14},
+                    itemWidth: isMobile ? 14 : 18,
+                    itemHeight: isMobile ? 8 : 10
+                },
+                grid: {
+                    left: isMobile ? '16%' : '10%',
+                    right: isMobile ? '6%' : '10%',
+                    top: isMobile ? '18%' : '20%',
+                    bottom: isMobile ? '24%' : '18%',
+                    backgroundColor: 'transparent',
+                    borderColor: 'transparent'
+                },
+                xAxis: {
+                    type: 'category',
+                    axisLabel: {
+                        color: '#cccccc',
+                        rotate: isMobile ? 50 : 42,
+                        fontSize: isMobile ? 9 : 10.5
+                    },
+                    axisLine: {lineStyle:{color:'rgba(0,0,0,0)'}},
+                    splitLine: {show:false},
+                    axisTick: {lineStyle:{color:'rgba(0,0,0,0)'}}
+                },
+                yAxis: {
+                    type: 'value',
+                    name: '伤害差距百分比 %',
+                    nameTextStyle: {color:'#bbbbbb', fontSize: isMobile ? 11 : 13},
+                    max:105,
+                    axisLine: {lineStyle:{color:'rgba(0,0,0,0)'}},
+                    splitLine: {
+                        show: true,
+                        lineStyle:{color:'rgba(0,0,0,0)', width:1}
+                    },
+                    axisLabel: {color:'#bbbbbb', fontSize: isMobile ? 10 : 11},
+                    axisTick: {lineStyle:{color:'rgba(0,0,0,0)'}}
+                },
+                series: [
                     {
                         name: '单人差距%',
+                        type: 'bar',
+                        barWidth: isMobile ? '32%' : '36%',
+                        barGap: '12%',
                         itemStyle: {
+                            borderRadius: [4,4,0,0],
                             color: hatchPattern,
                             borderColor: '#666666',
-                            borderWidth:1.5
+                            borderWidth: 1.5,
+                            shadowBlur: 0
+                        },
+                        label: {
+                            show:true,
+                            position:'top',
+                            color:'#e8e8e8',
+                            fontSize: isMobile ? 8 : 10,
+                            formatter:'{c}%',
+                            textShadowColor:'rgba(0,0,0,0.6)',
+                            textShadowBlur:2
                         }
                     },
                     {
                         name: '全队差距%',
+                        type: 'bar',
+                        barWidth: isMobile ? '32%' : '36%',
                         itemStyle: {
+                            borderRadius: [4,4,0,0],
                             color: 'transparent',
                             borderColor: '#cccccc',
-                            borderWidth:1.5
+                            borderWidth: 1.5,
+                            shadowBlur: 0
+                        },
+                        label: {
+                            show:true,
+                            position:'top',
+                            color:'#f5f5f5',
+                            fontSize: isMobile ? 8 : 10,
+                            formatter:'{c}%',
+                            textShadowColor:'rgba(0,0,0,0.6)',
+                            textShadowBlur:2
                         }
                     }
-                ],
-                top:8,
-                left:'center',
-                textStyle:{color:'#e2e2e2', fontSize:14},
-                itemWidth:18,
-                itemHeight:10
-            },
-            grid: {
-                left: '10%',
-                right: '10%',
-                top: '20%',
-                bottom: '18%',
-                backgroundColor: 'transparent',
-                borderColor: 'transparent'
-            },
-            xAxis: {
-                type: 'category',
-                data: weaponNames,
-                axisLabel: {
-                    color: '#cccccc',
-                    rotate: 42,
-                    fontSize:10.5
-                },
-                axisLine: {lineStyle:{color:'rgba(0,0,0,0)'}},
-                splitLine: {show:false},
-                axisTick: {lineStyle:{color:'rgba(0,0,0,0)'}}
-            },
-            yAxis: {
-                type: 'value',
-                name: '伤害差距百分比 %',
-                nameTextStyle: {color:'#bbbbbb', fontSize:13},
-                max:105,
-                axisLine: {lineStyle:{color:'rgba(0,0,0,0)'}},
-                splitLine: {
-                    show: true,
-                    lineStyle:{color:'rgba(0,0,0,0)', width:1}
-                },
-                axisLabel: {color:'#bbbbbb', fontSize:11},
-                axisTick: {lineStyle:{color:'rgba(0,0,0,0)'}}
-            },
-            series: [
-                {
-                    name: '单人差距%',
-                    type: 'bar',
-                    data: singleData,
-                    barWidth: '36%',
-                    barGap: '12%',
-                    itemStyle: {
-                        borderRadius: [4,4,0,0],
-                        color: hatchPattern,
-                        borderColor: '#666666',
-                        borderWidth: 1.5,
-                        shadowBlur: 0
-                    },
-                    label: {
-                        show:true,
-                        position:'top',
-                        color:'#e8e8e8',
-                        fontSize:10,
-                        formatter:'{c}%',
-                        textShadowColor:'rgba(0,0,0,0.6)',
-                        textShadowBlur:2
-                    }
-                },
-                {
-                    name: '全队差距%',
-                    type: 'bar',
-                    data: teamData,
-                    barWidth: '36%',
-                    itemStyle: {
-                        borderRadius: [4,4,0,0],
-                        color: 'transparent',
-                        borderColor: '#cccccc',
-                        borderWidth: 1.5,
-                        shadowBlur: 0
-                    },
-                    label: {
-                        show:true,
-                        position:'top',
-                        color:'#f5f5f5',
-                        fontSize:10,
-                        formatter:'{c}%',
-                        textShadowColor:'rgba(0,0,0,0.6)',
-                        textShadowBlur:2
-                    }
-                }
-            ]
-        };
+                ]
+            }
+        }
+        // 初始化第一张图
+        const option = getChartBaseOption();
+        option.xAxis.data = weaponNames;
+        option.series[0].data = singleData;
+        option.series[1].data = teamData;
         myChart.setOption(option);
 
         // ====================== 第二幅图表数据 ======================
@@ -310,15 +348,27 @@
             renderer: 'canvas',
             backgroundColor: 'transparent'
         });
-        const option2 = JSON.parse(JSON.stringify(option));
+        // 初始化第二张图
+        const option2 = getChartBaseOption();
         option2.xAxis.data = weaponNames2;
         option2.series[0].data = singleData2;
         option2.series[1].data = teamData2;
         myChart2.setOption(option2);
 
-        // 窗口自适应
+        // 窗口自适应（尺寸变化时重新生成适配配置）
         window.addEventListener('resize',()=>{
+            const newOpt1 = getChartBaseOption();
+            newOpt1.xAxis.data = weaponNames;
+            newOpt1.series[0].data = singleData;
+            newOpt1.series[1].data = teamData;
+            myChart.setOption(newOpt1);
             myChart.resize();
+
+            const newOpt2 = getChartBaseOption();
+            newOpt2.xAxis.data = weaponNames2;
+            newOpt2.series[0].data = singleData2;
+            newOpt2.series[1].data = teamData2;
+            myChart2.setOption(newOpt2);
             myChart2.resize();
         });
     </script>
