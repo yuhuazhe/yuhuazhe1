@@ -96,6 +96,38 @@
         .log-btn:hover {
             background: rgba(183, 110, 216, 0.02) !important;
         }
+        /* 醒目跳转按钮样式 */
+        .jump-btn-group {
+            margin-top: 14px;
+            display: flex;
+            gap: 18px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .jump-btn {
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #a1a1a1, #cecece) !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            color: #111 !important;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            box-shadow: 0 0 18px rgba(199, 140, 223, 0.5),
+                        0 0 34px rgba(183, 110, 216, 0.25);
+            transition: all 0.22s ease;
+        }
+        .jump-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            background: linear-gradient(135deg, #d8a2ef, #c78cdf) !important;
+            box-shadow: 0 0 24px rgba(199, 140, 223, 0.7),
+                        0 0 45px rgba(183, 110, 216, 0.35);
+        }
+        .jump-btn:active {
+            transform: translateY(0) scale(1.02);
+            box-shadow: 0 0 12px rgba(199, 140, 223, 0.45);
+        }
         /* 弹窗遮罩 弱化透明度，不刺眼 */
         .modal-mask {
             position: fixed;
@@ -182,7 +214,7 @@
         .num {
             font-size: 2.8rem;
             font-weight: bold;
-            color: #c78cdf;
+            color: #decce6;
             line-height: 1;
         }
         .label {
@@ -221,7 +253,12 @@
             background: rgba(183, 110, 216, 0.08);
             transform: translateY(-4px);
         }
+        /* 手机端背景适配：完整显示图片，人物水平居中不裁切 */
         @media (max-width: 600px) {
+            body {
+                background-color: #0a060f;
+                background: url("zhanshi/1.0.jpg") center top / contain no-repeat fixed #0a060f;
+            }
             .time-item {
                 width: 80px;
                 padding: 15px 5px;
@@ -245,6 +282,13 @@
             #logBox {
                 width: 90vw;
             }
+            .jump-btn-group {
+                gap: 10px;
+            }
+            .jump-btn {
+                padding: 10px 20px;
+                font-size: 15px;
+            }
         }
     </style>
 </head>
@@ -254,6 +298,12 @@
         <p class="header-subtitle">羽化哲 更新至7.0版本V5 最后更新日期：2026.7.27</p>
         <p class="header-note">所涉及的主C及副c均为30词条<br>最终数据请以正式服为准！！！</p>
         <a href="https://b23.tv/rDCFTFA" target="_blank" style="color:#c78cdf;">羽化哲主页</a>
+        
+        <!-- 醒目跳转按钮区域 -->
+        <div class="jump-btn-group">
+            <a href="https://qm.qq.com/q/uL4U8Tvd4s" target="_blank" class="jump-btn">点击进入qq1群</a>
+            <a href="https://qm.qq.com/q/PefEgCWmMW" target="_blank" class="jump-btn">点击进入qq2群</a>
+        </div>
         <div align="center" style="margin:8px 0;">
             <button class="log-btn" onclick="toggleLog()">快速查找指南</button>
         </div>
@@ -278,7 +328,6 @@
         </div>
         <div class="tip" id="overTip">数据已更新！</div>
     </div>
-
     <!-- 弹窗遮罩 -->
     <div class="modal-mask" id="mask"></div>
     <!-- 使用指南小弹窗 -->
@@ -294,10 +343,8 @@
                 <p>角色面板计算器，月感电计算器，星超导计算器，圣遗物词条计算器等</p>
                 <p>五.幽静危站/怪物机制板块包含：<br>
                 <p>版本的幽境怪物，以及幽境怪物的详细机制等</p>
-
         </p>
     </div>
-
     <div class="card-container">
         <!-- 全部图片加loading="lazy"，视口外延迟加载，不阻塞首屏 -->
         <a href="juese.html" class="char-card glass-box">
@@ -338,7 +385,6 @@
         }
         // 点击遮罩关闭弹窗
         mask.addEventListener('click', closeLog);
-
         const targetTime = new Date(2026, 6, 20, 18, 0, 0);
         function updateCountDown() {
             const now = new Date().getTime();
