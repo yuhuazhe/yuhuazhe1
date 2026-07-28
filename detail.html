@@ -187,12 +187,10 @@
         <div class="nav-bar" onclick="location.href='sdn1.html'">武器差距</div>
         <div class="nav-bar" onclick="openMechanicPopup()">角色机制</div>
     </div>
-
     <!-- 计算数据弹窗 -->
     <div class="mask" id="calcMask">
         <div class="popup-box">
             <button class="close-pop" onclick="closeCalcPopup()">关闭计算数据</button>
-
             <h6 style="color:#fff;">木偶最终计算数据</h6>
             <small class="title-desc"></small>
             <div class="item">
@@ -213,9 +211,7 @@
                     <a href="计算表格/v1.5自用.xlsx" download class="down-btn">自用计算表</a>
                 </div>
             </div>
-
            
-
             <h6 style="color:#fff;">木偶v4计算数据</h6>
             <small class="title-desc">v4版本伤害测算</small>
             <div class="item">
@@ -225,14 +221,13 @@
                     <p>计算队伍：桑多涅，北斗，砂糖，迪奥娜（四星均为6命）</p>
                     <p>圣遗物选择：新超导套，宗室，风套，千岩/与上面角色对应</p>
                     <p>30词条，21s轴</p>
-                    <p>此计算采用v3.1的hit数，而非最新v4改动后hit数</p>
+                    <p>此计算采用v3.1的命中段数，而非最新v4改动后的命中段数</p>
                     <p>以上数据仅供参考，请以正式服上线为准</p>
                 </div>
                 <div style="text-align:center;margin-top:10px;">
                     <a href="计算表格/v1.5自用.xlsx" download class="down-btn">自用计算表</a>
                 </div>
             </div>
-
             <h6 style="color:#fff;">木偶v1.5计算数据</h6>
             <small class="title-desc"></small>
             <div class="item">
@@ -242,14 +237,13 @@
                     <p>计算队伍：桑多涅，北斗，砂糖，迪奥娜（四星均为6命）</p>
                     <p>圣遗物选择：新超导套，宗室，风套，千岩/与上面角色对应</p>
                     <p>30词条，21s轴</p>
-                    <p>由于之前理解错c6意思，导致之前c6偏低，本次计算已完成修改</p>
+                    <p>由于之前误解六命效果，旧版六命伤害计算偏低，本次数据已修正</p>
                     <p>以上数据仅供参考，请以正式服上线为准</p>
                 </div>
                 <div style="text-align:center;margin-top:10px;">
                     <a href="计算表格/v1.5自用.xlsx" download class="down-btn">自用计算表</a>
                 </div>
             </div>
-
             <h4 style="color:#fff;">木偶v3计算数据</h4>
             <small class="title-desc"></small>
             <div class="item">
@@ -265,7 +259,6 @@
                     <a href="计算表格/v3自用.xlsx" download class="down-btn">自用计算表</a>
                 </div>
             </div>
-
             <h5 style="color:#fff;">木偶v2计算数据</h5>
             <small class="title-desc"></small>
             <div class="item">
@@ -278,7 +271,6 @@
                     <p>以上数据仅供参考，请以正式服上线为准</p>
                 </div>
             </div>
-
             <h6 style="color:#fff;">木偶v1计算数据</h6>
             <small class="title-desc"></small>
             <div class="item">
@@ -293,19 +285,242 @@
             </div>
         </div>
     </div>
-
-    <!-- 角色机制弹窗（预留，和第二个页面结构统一，当前无桑多涅机制内容） -->
+    <!-- 角色机制弹窗 纯中文翻译，无英文 -->
     <div class="mask" id="mechanicMask">
         <div class="popup-box">
             <button class="close-pop" onclick="closeMechanicPopup()">关闭机制介绍</button>
-            <h2 style="color:#fff;text-align:center;margin:0;">桑多涅 角色机制</h2>
-            <small class="title-desc">暂无机制数据，后续更新补充</small>
+            <h2 style="color:#fff;text-align:center;margin:0;">桑多涅</h2>
+            <small class="title-desc">机制详情</small>
             <div style="padding:10px;text-align:left;line-height:2;">
-                <p>机制内容待补充，敬请期待后续更新</p>
+                <h4>下落攻击参数</h4>
+                <table>
+                    <tr>
+                        <th>技能名称</th>
+                        <th>伤害类型</th>
+                        <th>附着量</th>
+                        <th>削韧/抗打断</th>
+                        <th>附着冷却规则</th>
+                        <th>标签</th>
+                    </tr>
+                    <tr>
+                        <td>事象数式·自明演绎(下落)</td>
+                        <td>物理伤害加成</td>
+                        <td>0单位</td>
+                        <td>2级/35</td>
+                        <td>独立冷却</td>
+                        <td>下落攻击</td>
+                    </tr>
+                    <tr>
+                        <td>事象数式·自明演绎(下落)</td>
+                        <td>物理伤害加成</td>
+                        <td>1单位</td>
+                        <td>4级/150</td>
+                        <td>独立冷却</td>
+                        <td>下落攻击</td>
+                    </tr>
+                </table>
+
+                <h4>抗打断</h4>
+                <table>
+                    <tr>
+                        <th>名称</th>
+                        <th></th>
+                        <th>抗打断</th>
+                    </tr>
+                    <tr>
+                        <td>事象数式·自明演绎</td>
+                        <td><br></td>
+                        <td>0.50</td>
+                    </tr>
+                </table>
+
+                <h4></h4>
+                <table>
+                    <tr>
+                        <th>技能名称</th>
+                        <th>元素</th>
+                        <th>附着量</th>
+                        <th>削韧等级</th>
+                        <th>打击频率/规则</th>
+                        <th>分类标签</th>
+                    </tr>
+                    <tr>
+                        <td>事象数式·自明演绎(额外打击)</td>
+                        <td>冰</td>
+                        <td>1单位</td>
+                        <td>1级/10</td>
+                        <td>1.4秒2段伤害</td>
+                        <td>人偶机枪攻击</td>
+                    </tr>
+                    <tr>
+                        <td>事象数式·自明演绎(额外打击)</td>
+                        <td>物理伤害加成</td>
+                        <td>0单位</td>
+                        <td>0级/1</td>
+                        <td>标准：2.5秒3段伤害</td>
+                        <td>默认分组</td>
+                    </tr>
+                    <tr>
+                        <td>事象数式·自明演绎(额外打击)</td>
+                        <td>冰</td>
+                        <td>1单位</td>
+                        <td>0级/1</td>
+                        <td>标准：2.5秒3段伤害</td>
+                        <td>默认分组</td>
+                    </tr>
+                    <tr>
+                        <td>事象数式·自明演绎(额外打击)</td>
+                        <td>冰</td>
+                        <td>1单位</td>
+                        <td>2级/10</td>
+                        <td>1.4秒2段伤害</td>
+                        <td>人偶机枪攻击</td>
+                    </tr>
+                    <tr>
+                        <td>事象数式·游衍解析(弹射物)</td>
+                        <td>冰</td>
+                        <td>1单位</td>
+                        <td>3级/75</td>
+                        <td>独立冷却</td>
+                        <td>额外攻击</td>
+                    </tr>
+                    <tr>
+                        <td>事象数式·万理证毕</td>
+                        <td>冰</td>
+                        <td>1单位</td>
+                        <td>3级/50</td>
+                        <td>独立冷却</td>
+                        <td>元素爆发</td>
+                    </tr>
+                    <tr>
+                        <td>事象数式·万理证毕(星超导)</td>
+                        <td>冰</td>
+                        <td>0单位</td>
+                        <td>3级/100</td>
+                        <td>独立冷却</td>
+                        <td>星超导冰伤</td>
+                    </tr>
+                    <tr>
+                        <td>事象数式·万理证毕</td>
+                        <td>冰</td>
+                        <td>0单位</td>
+                        <td>3级/100</td>
+                        <td>独立冷却</td>
+                        <td>星扩散冰伤</td>
+                    </tr>
+                    <tr>
+                        <td>其他(星超导) T4</td>
+                        <td>冰</td>
+                        <td>0单位</td>
+                        <td>3级/50</td>
+                        <td>独立冷却</td>
+                        <td>星超导冰伤</td>
+                    </tr>
+                    <tr>
+                        <td>其他 T4</td>
+                        <td>冰</td>
+                        <td>0单位</td>
+                        <td>3级/50</td>
+                        <td>独立冷却</td>
+                        <td>星扩散冰伤</td>
+                    </tr>
+                </table>
+
+                <h4></h4>
+                <table>
+                    <tr>
+                        <th>技能名称</th>
+                        <th>元素</th>
+                        <th>附着单位</th>
+                        <th>削韧等级</th>
+                        <th>冷却规则</th>
+                        <th>冷却来源标签</th>
+                    </tr>
+                    <tr>
+                        <td>事象数式·游衍解析(弹射物)</td>
+                        <td>冰</td>
+                        <td>1单位</td>
+                        <td>2级/40</td>
+                        <td>独立冷却</td>
+                        <td>元素战技</td>
+                    </tr>
+                    <tr>
+                        <td>事象数式·游衍解析(弹射物)</td>
+                        <td>冰</td>
+                        <td>1单位</td>
+                        <td>3级/40</td>
+                        <td>独立冷却</td>
+                        <td>元素战技</td>
+                    </tr>
+                    <tr>
+                        <td>其他(星超导)</td>
+                        <td>冰</td>
+                        <td>0单位</td>
+                        <td>3级/60</td>
+                        <td>独立冷却</td>
+                        <td>星超导冰伤</td>
+                    </tr>
+                    <tr>
+                        <td>其他(弹射物)</td>
+                        <td>冰</td>
+                        <td>0单位</td>
+                        <td>3级/60</td>
+                        <td>独立冷却</td>
+                        <td>星扩散冰伤</td>
+                    </tr>
+                    <tr>
+                        <td>事象数式·自明演绎(额外打击)</td>
+                        <td>冰</td>
+                        <td>1单位</td>
+                        <td>2级/30</td>
+                        <td>独立冷却</td>
+                        <td>额外攻击射线</td>
+                    </tr>
+                    <tr>
+                        <td>事象数式·自明演绎(星超导)</td>
+                        <td>冰</td>
+                        <td>0单位</td>
+                        <td>2级/45</td>
+                        <td>独立冷却</td>
+                        <td>星超导冰伤</td>
+                    </tr>
+                    <tr>
+                        <td>事象数式·自明演绎(额外打击)</td>
+                        <td>冰</td>
+                        <td>0单位</td>
+                        <td>2级/45</td>
+                        <td>独立冷却</td>
+                        <td>星扩散冰伤</td>
+                    </tr>
+                    <tr>
+                        <td>事象数式·自明演绎(额外打击)循环</td>
+                        <td>冰</td>
+                        <td>1单位</td>
+                        <td>2级/30</td>
+                        <td>独立冷却</td>
+                        <td>额外攻击射线</td>
+                    </tr>
+                    <tr>
+                        <td>事象数式·自明演绎(星超导)循环</td>
+                        <td>冰</td>
+                        <td>0单位</td>
+                        <td>2级/45</td>
+                        <td>独立冷却</td>
+                        <td>星超导冰伤</td>
+                    </tr>
+                    <tr>
+                        <td>事象数式·自明演绎(额外打击)循环</td>
+                        <td>冰</td>
+                        <td>0单位</td>
+                        <td>2级/45</td>
+                        <td>独立冷却</td>
+                        <td>星扩散冰伤</td>
+                    </tr>
+                </table>
+                <p>术语说明：附着单位代表元素附着量；独立冷却指每次命中单独计算附着冷却；星超导为专属反应伤害标签，不产生元素附着。</p>
             </div>
         </div>
     </div>
-
    
 <script>
 // 折叠面板函数
@@ -337,7 +552,6 @@ function toggle7(){
     let d=document.getElementById('txt7');
     d.style.display=d.style.display==='none'?'block':'none';
 }
-
 // 弹窗控制函数
 function openCalcPopup(){
     document.getElementById('calcMask').style.display = 'block';
@@ -351,7 +565,6 @@ function openMechanicPopup(){
 function closeMechanicPopup(){
     document.getElementById('mechanicMask').style.display = 'none';
 }
-
 // 点击遮罩关闭弹窗
 document.getElementById('calcMask').addEventListener('click', function(e){
     if(e.target === this) this.style.display = 'none';
