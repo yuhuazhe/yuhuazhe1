@@ -2,34 +2,44 @@
 <html lang="zh-CN">
 <head>
     <link rel="icon" href="资料库.png">
+    <link rel="preconnect" href="https://yuhuazhe.github.io" crossorigin>
+    <link rel="dns-prefetch" href="https://yuhuazhe.github.io">
+    <link rel="preload" href="zhanshi/1.png" as="image" type="image/png">
+    
     <meta charset="UTF-8">
-    <!--手机自适应必备-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>详情页面</title>
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
         body{
-            background:#000;
+            /* 核心：底色透明 + 全屏固定底图，和第二个页面统一 */
+            background: transparent url("zhanshi/1.png") center / cover fixed;
             color:#eee;
-            max-width:1050px; /*电脑大屏限制最大宽度，不会拉太宽*/
+            max-width:1050px;
             margin:0 auto;
             padding:30px 20px;
         }
         h1{
-            color:#ffd700;
+            color:#decb60;
             font-size:32px;
             text-align:center;
         }
         h3{
-            color:#66ccff;
+            color:#d6f1ff;
             font-size:20px;
             text-align:center;
             margin-bottom:40px;
         }
         .item{
             width:85%;
-            max-width:800px;/*电脑端单块最大宽度，防止大图无限拉长*/
+            max-width:800px;
             margin:0 auto 45px;
             text-align:center;
+            background: transparent;
         }
         img{
             width:100%;
@@ -39,7 +49,7 @@
         }
         .fold-btn{
             background:#222;
-            color:#ffd700;
+            color:#dcd9c5;
             border:1px solid #ffd700;
             padding:6px 12px;
             cursor:pointer;
@@ -53,201 +63,252 @@
             margin:8px auto 0;
             width:100%;
             text-align:left;
+            background: rgba(0,0,0,0.25);
         }
         p{
             line-height:1.8;
             font-size:16px;
         }
-        h4{
-            color:#d2f0ff;
-            font-size:20px;
-            text-align:center;
-            margin-bottom:40px;
+        h4, h5, h6 {
+            color: #ffffff !important;
+            font-size: 20px;
+            text-align: center;
+            margin: 0 0 4px 0 !important;
         }
-        h5{
-            color:#d2f0ff;
-            font-size:20px;
-            text-align:center;
-            margin-bottom:40px;
+        small.title-desc {
+            display: block;
+            font-size: 14px;
+            color: #a0c8e8;
+            opacity: 0.75;
+            text-align: center;
+            margin: 0 auto 40px;
         }
-        h6{
-            color:#d2f0ff;
-            font-size:20px;
-            text-align:center;
-            margin-bottom:40px;
+        .nav-wrap {
+            width: 90%;
+            max-width: 700px;
+            margin: 0 auto 50px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: transparent;
         }
-        h6{
-            color:#d2f0ff;
-            font-size:20px;
-            text-align:center;
-            margin-bottom:40px;
+        .nav-bar {
+            width: 100%;
+            padding: 14px;
+            text-align: center;
+            font-size: 18px;
+            color: #ffd700;
+            border: 1px solid rgba(255,215,0,0.4);
+            border-radius: 8px;
+            background: rgba(40,40,40,0.35);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            cursor: pointer;
+            transition: 0.2s;
         }
-
-
-
-
-
+        .nav-bar:hover {
+            background: rgba(60,60,60,0.45);
+        }
+        .mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            display: none;
+            z-index: 999;
+            overflow-y: auto;
+            padding: 40px 20px;
+        }
+        .popup-box {
+            width: 90%;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(102,204,255,0.3);
+            background: rgba(20,20,20,0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .close-pop {
+            display: block;
+            margin: 0 auto 30px;
+            padding: 8px 20px;
+            color: #ffd700;
+            border: 1px solid #ffd700;
+            background: rgba(30,30,30,0.4);
+            backdrop-filter: blur(6px);
+            cursor: pointer;
+            border-radius: 6px;
+        }
+        a {
+            color: #66ccff;
+        }
+        .down-btn {
+            color: #ffd700;
+        }
+        /* 表格样式保留统一 */
+        table{
+            width:100%;
+            border-collapse: collapse;
+            margin:20px 0 40px;
+            font-size:14px;
+        }
+        th,td{
+            border:1px solid rgba(255,255,255,0.2);
+            padding:10px 6px;
+            text-align:center;
+        }
+        th{
+            background:rgba(255,255,255,0.1);
+            color:#decb60;
+        }
+        td{
+            background:rgba(0,0,0,0.15);
+        }
+        .table-title{
+            font-size:18px;
+            color:#d6f1ff;
+            margin:30px 0 10px;
+            text-align:center;
+        }
     </style>
 </head>
 <body>
     <h1>桑多涅</h1>
-    <h3>更新日期：6.27  b站羽化哲
-        bug反馈请找up主
-    </h3>
+    <h3>b站羽化哲<br>bug反馈请找up主</h3>
+    <!-- 导航栏（和第二个页面结构统一） -->
+    <div class="nav-wrap">
+        <div class="nav-bar" onclick="openCalcPopup()">角色计算数据</div>
+        <div class="nav-bar" onclick="location.href='sdn1.html'">武器差距</div>
+        <div class="nav-bar" onclick="openMechanicPopup()">角色机制</div>
+    </div>
 
+    <!-- 计算数据弹窗 -->
+    <div class="mask" id="calcMask">
+        <div class="popup-box">
+            <button class="close-pop" onclick="closeCalcPopup()">关闭计算数据</button>
 
-    <h6>木偶最终计算数据</h6>
-    <div class="item">
-        <img src="dps库/v6.png">
-        <img src="dps库/最终版八重.png">
-       
+            <h6 style="color:#fff;">木偶最终计算数据</h6>
+            <small class="title-desc"></small>
+            <div class="item">
+                <img src="dps库/v6.png">
+                <img src="dps库/最终版八重.png">
+                <button class="fold-btn" onclick="toggle6()">展开最终各队伍介绍</button>
+                <div class="fold-content" id="txt6">
+                    <p>计算队伍：桑多涅，北斗，砂糖，迪奥娜（四星均为6命）</p>
+                    <p>圣遗物选择：新超导套，宗室，风套，千岩/与上面角色对应</p>
+                    <br>
+                    <p>计算队伍：桑多涅，八重，北斗，七七</p>
+                    <p>圣遗物选择：新超导套，新超导套，宗室，千岩/与上面角色对应</p>
+                    <p>带八重的计算相对保守，有10%的上限空间</p>
+                    <br>
+                    <p>以上数据仅供参考，请以正式服上线为准</p>
+                </div>
+                <div style="text-align:center;margin-top:10px;">
+                    <a href="计算表格/v1.5自用.xlsx" download class="down-btn">自用计算表</a>
+                </div>
+            </div>
 
-        <button class="fold-btn" onclick="toggle6()">展开最终各队伍介绍</button>
-        <div class="fold-content" id="txt6">
-            <p>计算队伍：桑多涅，北斗，砂糖，迪奥娜（四星均为6命）</p>
-            <p>圣遗物选择：新超导套，宗室，风套，千岩/与上面角色对应</p>
-            
            
-            <p>计算队伍：桑多涅，八重，北斗，七七</p>
-            <p>圣遗物选择：新超导套，新超导套，宗室，千岩/与上面角色对应</p>
-            <p>带八重的计算相对保守，有10%的上限空间</p>
 
+            <h6 style="color:#fff;">木偶v4计算数据</h6>
+            <small class="title-desc">v4版本伤害测算</small>
+            <div class="item">
+                <img src="dps库/v4.png">
+                <button class="fold-btn" onclick="toggle5()">展开v4介绍</button>
+                <div class="fold-content" id="txt5">
+                    <p>计算队伍：桑多涅，北斗，砂糖，迪奥娜（四星均为6命）</p>
+                    <p>圣遗物选择：新超导套，宗室，风套，千岩/与上面角色对应</p>
+                    <p>30词条，21s轴</p>
+                    <p>此计算采用v3.1的hit数，而非最新v4改动后hit数</p>
+                    <p>以上数据仅供参考，请以正式服上线为准</p>
+                </div>
+                <div style="text-align:center;margin-top:10px;">
+                    <a href="计算表格/v1.5自用.xlsx" download class="down-btn">自用计算表</a>
+                </div>
+            </div>
 
+            <h6 style="color:#fff;">木偶v1.5计算数据</h6>
+            <small class="title-desc"></small>
+            <div class="item">
+                <img src="dps库/v3.1.png">
+                <button class="fold-btn" onclick="toggle1()">展开v1.5介绍</button>
+                <div class="fold-content" id="txt1">
+                    <p>计算队伍：桑多涅，北斗，砂糖，迪奥娜（四星均为6命）</p>
+                    <p>圣遗物选择：新超导套，宗室，风套，千岩/与上面角色对应</p>
+                    <p>30词条，21s轴</p>
+                    <p>由于之前理解错c6意思，导致之前c6偏低，本次计算已完成修改</p>
+                    <p>以上数据仅供参考，请以正式服上线为准</p>
+                </div>
+                <div style="text-align:center;margin-top:10px;">
+                    <a href="计算表格/v1.5自用.xlsx" download class="down-btn">自用计算表</a>
+                </div>
+            </div>
 
-            
-           
+            <h4 style="color:#fff;">木偶v3计算数据</h4>
+            <small class="title-desc"></small>
+            <div class="item">
+                <img src="dps库/v3.png">
+                <button class="fold-btn" onclick="toggle2()">展开v3介绍</button>
+                <div class="fold-content" id="txt2">
+                    <p>计算队伍：桑多涅，北斗，砂糖，迪奥娜（四星均为6命）</p>
+                    <p>圣遗物选择：新超导套，宗室，风套，千岩/与上面角色对应</p>
+                    <p>30词条，21s轴</p>
+                    <p>以上数据仅供参考，请以正式服上线为准</p>
+                </div>
+                <div style="text-align:center;margin-top:10px;">
+                    <a href="计算表格/v3自用.xlsx" download class="down-btn">自用计算表</a>
+                </div>
+            </div>
 
-            <p>以上数据仅供参考，请以正式服上线为准</p>
-        </div>
-         <div style="text-align:center;margin-top:10px;">
-<a href="计算表格/v1.5自用.xlsx" download class="down-btn">自用计算表</a>
+            <h5 style="color:#fff;">木偶v2计算数据</h5>
+            <small class="title-desc"></small>
+            <div class="item">
+                <img src="dps库/v2.png">
+                <button class="fold-btn" onclick="toggle3()">展开v2介绍</button>
+                <div class="fold-content" id="txt3">
+                    <p>计算队伍：桑多涅，北斗，砂糖，迪奥娜（四星均为6命）</p>
+                    <p>圣遗物选择：新超导套，宗室，风套，千岩/与上面角色对应</p>
+                    <p>30词条，21s轴</p>
+                    <p>以上数据仅供参考，请以正式服上线为准</p>
+                </div>
+            </div>
 
-
-
-        </div>
-    </div>
-
-    <h6>木偶v5武器差距对比</h6>
-    <div class="item">
-        <img src="wuqichaju/muou .png">
-        <img src="">
-        <img src="">
-
-        <button class="fold-btn" onclick="toggle7()">展开v5武器差距介绍</button>
-        <div class="fold-content" id="txt7">
-            <p>计算队伍：01桑多涅，北斗，砂糖，迪奥娜（四星均为6命）</p>
-            <p>圣遗物选择：新超导套，宗室，风套，千岩/与上面角色对应</p>
-            <p>计算队伍：01桑多涅，北斗，八重，迪奥娜（四星均为6命）</p>
-            <p>圣遗物选择：新超导套，宗室，新超导，千岩/与上面角色对应</p>
-
-            <p>30词条，21s轴</p>
-            <p>若转载请标明出处，谢谢</p>
-            <p>以上数据仅供参考，请以正式服上线为准</p>
-        </div>
-         <div style="text-align:center;margin-top:10px;">
-<a href="计算表格/v1.5自用.xlsx" download class="down-btn">自用计算表</a>
-
-
-
-        </div>
-    </div>
-
-
-
-
-<h6>木偶v4计算数据</h6>
-    <div class="item">
-        <img src="dps库/v4.png">
-        <button class="fold-btn" onclick="toggle5()">展开v4介绍</button>
-        <div class="fold-content" id="txt5">
-            <p>计算队伍：桑多涅，北斗，砂糖，迪奥娜（四星均为6命）</p>
-            <p>圣遗物选择：新超导套，宗室，风套，千岩/与上面角色对应</p>
-            <p>30词条，21s轴</p>
-            <p>此计算采用v3.1的hit数，而非最新v4改动后hit数</p>
-            <p>以上数据仅供参考，请以正式服上线为准</p>
-        </div>
-         <div style="text-align:center;margin-top:10px;">
-<a href="计算表格/v1.5自用.xlsx" download class="down-btn">自用计算表</a>
-
-
-
-        </div>
-    </div>
-
-
-
-
-<h6>木偶v1.5计算数据</h6>
-    <div class="item">
-        <img src="dps库/v3.1.png">
-        <button class="fold-btn" onclick="toggle1()">展开v1.5介绍</button>
-        <div class="fold-content" id="txt1">
-            <p>计算队伍：桑多涅，北斗，砂糖，迪奥娜（四星均为6命）</p>
-            <p>圣遗物选择：新超导套，宗室，风套，千岩/与上面角色对应</p>
-            <p>30词条，21s轴</p>
-            <p>由于之前理解错c6意思，导致之前c6偏低，本次计算已完成修改</p>
-            <p>以上数据仅供参考，请以正式服上线为准</p>
-        </div>
-         <div style="text-align:center;margin-top:10px;">
-<a href="计算表格/v1.5自用.xlsx" download class="down-btn">自用计算表</a>
-
-
-
+            <h6 style="color:#fff;">木偶v1计算数据</h6>
+            <small class="title-desc"></small>
+            <div class="item">
+                <img src="dps库/v1.png">
+                <button class="fold-btn" onclick="toggle4()">展开v1介绍</button>
+                <div class="fold-content" id="txt4">
+                    <p>计算队伍：桑多涅，北斗，砂糖，迪奥娜（四星均为6命）</p>
+                    <p>圣遗物选择：新超导套，宗室，风套，千岩/与上面角色对应</p>
+                    <p>30词条，21s轴</p>
+                    <p>以上数据仅供参考，请以正式服上线为准</p>
+                </div>
+            </div>
         </div>
     </div>
 
-
-
-
-
-    <h4>木偶v3计算数据</h4>
-    <div class="item">
-        <img src="dps库/v3.png">
-        <button class="fold-btn" onclick="toggle2()">展开v3介绍</button>
-        <div class="fold-content" id="txt2">
-            <p>计算队伍：桑多涅，北斗，砂糖，迪奥娜（四星均为6命）</p>
-            <p>圣遗物选择：新超导套，宗室，风套，千岩/与上面角色对应</p>
-            <p>30词条，21s轴</p>
-            <p>以上数据仅供参考，请以正式服上线为准</p>
-        </div>
-         <div style="text-align:center;margin-top:10px;">
-<a href="计算表格/v3自用.xlsx" download class="down-btn">自用计算表</a>
-
-
-
+    <!-- 角色机制弹窗（预留，和第二个页面结构统一，当前无桑多涅机制内容） -->
+    <div class="mask" id="mechanicMask">
+        <div class="popup-box">
+            <button class="close-pop" onclick="closeMechanicPopup()">关闭机制介绍</button>
+            <h2 style="color:#fff;text-align:center;margin:0;">桑多涅 角色机制</h2>
+            <small class="title-desc">暂无机制数据，后续更新补充</small>
+            <div style="padding:10px;text-align:left;line-height:2;">
+                <p>机制内容待补充，敬请期待后续更新</p>
+            </div>
         </div>
     </div>
 
-
-    <h5>木偶v2计算数据</h5>
-    <div class="item">
-        <img src="dps库/v2.png">
-        <button class="fold-btn" onclick="toggle3()">展开v2介绍</button>
-        <div class="fold-content" id="txt3">
-            
-            <p>计算队伍：桑多涅，北斗，砂糖，迪奥娜（四星均为6命）</p>
-            <p>圣遗物选择：新超导套，宗室，风套，千岩/与上面角色对应</p>
-            <p>30词条，21s轴</p>
-            <p>以上数据仅供参考，请以正式服上线为准</p>
-
-        </div>
-    </div>
-
-
-    <h6>木偶v1计算数据</h6>
-    <div class="item">
-        <img src="dps库/v1.png">
-        <button class="fold-btn" onclick="toggle4()">展开v1介绍</button>
-        <div class="fold-content" id="txt4">
-            
-            <p>计算队伍：桑多涅，北斗，砂糖，迪奥娜（四星均为6命）</p>
-            <p>圣遗物选择：新超导套，宗室，风套，千岩/与上面角色对应</p>
-            <p>30词条，21s轴</p>
-            <p>以上数据仅供参考，请以正式服上线为准</p>
-        </div>
-    </div>
-
+   
 <script>
+// 折叠面板函数
 function toggle1(){
     let d=document.getElementById('txt1');
     d.style.display=d.style.display==='none'?'block':'none';
@@ -277,8 +338,27 @@ function toggle7(){
     d.style.display=d.style.display==='none'?'block':'none';
 }
 
+// 弹窗控制函数
+function openCalcPopup(){
+    document.getElementById('calcMask').style.display = 'block';
+}
+function closeCalcPopup(){
+    document.getElementById('calcMask').style.display = 'none';
+}
+function openMechanicPopup(){
+    document.getElementById('mechanicMask').style.display = 'block';
+}
+function closeMechanicPopup(){
+    document.getElementById('mechanicMask').style.display = 'none';
+}
 
-
+// 点击遮罩关闭弹窗
+document.getElementById('calcMask').addEventListener('click', function(e){
+    if(e.target === this) this.style.display = 'none';
+})
+document.getElementById('mechanicMask').addEventListener('click', function(e){
+    if(e.target === this) this.style.display = 'none';
+})
 </script>
 </body>
 </html>
