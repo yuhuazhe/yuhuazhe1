@@ -20,23 +20,23 @@
             color:#eee;
             max-width:1050px;
             margin:0 auto;
-            padding:30px 20px;
+            padding:30px 12px;
         }
         h1{
             color:#decb60;
-            font-size:32px;
+            font-size:26px;
             text-align:center;
         }
         h3{
             color:#d6f1ff;
-            font-size:20px;
+            font-size:16px;
             text-align:center;
-            margin-bottom:40px;
+            margin-bottom:30px;
         }
         .item{
-            width:85%;
+            width:100%;
             max-width:800px;
-            margin:0 auto 45px;
+            margin:0 auto 30px;
             text-align:center;
             background: transparent;
             position: relative;
@@ -54,7 +54,7 @@
             background:#222;
             color:#dcd9c5;
             border:1px solid #ffd700;
-            padding:6px 12px;
+            padding:10px 16px;
             cursor:pointer;
             font-size:14px;
             width:fit-content;
@@ -73,14 +73,14 @@
             z-index: 2;
         }
         p{
-            line-height:1.8;
-            font-size:16px;
+            line-height:1.7;
+            font-size:15px;
             position: relative;
             z-index: 2;
         }
         h4, h5, h6 {
             color: #ffffff !important;
-            font-size: 20px;
+            font-size: 18px;
             text-align: center;
             margin: 0 0 4px 0 !important;
             position: relative;
@@ -89,31 +89,32 @@
         h2{
             position: relative;
             z-index: 2;
+            font-size:20px;
         }
         small.title-desc {
             display: block;
-            font-size:14px;
+            font-size:13px;
             color: #a0c8e8;
             opacity: 0.75;
             text-align: center;
-            margin: 0 auto 40px;
+            margin: 0 auto 30px;
             position: relative;
             z-index: 2;
         }
         .nav-wrap {
-            width: 90%;
+            width: 100%;
             max-width: 700px;
-            margin: 0 auto 50px;
+            margin: 0 auto 40px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
             background: transparent;
         }
         .nav-bar {
             width: 100%;
-            padding: 14px;
+            padding: 12px 8px;
             text-align: center;
-            font-size: 18px;
+            font-size: 16px;
             color: #ffd700;
             border: 1px solid rgba(255,215,0,0.4);
             border-radius: 8px;
@@ -132,28 +133,27 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
             display: none;
             z-index: 999;
             overflow-y: auto;
-            padding: 40px 20px;
+            padding: 20px 8px;
         }
         .popup-box {
-            width: 90%;
+            width: 100%;
             max-width: 900px;
             margin: 0 auto;
-            padding: 30px 20px;
+            padding: 20px 10px;
             border-radius: 10px;
             border: 1px solid rgba(102,204,255,0.3);
             background: transparent;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
             position: relative;
             overflow: hidden;
         }
-        /* SVG平铺水印，完整铺满弹窗，无左上角局限 */
         .popup-box::before {
             content: "";
             position: absolute;
@@ -166,8 +166,8 @@
         }
         .close-pop {
             display: block;
-            margin: 0 auto 30px;
-            padding: 8px 20px;
+            margin: 0 auto 20px;
+            padding: 10px 16px;
             color: #ffd700;
             border: 1px solid #ffd700;
             background: rgba(30,30,30,0.4);
@@ -176,6 +176,7 @@
             border-radius: 6px;
             position: relative;
             z-index: 2;
+            font-size:14px;
         }
         a {
             color: #66ccff;
@@ -186,42 +187,62 @@
             color: #ffd700;
             border:1px solid #ffd700;
             background:#222;
-            padding:7px 14px;
+            padding:9px 16px;
             border-radius:6px;
             display:inline-block;
             text-decoration:none;
             margin-bottom:15px;
             position: relative;
             z-index: 2;
+            font-size:14px;
+        }
+        /* 表格横向滚动容器 */
+        .table-wrap {
+            width: 100%;
+            overflow-x: auto;
+            margin:10px 0 30px;
         }
         table{
-            width:100%;
+            min-width: 700px;
+            width: 100%;
             border-collapse: collapse;
-            margin:20px 0 40px;
-            font-size:14px;
+            font-size:12px;
             position: relative;
             z-index: 2;
         }
-        /* 已修改：表格边框改为半透明白色 */
         th,td{
             border:1px solid rgba(255,255,255,0.75);
-            padding:10px 6px;
+            padding:6px 3px;
             text-align:center;
         }
         th{
             background:rgba(255,255,255,0.1);
             color:#decb60;
+            white-space: nowrap;
         }
         td{
             background:rgba(0,0,0,0.15);
+            white-space: nowrap;
         }
         .table-title{
-            font-size:18px;
+            font-size:16px;
             color:#d6f1ff;
-            margin:30px 0 10px;
+            margin:20px 0 8px;
             text-align:center;
             position: relative;
             z-index: 2;
+        }
+        /* 美化滚动条 */
+        .table-wrap::-webkit-scrollbar {
+            height: 4px;
+        }
+        .table-wrap::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+        .table-wrap::-webkit-scrollbar-thumb {
+            background: rgba(102,204,255,0.6);
+            border-radius: 4px;
         }
     </style>
 </head>
@@ -234,8 +255,7 @@
         <div class="nav-bar" onclick="location.href='awq.html'">武器差距</div>
         <div class="nav-bar" onclick="openMechanicPopup()">角色机制</div>
     </div>
-
-    <!-- 星超导弹窗（完整原始数据保留） -->
+    <!-- 星超导弹窗 -->
     <div class="mask" id="superMask">
         <div class="popup-box">
             <button class="close-pop" onclick="closeSuperPopup()">关闭星超导数据</button>
@@ -243,545 +263,555 @@
             <small class="title-desc"></small>
             <div class="item">
                 <div class="table-title">队伍1：木偶10八重奥黛塔阿罗夏</div>
-                <table>
-                    <tr>
-                        <th>桑多涅/奥黛塔</th>
-                        <th>0+0</th>
-                        <th>0+1</th>
-                        <th>1+0</th>
-                        <th>1+1</th>
-                        <th>2+0</th>
-                        <th>2+1</th>
-                        <th>6+1</th>
-                    </tr>
-                    <tr>
-                        <td rowspan="2">0+新锻造</td>
-                        <td>171255.84</td>
-                        <td>183440.43</td>
-                        <td>187765.94</td>
-                        <td>204261.46</td>
-                        <td>273511.32</td>
-                        <td>293328.80</td>
-                        <td>428192.30</td>
-                    </tr>
-                    <tr>
-                        <td>190817.37</td>
-                        <td>202729.26</td>
-                        <td>205561.73</td>
-                        <td>218757.88</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td rowspan="2">0+1</td>
-                        <td>194402.31</td>
-                        <td>206586.90</td>
-                        <td>212396.26</td>
-                        <td>229959.03</td>
-                        <td>314403.53</td>
-                        <td>334221.01</td>
-                        <td>478789.14</td>
-                    </tr>
-                    <tr>
-                        <td>219493.32</td>
-                        <td>231405.25</td>
-                        <td>238357.33</td>
-                        <td>248828.80</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td rowspan="2">1+1</td>
-                        <td>210498.16</td>
-                        <td>222806.53</td>
-                        <td>228220.83</td>
-                        <td>244199.87</td>
-                        <td>337891.16</td>
-                        <td>357482.20</td>
-                        <td>506656.49</td>
-                    </tr>
-                    <tr>
-                        <td>237981.18</td>
-                        <td>250035.44</td>
-                        <td>256328.30</td>
-                        <td>272053.24</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td rowspan="2">2+1</td>
-                        <td>231564.73</td>
-                        <td>243873.10</td>
-                        <td>250682.01</td>
-                        <td>266930.55</td>
-                        <td>372955.36</td>
-                        <td>392546.40</td>
-                        <td>551050.69</td>
-                    </tr>
-                    <tr>
-                        <td>262997.27</td>
-                        <td>275051.53</td>
-                        <td>283177.07</td>
-                        <td>298902.01</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td rowspan="2">6+1</td>
-                        <td>381473.35</td>
-                        <td>393781.72</td>
-                        <td>410797.82</td>
-                        <td>426776.86</td>
-                        <td>620731.58</td>
-                        <td>640322.63</td>
-                        <td>843332.22</td>
-                    </tr>
-                    <tr>
-                        <td>441989.32</td>
-                        <td>454043.59</td>
-                        <td>473291.72</td>
-                        <td>489470.10</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                </table>
+                <div class="table-wrap">
+                    <table>
+                        <tr>
+                            <th>桑多涅/奥黛塔</th>
+                            <th>0+0</th>
+                            <th>0+1</th>
+                            <th>1+0</th>
+                            <th>1+1</th>
+                            <th>2+0</th>
+                            <th>2+1</th>
+                            <th>6+1</th>
+                        </tr>
+                        <tr>
+                            <td rowspan="2">0+新锻造</td>
+                            <td>171255.84</td>
+                            <td>183440.43</td>
+                            <td>187765.94</td>
+                            <td>204261.46</td>
+                            <td>273511.32</td>
+                            <td>293328.80</td>
+                            <td>428192.30</td>
+                        </tr>
+                        <tr>
+                            <td>190817.37</td>
+                            <td>202729.26</td>
+                            <td>205561.73</td>
+                            <td>218757.88</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td rowspan="2">0+1</td>
+                            <td>194402.31</td>
+                            <td>206586.90</td>
+                            <td>212396.26</td>
+                            <td>229959.03</td>
+                            <td>314403.53</td>
+                            <td>334221.01</td>
+                            <td>478789.14</td>
+                        </tr>
+                        <tr>
+                            <td>219493.32</td>
+                            <td>231405.25</td>
+                            <td>238357.33</td>
+                            <td>248828.80</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td rowspan="2">1+1</td>
+                            <td>210498.16</td>
+                            <td>222806.53</td>
+                            <td>228220.83</td>
+                            <td>244199.87</td>
+                            <td>337891.16</td>
+                            <td>357482.20</td>
+                            <td>506656.49</td>
+                        </tr>
+                        <tr>
+                            <td>237981.18</td>
+                            <td>250035.44</td>
+                            <td>256328.30</td>
+                            <td>272053.24</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td rowspan="2">2+1</td>
+                            <td>231564.73</td>
+                            <td>243873.10</td>
+                            <td>250682.01</td>
+                            <td>266930.55</td>
+                            <td>372955.36</td>
+                            <td>392546.40</td>
+                            <td>551050.69</td>
+                        </tr>
+                        <tr>
+                            <td>262997.27</td>
+                            <td>275051.53</td>
+                            <td>283177.07</td>
+                            <td>298902.01</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td rowspan="2">6+1</td>
+                            <td>381473.35</td>
+                            <td>393781.72</td>
+                            <td>410797.82</td>
+                            <td>426776.86</td>
+                            <td>620731.58</td>
+                            <td>640322.63</td>
+                            <td>843332.22</td>
+                        </tr>
+                        <tr>
+                            <td>441989.32</td>
+                            <td>454043.59</td>
+                            <td>473291.72</td>
+                            <td>489470.10</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </div>
                 <div class="table-title">队伍1：木偶20八重奥黛塔阿罗夏</div>
-                <table>
-                    <tr>
-                        <th>桑多涅/奥黛塔</th>
-                        <th>0+0</th>
-                        <th>0+1</th>
-                        <th>1+0</th>
-                        <th>1+1</th>
-                        <th>2+0</th>
-                        <th>2+1</th>
-                        <th>6+1</th>
-                    </tr>
-                    <tr>
-                        <td rowspan="2">0+新锻造</td>
-                        <td>190827.16</td>
-                        <td>203243.63</td>
-                        <td>207527.31</td>
-                        <td>226325.31</td>
-                        <td>302619.92</td>
-                        <td>326601.78</td>
-                        <td>474165.48</td>
-                    </tr>
-                    <tr>
-                        <td>211726.11</td>
-                        <td>226340.28</td>
-                        <td>230136.36</td>
-                        <td>249269.65</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td rowspan="2">0+1</td>
-                        <td>216870.91</td>
-                        <td>229287.38</td>
-                        <td>234795.35</td>
-                        <td>253593.34</td>
-                        <td>347464.26</td>
-                        <td>371582.86</td>
-                        <td>529635.67</td>
-                    </tr>
-                    <tr>
-                        <td>243442.73</td>
-                        <td>258056.90</td>
-                        <td>263247.95</td>
-                        <td>282381.24</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td rowspan="2">1+1</td>
-                        <td>234592.84</td>
-                        <td>246109.15</td>
-                        <td>250913.72</td>
-                        <td>269049.34</td>
-                        <td>370651.73</td>
-                        <td>394250.63</td>
-                        <td>556523.22</td>
-                    </tr>
-                    <tr>
-                        <td>261486.22</td>
-                        <td>276058.52</td>
-                        <td>281012.52</td>
-                        <td>299795.81</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td rowspan="2">2+1</td>
-                        <td>256555.83</td>
-                        <td>269434.19</td>
-                        <td>275773.37</td>
-                        <td>293779.50</td>
-                        <td>408496.96</td>
-                        <td>432095.87</td>
-                        <td>604242.57</td>
-                    </tr>
-                    <tr>
-                        <td>288933.90</td>
-                        <td>303506.40</td>
-                        <td>309990.74</td>
-                        <td>328774.03</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td rowspan="2">6+1</td>
-                        <td>421521.56</td>
-                        <td>434399.92</td>
-                        <td>450547.31</td>
-                        <td>468682.93</td>
-                        <td>675924.97</td>
-                        <td>698222.32</td>
-                        <td>918416.13</td>
-                    </tr>
-                    <tr>
-                        <td>482980.49</td>
-                        <td>497552.78</td>
-                        <td>514857.77</td>
-                        <td>533641.06</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                </table>
+                <div class="table-wrap">
+                    <table>
+                        <tr>
+                            <th>桑多涅/奥黛塔</th>
+                            <th>0+0</th>
+                            <th>0+1</th>
+                            <th>1+0</th>
+                            <th>1+1</th>
+                            <th>2+0</th>
+                            <th>2+1</th>
+                            <th>6+1</th>
+                        </tr>
+                        <tr>
+                            <td rowspan="2">0+新锻造</td>
+                            <td>190827.16</td>
+                            <td>203243.63</td>
+                            <td>207527.31</td>
+                            <td>226325.31</td>
+                            <td>302619.92</td>
+                            <td>326601.78</td>
+                            <td>474165.48</td>
+                        </tr>
+                        <tr>
+                            <td>211726.11</td>
+                            <td>226340.28</td>
+                            <td>230136.36</td>
+                            <td>249269.65</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td rowspan="2">0+1</td>
+                            <td>216870.91</td>
+                            <td>229287.38</td>
+                            <td>234795.35</td>
+                            <td>253593.34</td>
+                            <td>347464.26</td>
+                            <td>371582.86</td>
+                            <td>529635.67</td>
+                        </tr>
+                        <tr>
+                            <td>243442.73</td>
+                            <td>258056.90</td>
+                            <td>263247.95</td>
+                            <td>282381.24</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td rowspan="2">1+1</td>
+                            <td>234592.84</td>
+                            <td>246109.15</td>
+                            <td>250913.72</td>
+                            <td>269049.34</td>
+                            <td>370651.73</td>
+                            <td>394250.63</td>
+                            <td>556523.22</td>
+                        </tr>
+                        <tr>
+                            <td>261486.22</td>
+                            <td>276058.52</td>
+                            <td>281012.52</td>
+                            <td>299795.81</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td rowspan="2">2+1</td>
+                            <td>256555.83</td>
+                            <td>269434.19</td>
+                            <td>275773.37</td>
+                            <td>293779.50</td>
+                            <td>408496.96</td>
+                            <td>432095.87</td>
+                            <td>604242.57</td>
+                        </tr>
+                        <tr>
+                            <td>288933.90</td>
+                            <td>303506.40</td>
+                            <td>309990.74</td>
+                            <td>328774.03</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td rowspan="2">6+1</td>
+                            <td>421521.56</td>
+                            <td>434399.92</td>
+                            <td>450547.31</td>
+                            <td>468682.93</td>
+                            <td>675924.97</td>
+                            <td>698222.32</td>
+                            <td>918416.13</td>
+                        </tr>
+                        <tr>
+                            <td>482980.49</td>
+                            <td>497552.78</td>
+                            <td>514857.77</td>
+                            <td>533641.06</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </div>
                 <div class="table-title">队伍1：木偶61八重奥黛塔阿罗夏</div>
-                <table>
-                    <tr>
-                        <th>桑多涅/奥黛塔</th>
-                        <th>0+0</th>
-                        <th>0+1</th>
-                        <th>1+0</th>
-                        <th>1+1</th>
-                        <th>2+0</th>
-                        <th>2+1</th>
-                        <th>6+1</th>
-                    </tr>
-                    <tr>
-                        <td rowspan="2">0+新锻造</td>
-                        <td>227671.62</td>
-                        <td>240088.08</td>
-                        <td>246089.85</td>
-                        <td>264887.84</td>
-                        <td>356338.29</td>
-                        <td>380456.88</td>
-                        <td>536435.26</td>
-                    </tr>
-                    <tr>
-                        <td>250004.21</td>
-                        <td>264618.38</td>
-                        <td>270132.54</td>
-                        <td>289265.83</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td rowspan="2">0+1</td>
-                        <td>253715.36</td>
-                        <td>266131.83</td>
-                        <td>273357.88</td>
-                        <td>292155.87</td>
-                        <td>401319.36</td>
-                        <td>425437.96</td>
-                        <td>591905.46</td>
-                    </tr>
-                    <tr>
-                        <td>281720.83</td>
-                        <td>296335.00</td>
-                        <td>303244.13</td>
-                        <td>322377.42</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td rowspan="2">1+1</td>
-                        <td>269164.06</td>
-                        <td>282042.43</td>
-                        <td>288447.93</td>
-                        <td>306583.56</td>
-                        <td>422990.89</td>
-                        <td>446589.80</td>
-                        <td>617309.76</td>
-                    </tr>
-                    <tr>
-                        <td>298755.39</td>
-                        <td>313327.69</td>
-                        <td>319883.62</td>
-                        <td>338665.92</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td rowspan="2">2+1</td>
-                        <td>292489.10</td>
-                        <td>305367.46</td>
-                        <td>313366.20</td>
-                        <td>331501.83</td>
-                        <td>460836.12</td>
-                        <td>484435.03</td>
-                        <td>665029.12</td>
-                    </tr>
-                    <tr>
-                        <td>326203.07</td>
-                        <td>340775.37</td>
-                        <td>348860.85</td>
-                        <td>367644.15</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td rowspan="2">6+1</td>
-                        <td>457454.83</td>
-                        <td>470333.19</td>
-                        <td>488081.52</td>
-                        <td>506217.14</td>
-                        <td>728264.13</td>
-                        <td>751863.04</td>
-                        <td>979202.68</td>
-                    </tr>
-                    <tr>
-                        <td>520249.66</td>
-                        <td>534821.95</td>
-                        <td>553727.88</td>
-                        <td>572511.17</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                </table>
+                <div class="table-wrap">
+                    <table>
+                        <tr>
+                            <th>桑多涅/奥黛塔</th>
+                            <th>0+0</th>
+                            <th>0+1</th>
+                            <th>1+0</th>
+                            <th>1+1</th>
+                            <th>2+0</th>
+                            <th>2+1</th>
+                            <th>6+1</th>
+                        </tr>
+                        <tr>
+                            <td rowspan="2">0+新锻造</td>
+                            <td>227671.62</td>
+                            <td>240088.08</td>
+                            <td>246089.85</td>
+                            <td>264887.84</td>
+                            <td>356338.29</td>
+                            <td>380456.88</td>
+                            <td>536435.26</td>
+                        </tr>
+                        <tr>
+                            <td>250004.21</td>
+                            <td>264618.38</td>
+                            <td>270132.54</td>
+                            <td>289265.83</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td rowspan="2">0+1</td>
+                            <td>253715.36</td>
+                            <td>266131.83</td>
+                            <td>273357.88</td>
+                            <td>292155.87</td>
+                            <td>401319.36</td>
+                            <td>425437.96</td>
+                            <td>591905.46</td>
+                        </tr>
+                        <tr>
+                            <td>281720.83</td>
+                            <td>296335.00</td>
+                            <td>303244.13</td>
+                            <td>322377.42</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td rowspan="2">1+1</td>
+                            <td>269164.06</td>
+                            <td>282042.43</td>
+                            <td>288447.93</td>
+                            <td>306583.56</td>
+                            <td>422990.89</td>
+                            <td>446589.80</td>
+                            <td>617309.76</td>
+                        </tr>
+                        <tr>
+                            <td>298755.39</td>
+                            <td>313327.69</td>
+                            <td>319883.62</td>
+                            <td>338665.92</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td rowspan="2">2+1</td>
+                            <td>292489.10</td>
+                            <td>305367.46</td>
+                            <td>313366.20</td>
+                            <td>331501.83</td>
+                            <td>460836.12</td>
+                            <td>484435.03</td>
+                            <td>665029.12</td>
+                        </tr>
+                        <tr>
+                            <td>326203.07</td>
+                            <td>340775.37</td>
+                            <td>348860.85</td>
+                            <td>367644.15</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td rowspan="2">6+1</td>
+                            <td>457454.83</td>
+                            <td>470333.19</td>
+                            <td>488081.52</td>
+                            <td>506217.14</td>
+                            <td>728264.13</td>
+                            <td>751863.04</td>
+                            <td>979202.68</td>
+                        </tr>
+                        <tr>
+                            <td>520249.66</td>
+                            <td>534821.95</td>
+                            <td>553727.88</td>
+                            <td>572511.17</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </div>
                 <div class="table-title">队伍2：木偶00希诺宁奥黛塔阿罗夏</div>
-                <table>
-                    <tr>
-                        <th>桑多涅/奥黛塔</th>
-                        <th>0+0</th>
-                        <th>0+1</th>
-                        <th>1+0</th>
-                        <th>1+1</th>
-                        <th>2+0</th>
-                        <th>2+1</th>
-                        <th>6+1</th>
-                    </tr>
-                    <tr>
-                        <td rowspan="2">0+新锻造</td>
-                        <td>140369.96</td>
-                        <td>151139.73</td>
-                        <td>161837.99</td>
-                        <td>176626.31</td>
-                        <td>220225.11</td>
-                        <td>236623.19</td>
-                        <td>361443.64</td>
-                    </tr>
-                    <tr>
-                        <td>163067.50</td>
-                        <td>174533.21</td>
-                        <td>179103.28</td>
-                        <td>193915.92</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td rowspan="2">0+1</td>
-                        <td>168001.01</td>
-                        <td>178638.79</td>
-                        <td>184110.19</td>
-                        <td>198898.52</td>
-                        <td>262691.50</td>
-                        <td>281038.92</td>
-                        <td>416383.74</td>
-                    </tr>
-                    <tr>
-                        <td>197091.99</td>
-                        <td>208557.70</td>
-                        <td>214134.89</td>
-                        <td>228947.52</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td rowspan="2">1+1</td>
-                        <td>184449.60</td>
-                        <td>195536.00</td>
-                        <td>201092.81</td>
-                        <td>216031.29</td>
-                        <td>286430.52</td>
-                        <td>304795.29</td>
-                        <td>444938.83</td>
-                    </tr>
-                    <tr>
-                        <td>215442.42</td>
-                        <td>227012.77</td>
-                        <td>233612.78</td>
-                        <td>248577.92</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td rowspan="2">2+1</td>
-                        <td>208097.32</td>
-                        <td>219078.25</td>
-                        <td>226441.59</td>
-                        <td>241380.07</td>
-                        <td>323294.43</td>
-                        <td>341659.21</td>
-                        <td>525102.24</td>
-                    </tr>
-                    <tr>
-                        <td>244392.06</td>
-                        <td>257300.92</td>
-                        <td>263857.48</td>
-                        <td>278822.62</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td rowspan="2">6+1</td>
-                        <td>374715.93</td>
-                        <td>386259.62</td>
-                        <td>403568.32</td>
-                        <td>418506.80</td>
-                        <td>637629.56</td>
-                        <td>655994.33</td>
-                        <td>862297.79</td>
-                    </tr>
-                    <tr>
-                        <td>444523.76</td>
-                        <td>459485.16</td>
-                        <td>477119.30</td>
-                        <td>492084.45</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                </table>
+                <div class="table-wrap">
+                    <table>
+                        <tr>
+                            <th>桑多涅/奥黛塔</th>
+                            <th>0+0</th>
+                            <th>0+1</th>
+                            <th>1+0</th>
+                            <th>1+1</th>
+                            <th>2+0</th>
+                            <th>2+1</th>
+                            <th>6+1</th>
+                        </tr>
+                        <tr>
+                            <td rowspan="2">0+新锻造</td>
+                            <td>140369.96</td>
+                            <td>151139.73</td>
+                            <td>161837.99</td>
+                            <td>176626.31</td>
+                            <td>220225.11</td>
+                            <td>236623.19</td>
+                            <td>361443.64</td>
+                        </tr>
+                        <tr>
+                            <td>163067.50</td>
+                            <td>174533.21</td>
+                            <td>179103.28</td>
+                            <td>193915.92</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td rowspan="2">0+1</td>
+                            <td>168001.01</td>
+                            <td>178638.79</td>
+                            <td>184110.19</td>
+                            <td>198898.52</td>
+                            <td>262691.50</td>
+                            <td>281038.92</td>
+                            <td>416383.74</td>
+                        </tr>
+                        <tr>
+                            <td>197091.99</td>
+                            <td>208557.70</td>
+                            <td>214134.89</td>
+                            <td>228947.52</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td rowspan="2">1+1</td>
+                            <td>184449.60</td>
+                            <td>195536.00</td>
+                            <td>201092.81</td>
+                            <td>216031.29</td>
+                            <td>286430.52</td>
+                            <td>304795.29</td>
+                            <td>444938.83</td>
+                        </tr>
+                        <tr>
+                            <td>215442.42</td>
+                            <td>227012.77</td>
+                            <td>233612.78</td>
+                            <td>248577.92</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td rowspan="2">2+1</td>
+                            <td>208097.32</td>
+                            <td>219078.25</td>
+                            <td>226441.59</td>
+                            <td>241380.07</td>
+                            <td>323294.43</td>
+                            <td>341659.21</td>
+                            <td>525102.24</td>
+                        </tr>
+                        <tr>
+                            <td>244392.06</td>
+                            <td>257300.92</td>
+                            <td>263857.48</td>
+                            <td>278822.62</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td rowspan="2">6+1</td>
+                            <td>374715.93</td>
+                            <td>386259.62</td>
+                            <td>403568.32</td>
+                            <td>418506.80</td>
+                            <td>637629.56</td>
+                            <td>655994.33</td>
+                            <td>862297.79</td>
+                        </tr>
+                        <tr>
+                            <td>444523.76</td>
+                            <td>459485.16</td>
+                            <td>477119.30</td>
+                            <td>492084.45</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </div>
                 <div class="table-title">队伍3：木偶砂糖奥黛塔阿罗夏</div>
-                <table>
-                    <tr>
-                        <th>桑多涅/奥黛塔</th>
-                        <th>0+0</th>
-                        <th>0+1</th>
-                        <th>1+0</th>
-                        <th>1+1</th>
-                        <th>2+0</th>
-                        <th>2+1</th>
-                        <th>6+1</th>
-                    </tr>
-                    <tr>
-                        <td rowspan="2">0+新锻造</td>
-                        <td>151847.52</td>
-                        <td>164671.52</td>
-                        <td>167919.20</td>
-                        <td>185596.54</td>
-                        <td>240637.09</td>
-                        <td>263193.26</td>
-                        <td>387852.08</td>
-                    </tr>
-                    <tr>
-                        <td>178024.33</td>
-                        <td>191439.54</td>
-                        <td>195827.38</td>
-                        <td>214666.45</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td rowspan="2">0+1</td>
-                        <td>190715.69</td>
-                        <td>203685.99</td>
-                        <td>209325.75</td>
-                        <td>227003.09</td>
-                        <td>290853.25</td>
-                        <td>313409.42</td>
-                        <td>449898.52</td>
-                    </tr>
-                    <tr>
-                        <td>215086.99</td>
-                        <td>228502.19</td>
-                        <td>235684.94</td>
-                        <td>254524.02</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td rowspan="2">1+1</td>
-                        <td>202717.05</td>
-                        <td>215776.86</td>
-                        <td>220861.18</td>
-                        <td>238135.81</td>
-                        <td>307928.79</td>
-                        <td>330077.66</td>
-                        <td>471056.58</td>
-                    </tr>
-                    <tr>
-                        <td>228201.07</td>
-                        <td>241867.80</td>
-                        <td>248694.80</td>
-                        <td>266810.68</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td rowspan="2">2+1</td>
-                        <td>217759.83</td>
-                        <td>230776.52</td>
-                        <td>236841.34</td>
-                        <td>254115.97</td>
-                        <td>345795.09</td>
-                        <td>367943.95</td>
-                        <td>554188.44</td>
-                    </tr>
-                    <tr>
-                        <td>256634.17</td>
-                        <td>270200.28</td>
-                        <td>278193.49</td>
-                        <td>296208.76</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td rowspan="2">6+1</td>
-                        <td>407320.06</td>
-                        <td>420336.75</td>
-                        <td>438726.29</td>
-                        <td>456044.04</td>
-                        <td>670870.76</td>
-                        <td>692602.83</td>
-                        <td>901623.01</td>
-                    </tr>
-                    <tr>
-                        <td>459585.73</td>
-                        <td>473443.43</td>
-                        <td>494473.46</td>
-                        <td>512880.93</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                </table>
+                <div class="table-wrap">
+                    <table>
+                        <tr>
+                            <th>桑多涅/奥黛塔</th>
+                            <th>0+0</th>
+                            <th>0+1</th>
+                            <th>1+0</th>
+                            <th>1+1</th>
+                            <th>2+0</th>
+                            <th>2+1</th>
+                            <th>6+1</th>
+                        </tr>
+                        <tr>
+                            <td rowspan="2">0+新锻造</td>
+                            <td>151847.52</td>
+                            <td>164671.52</td>
+                            <td>167919.20</td>
+                            <td>185596.54</td>
+                            <td>240637.09</td>
+                            <td>263193.26</td>
+                            <td>387852.08</td>
+                        </tr>
+                        <tr>
+                            <td>178024.33</td>
+                            <td>191439.54</td>
+                            <td>195827.38</td>
+                            <td>214666.45</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td rowspan="2">0+1</td>
+                            <td>190715.69</td>
+                            <td>203685.99</td>
+                            <td>209325.75</td>
+                            <td>227003.09</td>
+                            <td>290853.25</td>
+                            <td>313409.42</td>
+                            <td>449898.52</td>
+                        </tr>
+                        <tr>
+                            <td>215086.99</td>
+                            <td>228502.19</td>
+                            <td>235684.94</td>
+                            <td>254524.02</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td rowspan="2">1+1</td>
+                            <td>202717.05</td>
+                            <td>215776.86</td>
+                            <td>220861.18</td>
+                            <td>238135.81</td>
+                            <td>307928.79</td>
+                            <td>330077.66</td>
+                            <td>471056.58</td>
+                        </tr>
+                        <tr>
+                            <td>228201.07</td>
+                            <td>241867.80</td>
+                            <td>248694.80</td>
+                            <td>266810.68</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td rowspan="2">2+1</td>
+                            <td>217759.83</td>
+                            <td>230776.52</td>
+                            <td>236841.34</td>
+                            <td>254115.97</td>
+                            <td>345795.09</td>
+                            <td>367943.95</td>
+                            <td>554188.44</td>
+                        </tr>
+                        <tr>
+                            <td>256634.17</td>
+                            <td>270200.28</td>
+                            <td>278193.49</td>
+                            <td>296208.76</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td rowspan="2">6+1</td>
+                            <td>407320.06</td>
+                            <td>420336.75</td>
+                            <td>438726.29</td>
+                            <td>456044.04</td>
+                            <td>670870.76</td>
+                            <td>692602.83</td>
+                            <td>901623.01</td>
+                        </tr>
+                        <tr>
+                            <td>459585.73</td>
+                            <td>473443.43</td>
+                            <td>494473.46</td>
+                            <td>512880.93</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </div>
                 <button class="fold-btn" onclick="toggle5()">展开v5介绍</button>
                 <div class="fold-content" id="txt5">
                     <p>锻造武器后面会联系创体做核查</p>
@@ -793,8 +823,7 @@
             </div>
         </div>
     </div>
-
-    <!-- 星扩散独立弹窗（图片表格+Excel下载） -->
+    <!-- 星扩散弹窗 -->
     <div class="mask" id="diffuseMask">
         <div class="popup-box">
             <button class="close-pop" onclick="closeDiffusePopup()">关闭星扩散数据</button>
@@ -804,38 +833,40 @@
                 <div class="table-title">计算标准：热启动，桑奥布七</div>
                 <div class="table-title">若查看计算表格请点击下载Ecel（数据仅供参考，请以正式服为准）</div>
                 <div class="table-title">（修复了Excel部分问题，但对整体dps波动极小，具体可参考Excel）</div>
-                <table>
-                    <tr>
-                        <th>桑多涅/奥黛塔</th>
-                        <th>0+0</th>
-                        <th>1+0</th>
-                        <th>2+0</th>
-                    </tr>
-                    <tr>
-                        <td>0+1</td>
-                        <td>164772.4</td>
-                        <td>183179.7</td>
-                        <td>225566.3</td>
-                    </tr>
-                    <tr>
-                        <td>1+1</td>
-                        <td>174600.2</td>
-                        <td>192364.5</td>
-                        <td>238227.2</td>
-                    </tr>
-                    <tr>
-                        <td>2+1</td>
-                        <td>191528.5</td>
-                        <td>215344.7</td>
-                        <td>267728.6</td>
-                    </tr>
-                    <tr>
-                        <td>6+1</td>
-                        <td>315399.3</td>
-                        <td>348150.2</td>
-                        <td>432187.5</td>
-                    </tr>
-                </table>
+                <div class="table-wrap">
+                    <table>
+                        <tr>
+                            <th>桑多涅/奥黛塔</th>
+                            <th>0+0</th>
+                            <th>1+0</th>
+                            <th>2+0</th>
+                        </tr>
+                        <tr>
+                            <td>0+1</td>
+                            <td>164772.4</td>
+                            <td>183179.7</td>
+                            <td>225566.3</td>
+                        </tr>
+                        <tr>
+                            <td>1+1</td>
+                            <td>174600.2</td>
+                            <td>192364.5</td>
+                            <td>238227.2</td>
+                        </tr>
+                        <tr>
+                            <td>2+1</td>
+                            <td>191528.5</td>
+                            <td>215344.7</td>
+                            <td>267728.6</td>
+                        </tr>
+                        <tr>
+                            <td>6+1</td>
+                            <td>315399.3</td>
+                            <td>348150.2</td>
+                            <td>432187.5</td>
+                        </tr>
+                    </table>
+                </div>
                 <a href="桑多涅星扩散 - 副本.xlsx" class="down-btn" download>下载Excel数据表</a>
                 <div style="text-align:center;margin-top:10px;">
                     <a href="https://b23.tv/rDCFTFA" target="_blank">羽化哲主页</a>
@@ -843,7 +874,6 @@
             </div>
         </div>
     </div>
-
     <!-- 角色机制弹窗 -->
     <div class="mask" id="mechanicMask">
         <div class="popup-box">
@@ -858,149 +888,152 @@
                 ee耗时约：2.05s<br>   qe耗时约：3.2s <br>  因实际手操原因，会有一定波动</p>
             </div>
             <div class="table-title">附着明细</div>
-            <table>
-                <tr>
-                    <th>名称</th>
-                    <th>元素类型</th>
-                    <th>元素附着量（单位U）</th>
-                    <th>削韧(LV)/抗打断数值</th>
-                    <th>附着冷却规则</th>
-                    <th>伤害分类标签</th>
-                </tr>
-                <tr>
-                    <td>疾板·苍羽一梦<br>元素爆发</td>
-                    <td>冰</td>
-                    <td>1U</td>
-                    <td>LV2/30</td>
-                    <td>独立冷却</td>
-                    <td>元素爆发伤害</td>
-                </tr>
-                <tr>
-                    <td>C1：「不曾起舞的清晨，她望向倒影」(超导)<br>一命效果</td>
-                    <td>冰</td>
-                    <td>0U</td>
-                    <td>LV5/40</td>
-                    <td>独立冷却</td>
-                    <td>超导冰伤</td>
-                </tr>
-                <tr>
-                    <td>C1：「不曾起舞的清晨，她望向倒影」<br>一命效果</td>
-                    <td>冰</td>
-                    <td>0U</td>
-                    <td>LV5/40</td>
-                    <td>独立冷却</td>
-                    <td>冰元素扩散伤害</td>
-                </tr>
-                <tr>
-                    <td>C4：「向上，坠往恍惚、燃烧的蓝空」(超导)<br>四命效果</td>
-                    <td>冰</td>
-                    <td>0U</td>
-                    <td>LV2/20</td>
-                    <td>独立冷却</td>
-                    <td>超导冰伤</td>
-                </tr>
-                <tr>
-                    <td>C4：「向上，坠往恍惚、燃烧的蓝空」<br>四命效果</td>
-                    <td>冰</td>
-                    <td>0U</td>
-                    <td>LV2/20</td>
-                    <td>独立冷却</td>
-                    <td>冰元素扩散伤害</td>
-                </tr>
-            </table>
-            <table>
-                <tr>
-                    <th>名称</th>
-                    <th>元素类型</th>
-                    <th>元素附着量（单位U）</th>
-                    <th>削韧(LV)/抗打断数值</th>
-                    <th>附着冷却规则</th>
-                    <th>伤害分类标签</th>
-                </tr>
-                <tr>
-                    <td>雪鹊变奏(下落攻击)<br>下落攻击</td>
-                    <td>物理</td>
-                    <td>0U</td>
-                    <td>LV2/25</td>
-                    <td>独立冷却</td>
-                    <td>下落攻击</td>
-                </tr>
-                <tr>
-                    <td>雪鹊变奏(下落攻击)<br>下落攻击</td>
-                    <td>物理</td>
-                    <td>1U</td>
-                    <td>LV4/100</td>
-                    <td>独立冷却</td>
-                    <td>下落攻击</td>
-                </tr>
-                <tr>
-                    <td>柔板·幻灵夜舞(超导)<br>元素战技</td>
-                    <td>冰</td>
-                    <td>0U</td>
-                    <td>LV7/35</td>
-                    <td>独立冷却</td>
-                    <td>超导冰伤</td>
-                </tr>
-                <tr>
-                    <td>柔板·幻灵夜舞<br>元素战技</td>
-                    <td>冰</td>
-                    <td>0U</td>
-                    <td>LV7/35</td>
-                    <td>独立冷却</td>
-                    <td>冰元素扩散伤害</td>
-                </tr>
-                <tr>
-                    <td>柔板·幻灵夜舞 双舞判定<br>元素战技</td>
-                    <td>冰</td>
-                    <td>1U</td>
-                    <td>LV2/15</td>
-                    <td>3秒内4次附着上限</td>
-                    <td>奥黛塔E双舞伤害</td>
-                </tr>
-                <tr>
-                    <td>柔板·幻灵夜舞 本体攻击<br>元素战技</td>
-                    <td>冰</td>
-                    <td>1U</td>
-                    <td>LV1/20</td>
-                    <td>独立冷却</td>
-                    <td>元素战技伤害</td>
-                </tr>
-                <tr>
-                    <td>雪鹊变奏(召唤物)<br>召唤协同攻击</td>
-                    <td>冰</td>
-                    <td>1U</td>
-                    <td>LV2/15</td>
-                    <td>3秒内4次附着上限</td>
-                    <td>奥黛塔E双舞伤害</td>
-                </tr>
-                <tr>
-                    <td>柔板·幻灵夜舞 协同攻击<br>元素战技协同</td>
-                    <td>冰</td>
-                    <td>1U</td>
-                    <td>LV2/15</td>
-                    <td>独立冷却</td>
-                    <td>元素战技协同伤害</td>
-                </tr>
-                <tr>
-                    <td>柔板·幻灵夜舞(超导) 协同攻击<br>元素战技协同</td>
-                    <td>冰</td>
-                    <td>0U</td>
-                    <td>LV2/10</td>
-                    <td>独立冷却</td>
-                    <td>超导冰伤</td>
-                </tr>
-                <tr>
-                    <td>柔板·幻灵夜舞 协同攻击<br>元素战技协同</td>
-                    <td>冰</td>
-                    <td>0U</td>
-                    <td>LV2/10</td>
-                    <td>独立冷却</td>
-                    <td>冰元素扩散伤害</td>
-                </tr>
-            </table>
+            <div class="table-wrap">
+                <table>
+                    <tr>
+                        <th>名称</th>
+                        <th>元素类型</th>
+                        <th>元素附着量（单位U）</th>
+                        <th>削韧(LV)/抗打断数值</th>
+                        <th>附着冷却规则</th>
+                        <th>伤害分类标签</th>
+                    </tr>
+                    <tr>
+                        <td>疾板·苍羽一梦<br>元素爆发</td>
+                        <td>冰</td>
+                        <td>1U</td>
+                        <td>LV2/30</td>
+                        <td>独立冷却</td>
+                        <td>元素爆发伤害</td>
+                    </tr>
+                    <tr>
+                        <td>C1：「不曾起舞的清晨，她望向倒影」(超导)<br>一命效果</td>
+                        <td>冰</td>
+                        <td>0U</td>
+                        <td>LV5/40</td>
+                        <td>独立冷却</td>
+                        <td>超导冰伤</td>
+                    </tr>
+                    <tr>
+                        <td>C1：「不曾起舞的清晨，她望向倒影」<br>一命效果</td>
+                        <td>冰</td>
+                        <td>0U</td>
+                        <td>LV5/40</td>
+                        <td>独立冷却</td>
+                        <td>冰元素扩散伤害</td>
+                    </tr>
+                    <tr>
+                        <td>C4：「向上，坠往恍惚、燃烧的蓝空」(超导)<br>四命效果</td>
+                        <td>冰</td>
+                        <td>0U</td>
+                        <td>LV2/20</td>
+                        <td>独立冷却</td>
+                        <td>超导冰伤</td>
+                    </tr>
+                    <tr>
+                        <td>C4：「向上，坠往恍惚、燃烧的蓝空」<br>四命效果</td>
+                        <td>冰</td>
+                        <td>0U</td>
+                        <td>LV2/20</td>
+                        <td>独立冷却</td>
+                        <td>冰元素扩散伤害</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <tr>
+                        <th>名称</th>
+                        <th>元素类型</th>
+                        <th>元素附着量（单位U）</th>
+                        <th>削韧(LV)/抗打断数值</th>
+                        <th>附着冷却规则</th>
+                        <th>伤害分类标签</th>
+                    </tr>
+                    <tr>
+                        <td>雪鹊变奏(下落攻击)<br>下落攻击</td>
+                        <td>物理</td>
+                        <td>0U</td>
+                        <td>LV2/25</td>
+                        <td>独立冷却</td>
+                        <td>下落攻击</td>
+                    </tr>
+                    <tr>
+                        <td>雪鹊变奏(下落攻击)<br>下落攻击</td>
+                        <td>物理</td>
+                        <td>1U</td>
+                        <td>LV4/100</td>
+                        <td>独立冷却</td>
+                        <td>下落攻击</td>
+                    </tr>
+                    <tr>
+                        <td>柔板·幻灵夜舞(超导)<br>元素战技</td>
+                        <td>冰</td>
+                        <td>0U</td>
+                        <td>LV7/35</td>
+                        <td>独立冷却</td>
+                        <td>超导冰伤</td>
+                    </tr>
+                    <tr>
+                        <td>柔板·幻灵夜舞<br>元素战技</td>
+                        <td>冰</td>
+                        <td>0U</td>
+                        <td>LV7/35</td>
+                        <td>独立冷却</td>
+                        <td>冰元素扩散伤害</td>
+                    </tr>
+                    <tr>
+                        <td>柔板·幻灵夜舞 双舞判定<br>元素战技</td>
+                        <td>冰</td>
+                        <td>1U</td>
+                        <td>LV2/15</td>
+                        <td>3秒内4次附着上限</td>
+                        <td>奥黛塔E双舞伤害</td>
+                    </tr>
+                    <tr>
+                        <td>柔板·幻灵夜舞 本体攻击<br>元素战技</td>
+                        <td>冰</td>
+                        <td>1U</td>
+                        <td>LV1/20</td>
+                        <td>独立冷却</td>
+                        <td>元素战技伤害</td>
+                    </tr>
+                    <tr>
+                        <td>雪鹊变奏(召唤物)<br>召唤协同攻击</td>
+                        <td>冰</td>
+                        <td>1U</td>
+                        <td>LV2/15</td>
+                        <td>3秒内4次附着上限</td>
+                        <td>奥黛塔E双舞伤害</td>
+                    </tr>
+                    <tr>
+                        <td>柔板·幻灵夜舞 协同攻击<br>元素战技协同</td>
+                        <td>冰</td>
+                        <td>1U</td>
+                        <td>LV2/15</td>
+                        <td>独立冷却</td>
+                        <td>元素战技协同伤害</td>
+                    </tr>
+                    <tr>
+                        <td>柔板·幻灵夜舞(超导) 协同攻击<br>元素战技协同</td>
+                        <td>冰</td>
+                        <td>0U</td>
+                        <td>LV2/10</td>
+                        <td>独立冷却</td>
+                        <td>超导冰伤</td>
+                    </tr>
+                    <tr>
+                        <td>柔板·幻灵夜舞 协同攻击<br>元素战技协同</td>
+                        <td>冰</td>
+                        <td>0U</td>
+                        <td>LV2/10</td>
+                        <td>独立冷却</td>
+                        <td>冰元素扩散伤害</td>
+                    </tr>
+                </table>
+            </div>
         </div>
     </div>
-
     <div style="text-align:center;margin-top:60px;opacity:0.3;">
         <p>旧版武器对比入口：<a href="awq.html">点击查看武器详情</a></p>
     </div>
