@@ -2,8 +2,9 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>羽化哲</title>
+    <!-- 移动端核心优化：禁止缩放、适配安全区、宽度锁定设备宽度 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>羽化哲-伤害计算公式</title>
     <!-- MathJax 公式渲染库 -->
     <script id="MathJax-script" async
         src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
@@ -26,9 +27,8 @@
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
-            font-family: "Microsoft Yahei", sans-serif;
+            font-family: "Microsoft Yahei", system-ui, -apple-system, sans-serif;
             background-color: #0f0f0f;
             /* 背景底图 + 渐变光晕叠加 */
             background-image:
@@ -40,12 +40,13 @@
             background-attachment: fixed;
             color: #cccccc;
             line-height: 1.8;
-            padding: 20px;
+            /* 上下左右增加安全内边距，适配刘海屏/底部手势条 */
+            padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
             max-width: 1280px;
             margin: 0 auto;
             position: relative;
+            min-height: 100vh;
         }
-
         /* 全局暗遮罩，防止底图过亮看不清文字 */
         body::before {
             content: "";
@@ -54,68 +55,76 @@
             background-color: rgba(0, 0, 0, 0.28);
             z-index: -1;
         }
-
         /* 主标题 */
         h1 {
             color: #58a6ff;
             text-align: center;
-            margin-bottom: 40px;
-            padding-bottom: 12px;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
             border-bottom: 2px solid rgba(35, 134, 255, 0.6);
+            font-size: clamp(22px, 5vw, 32px);
         }
-
         /* 大板块标题 */
         h2 {
             color: #c792ea;
-            margin: 40px 0 20px;
-            padding-left: 12px;
+            margin: 30px 0 16px;
+            padding-left: 10px;
             border-left: 4px solid rgba(199, 146, 234, 0.6);
-            font-size: 20px;
+            font-size: clamp(17px, 4vw, 20px);
         }
-
         /* 小标题 */
         h3 {
             color: #89ddff;
-            margin: 20px 0 10px;
-            font-size: 17px;
+            margin: 16px 0 8px;
+            font-size: clamp(15px, 3.5vw, 17px);
         }
-
         /* 板块容器：低透明度磨砂，底图可穿透，不会完全透明丢失可读性 */
         .section {
             background-color: rgba(10, 10, 10, 0.52);
             border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 30px;
+            padding: clamp(14px, 3vw, 25px);
+            margin-bottom: 20px;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
             backdrop-filter: blur(16px) saturate(140%);
             -webkit-backdrop-filter: blur(16px) saturate(140%);
         }
-
         /* 普通描述文本 */
         .text-desc {
             color: #d1d1d1;
-            font-size: 15px;
-            margin: 10px 0;
+            font-size: clamp(14px, 3vw, 15px);
+            margin: 8px 0;
             line-height: 1.7;
         }
-
         /* 公式框：半透明底色，区分正文，不遮挡底图 */
         .formula {
             background-color: rgba(20, 20, 20, 0.62);
             color: #ffcb6b;
             font-family: "Consolas", "Courier New", monospace;
-            font-size: 14px;
-            padding: 16px;
+            font-size: clamp(12px, 2.8vw, 14px);
+            padding: clamp(12px, 3vw, 16px);
             border-radius: 8px;
-            margin: 12px 0;
+            margin: 10px 0;
+            /* 横向滚动优化，隐藏丑陋默认滚动条 */
             overflow-x: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #ffcb6b33 transparent;
             border-left: 3px solid rgba(255, 203, 107, 0.65);
             box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
             backdrop-filter: blur(10px) saturate(130%);
             -webkit-backdrop-filter: blur(10px) saturate(130%);
         }
-
+        /* 美化移动端横向滚动条 */
+        .formula::-webkit-scrollbar {
+            height: 4px;
+        }
+        .formula::-webkit-scrollbar-thumb {
+            background: rgba(255, 203, 107, 0.3);
+            border-radius: 4px;
+        }
+        .formula::-webkit-scrollbar-track {
+            background: transparent;
+        }
         /* MathJax公式颜色适配深色背景 */
         .formula mjx-container[jax="CHTML"][display="true"] {
             color: #ffcb6b !important;
@@ -123,53 +132,57 @@
         .formula mjx-container[jax="CHTML"] {
             color: #ffcb6b !important;
         }
-
-        /* 单个跳转链接 居中 */
+        /* 单个跳转链接 居中 增大触摸区域 */
         .jump-link {
             text-align: center;
-            margin-top: 25px;
-            padding-top: 15px;
+            margin-top: 20px;
+            padding-top: 12px;
             border-top: 1px solid rgba(51, 51, 51, 0.45);
         }
         .jump-link a {
             display: inline-block;
             color: #89ddff;
             text-decoration: none;
-            padding: 6px 14px;
+            /* 上下内边距加大，手机更容易点到 */
+            padding: 10px 16px;
             border: 1px solid rgba(137, 221, 255, 0.65);
-            border-radius: 4px;
-            font-size: 14px;
+            border-radius: 6px;
+            font-size: clamp(13px, 3vw, 14px);
             transition: all 0.25s ease;
+            min-width: 120px;
+        }
+        .jump-link a:active {
+            background-color: rgba(137, 221, 255, 0.2);
+            color: #ffffff;
+            border-color: #89ddff;
         }
         .jump-link a:hover {
             background-color: rgba(137, 221, 255, 0.12);
             color: #ffffff;
             border-color: #89ddff;
         }
-
         /* 备注文本 */
         .note {
             color: #888;
-            font-size: 14px;
-            margin: 8px 0;
-            padding-left: 10px;
+            font-size: clamp(12px, 2.7vw, 14px);
+            margin: 6px 0;
+            padding-left: 8px;
             border-left: 2px solid rgba(68, 68, 68, 0.6);
+            line-height: 1.6;
         }
-
-        /* 移动端适配 */
-        @media (max-width: 768px) {
-            body {
-                padding: 12px;
-            }
-            .section {
-                padding: 18px;
-            }
-            .formula {
-                font-size: 13px;
-                padding: 12px;
+        /* 小屏手机极限适配（480px以下） */
+        @media (max-width: 480px) {
+            h1 {
+                margin-bottom: 20px;
             }
             h2 {
-                font-size: 18px;
+                margin: 24px 0 12px;
+            }
+            .section {
+                border-radius: 10px;
+            }
+            .formula {
+                border-radius: 6px;
             }
         }
     </style>
