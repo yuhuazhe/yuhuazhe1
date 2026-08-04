@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <!-- 手机自适应核心标签 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>羽化哲</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", sans-serif;
+        }
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background: #0a0a12;
+        }
+        /* 全屏背景图 */
+        .bg-wrap {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+        }
+        .bg-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.75;
+        }
+        /* 主容器居中 */
+        .main-box {
+            width: min(92%, 720px);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        /* 顶部标题卡片 */
+        .title-card {
+            background: rgba(30, 12, 48, 0.65);
+            border: 1px solid #9955cc66;
+            border-radius: 12px;
+            padding: 20px 16px;
+            text-align: center;
+            backdrop-filter: blur(8px);
+        }
+        .title-card h1 {
+            color: #e099ff;
+            font-size: clamp(22px, 4vw, 32px);
+            margin-bottom: 8px;
+        }
+        .title-card .desc {
+            color: #d8c8ee;
+            font-size: clamp(13px, 2vw, 15px);
+            line-height: 1.5;
+        }
+        .title-card .link {
+            margin-top: 8px;
+            font-size: clamp(12px, 1.8vw, 14px);
+        }
+        .title-card .link a {
+            color: #c888ff;
+            text-decoration: underline;
+        }
+        /* 角色滚动列表容器 */
+        .list-wrap {
+            background: rgba(22, 8, 36, 0.6);
+            border: 1px solid #8844bb55;
+            border-radius: 12px;
+            max-height: 60vh;
+            overflow-y: auto;
+            backdrop-filter: blur(10px);
+            padding: 8px;
+        }
+        /* 自定义滚动条美化 */
+        .list-wrap::-webkit-scrollbar {
+            width: 6px;
+        }
+        .list-wrap::-webkit-scrollbar-track {
+            background: #33114444;
+            border-radius: 3px;
+        }
+        .list-wrap::-webkit-scrollbar-thumb {
+            background: #aa66dd;
+            border-radius: 3px;
+        }
+        /* 列表项：全透明背景 */
+        .item {
+            width: 100%;
+            padding: 16px 12px;
+            margin: 6px 0;
+            background: transparent; /* 完全透明 */
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.25s ease;
+        }
+        .item:hover {
+            background: transparent; /* hover也无底色 */
+            border: 1px solid #bb77ff77;
+        }
+        /* 链接铺满整个条目，清除默认样式 */
+        .item a {
+            display: block;
+            width: 100%;
+            height: 100%;
+            text-decoration: none;
+        }
+        .item h3 {
+            color: #f0d8ff;
+            font-size: clamp(16px, 2.5vw, 20px);
+            margin-bottom: 4px;
+        }
+        .item p {
+            color: #cbb8e6;
+            font-size: clamp(12px, 1.8vw, 14px);
+        }
+    </style>
+</head>
+<body>
+    <!-- 全屏背景 -->
+    <div class="bg-wrap">
+        <img src="1.0.jpg" alt="原神背景">
+    </div>
+    <!-- 中间主面板 -->
+    <div class="main-box">
+        <!-- 顶部标题区 -->
+        <div class="title-card">
+            <h1>资料库</h1>
+            <div class="desc">
+                暂未添加<br>
+                
+            </div>
+            <div class="link">
+                <a href="#">点击进入羽化哲主页</a>
+            </div>
+        </div>
+        <!-- 角色滚动列表 -->
+        <div class="list-wrap">
+            <div class="item">
+                <a href="#author">
+                    <h3>作者简介</h3>
+                    <p>暂未添加</p>
+                </a>
+            </div>
+            
+            <div class="item">
+                <a href="gongshi.html">
+                    <h3>计算公式</h3>
+                    <p>伤害计算公式，等级系数</p>
+                </a>
+            </div>
+            <div class="item">
+                <a href="1.html">
+                    <h3>原神时间表</h3>
+                    <p>记录版本时间，前瞻时间，ct，cs时间</p>
+                </a>
+            </div>
+            <div class="item">
+                <a href="3.html">
+                    <h3>附着查询</h3>
+                    <p>有关星超导角色叠层查询</p>
+                </a>
+            </div>
+            <div class="item">
+                <a href="#test1">
+                    <h3>未添加</h3>
+                    <p>测试滚动</p>
+                </a>
+            </div>
+            <div class="item">
+                <a href="#test2">
+                    <h3>未添加</h3>
+                    <p>测试滚动</p>
+                </a>
+            </div>
+            <div class="item">
+                <a href="#test3">
+                    <h3>未添加</h3>
+                    <p>测试滚动</p>
+                </a>
+            </div>
+            <div class="item">
+                <a href="#test4">
+                    <h3>未添加</h3>
+                    <p>测试滚动</p>
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
