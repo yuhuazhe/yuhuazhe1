@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>羽化哲</title>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, system-ui, sans-serif; }
+        body { background: #0d1117; margin: 20px; display: flex; justify-content: center; color: #c9d1d9; }
+        .container { max-width: 980px; width: 100%; background: #161b22; border-radius: 16px; padding: 24px 28px; border: 1px solid #30363d; }
+        h1 { font-size: 24px; font-weight: 400; margin: 0 0 2px 0; color: #f0f6fc; border-bottom: 1px solid #30363d; padding-bottom: 12px; }
+        .sub { color: #8b949e; font-size: 13px; margin-bottom: 20px; }
+        .section-title { font-size: 16px; font-weight: 500; color: #f0f6fc; margin: 20px 0 10px 0; border-bottom: 1px solid #30363d; padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
+        .section-title .toggle-btn { background: #21262d; border: 1px solid #30363d; border-radius: 6px; padding: 2px 14px; color: #c9d1d9; font-size: 13px; cursor: pointer; transition: 0.15s; }
+        .section-title .toggle-btn:hover { background: #30363d; }
+        .param-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px; background: #0d1117; border-radius: 10px; padding: 16px 18px; border: 1px solid #30363d; margin-bottom: 18px; }
+        @media (max-width: 700px) { .param-grid { grid-template-columns: 1fr; } }
+        .row { display: flex; align-items: center; gap: 6px 10px; flex-wrap: wrap; }
+        .row label { width: 110px; color: #b1bac4; font-size: 13px; flex-shrink: 0; }
+        .row input, .row select { background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 5px 10px; color: #f0f6fc; font-size: 13px; flex: 1 1 80px; min-width: 60px; outline: none; }
+        .row input:focus, .row select:focus { border-color: #58a6ff; box-shadow: 0 0 0 3px rgba(88,166,255,0.15); }
+        .row input:read-only { background: #161b22; color: #8b949e; cursor: default; border-color: #30363d; }
+        .row .hint { color: #8b949e; font-size: 12px; font-style: italic; }
+        .row .badge-auto { display: inline-block; background: #1c2333; border: 1px solid #58a6ff; border-radius: 4px; padding: 0 8px; font-size: 11px; color: #58a6ff; margin-left: 2px; font-style: normal; white-space: nowrap; }
+        .buff-manager { background: #0d1117; border: 1px solid #30363d; border-radius: 10px; padding: 12px 16px; margin-bottom: 18px; display: none; }
+        .buff-manager.visible { display: block; }
+        .buff-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
+        .buff-table th { text-align: left; color: #8b949e; font-weight: 400; padding: 6px 4px; border-bottom: 1px solid #30363d; }
+        .buff-table td { padding: 4px 4px; vertical-align: middle; border-bottom: 1px solid #21262d; }
+        .buff-table .buff-name { min-width: 70px; }
+        .buff-table .buff-input { background: #0d1117; border: 1px solid #30363d; border-radius: 4px; padding: 3px 6px; color: #f0f6fc; font-size: 12px; width: 100%; min-width: 40px; }
+        .buff-table .buff-input:focus { border-color: #58a6ff; }
+        .buff-table .btn-remove { background: none; border: none; color: #f85149; cursor: pointer; font-size: 16px; padding: 0 4px; }
+        .buff-table .btn-remove:hover { color: #ff7b72; }
+        .buff-add-row { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid #30363d; }
+        .buff-add-row input, .buff-add-row select { background: #0d1117; border: 1px solid #30363d; border-radius: 4px; padding: 4px 8px; color: #f0f6fc; font-size: 12px; flex: 1 1 80px; min-width: 50px; }
+        .buff-add-row .add-btn { background: #238636; border: 1px solid #2ea043; border-radius: 6px; padding: 4px 16px; color: white; font-size: 13px; cursor: pointer; transition: 0.15s; flex: 0 0 auto; }
+        .buff-add-row .add-btn:hover { background: #2ea043; }
+        .buff-add-row label { color: #b1bac4; font-size: 12px; margin-right: 2px; }
+        .result-area { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0; padding: 0; background: none; border: none; }
+        .total-dmg { font-size: 36px; font-weight: 600; color: #f0f6fc; }
+        .btn-group { display: flex; gap: 12px; }
+        .btn { background: #21262d; border: 1px solid #30363d; padding: 8px 20px; border-radius: 8px; font-size: 14px; font-weight: 500; color: #c9d1d9; cursor: pointer; transition: 0.15s; }
+        .btn-primary { background: #238636; border-color: #2ea043; color: white; }
+        .btn-primary:hover { background: #2ea043; }
+        .btn-secondary { background: #21262d; border-color: #30363d; }
+        .btn-secondary:hover { background: #30363d; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(3px); }
+        .modal-overlay.active { display: flex; }
+        .modal-box { background: #161b22; max-width: 960px; width: 95%; max-height: 85vh; border-radius: 16px; padding: 24px 28px; border: 1px solid #30363d; box-shadow: 0 20px 40px rgba(0,0,0,0.7); overflow-y: auto; position: relative; }
+        .modal-box h2 { margin-top: 0; font-weight: 400; color: #f0f6fc; border-bottom: 1px solid #30363d; padding-bottom: 10px; }
+        .modal-box .close-btn { position: sticky; top: 0; float: right; background: none; border: none; font-size: 28px; cursor: pointer; color: #8b949e; padding: 0 8px; }
+        .modal-box .close-btn:hover { color: #f0f6fc; }
+        .modal-content { font-family: 'Courier New', monospace; font-size: 13px; white-space: pre-wrap; line-height: 1.7; background: #0d1117; padding: 18px; border-radius: 8px; border: 1px solid #30363d; max-height: 70vh; overflow-y: auto; color: #c9d1d9; }
+        .time-window { grid-column: 1 / -1; display: flex; gap: 20px; align-items: center; flex-wrap: wrap; padding-top: 4px; border-top: 1px solid #21262d; }
+        .time-window .row { flex: 1; min-width: 180px; }
+        .highlight { color: #58a6ff; font-weight: 600; }
+        .skill-tag { display: inline-block; background: #1c2333; border-radius: 4px; padding: 0 8px; font-size: 12px; color: #58a6ff; border: 1px solid #30363d; font-weight: 500; }
+        .skill-tag.z { color: #f0883e; border-color: #f0883e44; }
+        .skill-tag.e { color: #7ee787; border-color: #7ee78744; }
+        .skill-tag.q { color: #d2a8ff; border-color: #d2a8ff44; }
+        .skill-tag.start { color: #8b949e; border-color: #30363d; }
+        .skill-tag.c4 { color: #f0883e; border-color: #ffaa00; background: #2a1f00; }
+        .skill-tag.c6 { color: #ff6b6b; border-color: #ff6b6b; background: #2a0000; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>桑多涅 · 伤害计算器（v1测试版）</h1>
+        <div class="sub">怪物基础抗性 10%（适用c0偶-c6偶）</div>
+
+        <div class="param-grid">
+            <div class="row">
+                <label>命座</label>
+                <select id="constellation">
+                    <option value="c0">C0</option>
+                    <option value="c1">C1</option>
+                    <option value="c2">C2</option>
+                    <option value="c3">C3</option>
+                    <option value="c4">C4</option>
+                    <option value="c5">C5</option>
+                    <option value="c6">C6</option>
+                </select>
+                
+            </div>
+            <div class="row">
+                <label>基础攻击力</label>
+                <input type="number" id="baseAtk" value="335" step="1" style="flex:0.6;">
+                <span class="hint">+</span>
+                <input type="number" id="weaponAtk" value="608" step="1" style="flex:0.6;">
+                <span class="hint">武器</span>
+            </div>
+            <div class="row">
+                <label>暴击率 / 暴伤</label>
+                <input type="number" id="critRate" value="0.65" step="0.01" style="flex:0.7;">
+                <input type="number" id="critDmg" value="1.80" step="0.01" style="flex:0.7;">
+            </div>
+            <div class="row">
+                <label>面板攻击力</label>
+                <input type="number" id="flatAtk" value="311" step="10">
+            </div>
+            <div class="row">
+                <label>攻击力%加成</label>
+                <input type="number" id="atkPercent" value="0.80" step="0.01">
+            </div>
+            <div class="row">
+                <label>元素精通</label>
+                <input type="number" id="em" value="120" step="1">
+            </div>
+            <div class="row">
+                <label>星超导系数</label>
+                <input type="number" id="sdCoeff" value="1.0" step="0.01" min="0">
+            </div>
+            <div class="row">
+                <label>基础提升%</label>
+                <input type="number" id="baseBuff" value="1.28" step="0.01">
+            </div>
+            <div class="row">
+                <label>星超导爆伤加成</label>
+                <input type="number" id="sdCritDmg" value="0.40" step="0.01">
+            </div>
+            <div class="row">
+                <label>星超导增伤加成</label>
+                <input type="number" id="sdDmgBonus" value="0.15" step="0.01">
+            </div>
+            <div class="row">
+                <label>传统增伤 <span class="badge-auto">自动识别</span></label>
+                <input type="text" id="eleDmgDisplay" value="20%" readonly style="flex:0.7; background:#161b22; color:#58a6ff; font-weight:500; border-color:#58a6ff;">
+            </div>
+            <div class="time-window">
+                <div class="row">
+                    <label>起始时间</label>
+                    <input type="number" id="startTime" value="0" step="0.1" style="flex:0.7;">
+                    
+                </div>
+                <div class="row">
+                    <label>终止时间</label>
+                    <input type="number" id="endTime" value="16.5" step="0.1" style="flex:0.7;">
+                    
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title">
+            <span>⚡ Buff 管理</span>
+            <button class="toggle-btn" id="toggleBuffBtn">展开</button>
+        </div>
+        <div class="buff-manager" id="buffManager">
+            <table class="buff-table" id="buffTable">
+                <thead>
+                    <tr><th style="width:16%;">名称</th><th style="width:10%;">起始</th><th style="width:10%;">结束</th><th style="width:22%;">增益类型</th><th style="width:12%;">数值</th><th style="width:10%;">操作</th></tr>
+                </thead>
+                <tbody id="buffBody"></tbody>
+            </table>
+            <div class="buff-add-row">
+                <input type="text" id="newBuffName" placeholder="名称" style="flex:1.5;">
+                <input type="number" id="newBuffStart" placeholder="起始" step="0.1" style="flex:1;">
+                <input type="number" id="newBuffEnd" placeholder="结束" step="0.1" style="flex:1;">
+                <select id="newBuffType" style="flex:1.8;">
+                    <option value="atkPercent">攻击力%加成</option>
+                    <option value="sdDmg">星超导增伤</option>
+                    <option value="sdCritDmg">星超导爆伤</option>
+                    <option value="resistance">减抗</option>
+                    <option value="critRate">暴击率</option>
+                    <option value="critDmg">暴击伤害</option>
+                    <option value="ascend">擢升</option>
+                    <option value="flatDmg">额外数值</option>
+                </select>
+                <input type="number" id="newBuffValue" placeholder="数值" step="0.01" style="flex:1;">
+                <button class="add-btn" id="addBuffBtn">添加</button>
+            </div>
+        </div>
+
+        <div class="result-area">
+            <div class="total-dmg" id="totalDisplay">0</div>
+            <div class="btn-group">
+                <button class="btn btn-primary" id="calcBtn">计算总伤害</button>
+                <button class="btn btn-secondary" id="showFlowBtn">📋 展示流程</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="flowModal">
+        <div class="modal-box">
+            <button class="close-btn" id="modalCloseBtn">&times;</button>
+            <h2>详细计算流程 · 桑多涅</h2>
+            <div class="modal-content" id="modalContent">加载中...</div>
+        </div>
+    </div>
+
+    <script>
+        // ========== 防查看源码 ==========
+        (function() {
+            document.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; });
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'F12') { e.preventDefault(); return false; }
+                if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i')) { e.preventDefault(); return false; }
+                if (e.ctrlKey && (e.key === 'U' || e.key === 'u')) { e.preventDefault(); return false; }
+                if (e.ctrlKey && e.shiftKey && (e.key === 'J' || e.key === 'j')) { e.preventDefault(); return false; }
+                if (e.ctrlKey && e.shiftKey && (e.key === 'C' || e.key === 'c')) { e.preventDefault(); return false; }
+                return true;
+            });
+        })();
+
+        // ========== 主程序 ==========
+        (function() {
+            const STORAGE_KEY = 'sandrone_calc_data';
+
+            // ---------- 根据命座生成时间轴并设置正确倍率 ----------
+            function getBaseSkillEvents() {
+                const constellation = document.getElementById('constellation').value;
+                const isC1Plus = constellation !== 'c0';
+                // z 倍率分组：C0-C2 用 0.85，C3-C6 用 1.03
+                const isZ_C3plus = constellation === 'c3' || constellation === 'c4' || constellation === 'c5' || constellation === 'c6';
+                const z_m1 = isZ_C3plus ? 1.03 : 0.85;
+                const z_m2 = isZ_C3plus ? 1.957 : 1.615;
+                // q 倍率分组：C0-C4 用 1.5879/7.9392，C5-C6 用 5.6238/9.3726
+                const isQ_C5plus = constellation === 'c5' || constellation === 'c6';
+                const q_m1 = isQ_C5plus ? 1.8746 * 3 : 1.5879;
+                const q_m2 = isQ_C5plus ? 4.6863 * 2 : 7.9392;
+
+                const events = [];
+                const start = { name: '起手', tag: 'start', m1: 0, m2: 0, duration: 0.5 };
+                const z = { name: 'z', tag: 'z', m1: z_m1, m2: z_m2, duration: 1.0 };
+                const eFirst = { name: 'e', tag: 'e', m1: 0.5832, m2: 1.5552, duration: 1.0 };
+                const eLater = { name: 'e', tag: 'e', m1: 0.5832, m2: 0.3888, duration: 1.0 };
+                const qSkill = { name: 'q', tag: 'q', m1: q_m1, m2: q_m2, duration: 1.5 };
+
+                let currentTime = 0;
+                function addEvent(evt) {
+                    events.push({
+                        t: currentTime,
+                        duration: evt.duration,
+                        m1: evt.m1,
+                        m2: evt.m2,
+                        name: evt.name,
+                        tag: evt.tag
+                    });
+                    currentTime += evt.duration;
+                }
+
+                if (isC1Plus) {
+                    // C1+ 循环：起手 + 6z + e(第一次) + q + 起手 + 6z + e(最后)
+                    addEvent(start);
+                    for (let i = 0; i < 6; i++) addEvent(z);
+                    addEvent(eFirst);
+                    addEvent(qSkill);
+                    addEvent(start);
+                    for (let i = 0; i < 6; i++) addEvent(z);
+                    addEvent(eLater);
+                } else {
+                    // C0 循环：起手 + 3z + e(第一次) + q + 起手 + 3z + e(后续) + 起手 + 3z + e(最后)
+                    addEvent(start);
+                    for (let i = 0; i < 3; i++) addEvent(z);
+                    addEvent(eFirst);
+                    addEvent(qSkill);
+                    addEvent(start);
+                    for (let i = 0; i < 3; i++) addEvent(z);
+                    addEvent(eLater);
+                    addEvent(start);
+                    for (let i = 0; i < 3; i++) addEvent(z);
+                    addEvent(eLater);
+                }
+
+                return events;
+            }
+
+            // ---------- C2+ z 爆伤循环 ----------
+            function getZCritDmgBonus(zIndex) {
+                const cycle = [0.60, 0.80, 1.00, 1.00, 1.00, 1.00];
+                const idx = (zIndex - 1) % cycle.length;
+                return cycle[idx];
+            }
+
+            // DOM 引用
+            const baseAtkInput = document.getElementById('baseAtk');
+            const weaponAtkInput = document.getElementById('weaponAtk');
+            const critRateInput = document.getElementById('critRate');
+            const critDmgInput = document.getElementById('critDmg');
+            const flatAtkInput = document.getElementById('flatAtk');
+            const atkPercentInput = document.getElementById('atkPercent');
+            const emInput = document.getElementById('em');
+            const sdCoeffInput = document.getElementById('sdCoeff');
+            const baseBuffInput = document.getElementById('baseBuff');
+            const sdCritDmgInput = document.getElementById('sdCritDmg');
+            const sdDmgBonusInput = document.getElementById('sdDmgBonus');
+            const eleDmgDisplay = document.getElementById('eleDmgDisplay');
+            const startTimeInput = document.getElementById('startTime');
+            const endTimeInput = document.getElementById('endTime');
+            const constellationSelect = document.getElementById('constellation');
+            const calcBtn = document.getElementById('calcBtn');
+            const showFlowBtn = document.getElementById('showFlowBtn');
+            const totalDisplay = document.getElementById('totalDisplay');
+            const modalOverlay = document.getElementById('flowModal');
+            const modalContent = document.getElementById('modalContent');
+            const modalCloseBtn = document.getElementById('modalCloseBtn');
+            const buffBody = document.getElementById('buffBody');
+            const newBuffName = document.getElementById('newBuffName');
+            const newBuffStart = document.getElementById('newBuffStart');
+            const newBuffEnd = document.getElementById('newBuffEnd');
+            const newBuffType = document.getElementById('newBuffType');
+            const newBuffValue = document.getElementById('newBuffValue');
+            const addBuffBtn = document.getElementById('addBuffBtn');
+            const toggleBuffBtn = document.getElementById('toggleBuffBtn');
+            const buffManager = document.getElementById('buffManager');
+
+            let userBuffs = [];
+
+            // ---------- 保存与加载 ----------
+            function saveData() {
+                try {
+                    const data = {
+                        params: {
+                            baseAtk: baseAtkInput.value,
+                            weaponAtk: weaponAtkInput.value,
+                            critRate: critRateInput.value,
+                            critDmg: critDmgInput.value,
+                            flatAtk: flatAtkInput.value,
+                            atkPercent: atkPercentInput.value,
+                            em: emInput.value,
+                            sdCoeff: sdCoeffInput.value,
+                            baseBuff: baseBuffInput.value,
+                            sdCritDmg: sdCritDmgInput.value,
+                            sdDmgBonus: sdDmgBonusInput.value,
+                            startTime: startTimeInput.value,
+                            endTime: endTimeInput.value,
+                            constellation: constellationSelect.value
+                        },
+                        buffs: userBuffs
+                    };
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+                } catch (e) {}
+            }
+
+            function loadData() {
+                try {
+                    const stored = localStorage.getItem(STORAGE_KEY);
+                    if (!stored) return false;
+                    const data = JSON.parse(stored);
+                    const p = data.params;
+                    if (p) {
+                        baseAtkInput.value = p.baseAtk ?? 335;
+                        weaponAtkInput.value = p.weaponAtk ?? 608;
+                        critRateInput.value = p.critRate ?? 0.65;
+                        critDmgInput.value = p.critDmg ?? 1.80;
+                        flatAtkInput.value = p.flatAtk ?? 311;
+                        atkPercentInput.value = p.atkPercent ?? 0.80;
+                        emInput.value = p.em ?? 120;
+                        sdCoeffInput.value = p.sdCoeff ?? 1.0;
+                        baseBuffInput.value = p.baseBuff ?? 1.28;
+                        sdCritDmgInput.value = p.sdCritDmg ?? 0.40;
+                        sdDmgBonusInput.value = p.sdDmgBonus ?? 0.15;
+                        startTimeInput.value = p.startTime ?? 0;
+                        endTimeInput.value = p.endTime ?? 16.5;
+                        constellationSelect.value = p.constellation ?? 'c0';
+                    }
+                    userBuffs = (data.buffs && Array.isArray(data.buffs)) ? data.buffs : [];
+                    return true;
+                } catch (e) { return false; }
+            }
+
+            function initDefaultBuffs() {
+                userBuffs = [
+                    { name: '宗室', start: 0, end: 16.5, type: 'atkPercent', value: 0.20 },
+                    { name: '千岩', start: 0, end: 16.5, type: 'atkPercent', value: 0.20 },
+                    { name: '风套减抗', start: 0, end: 16.5, type: 'resistance', value: -0.40 },
+                ];
+                renderBuffTable();
+            }
+
+            function renderBuffTable() {
+                let html = '';
+                userBuffs.forEach((buff, index) => {
+                    html += `<tr>
+                        <td><input class="buff-input buff-name" type="text" value="${buff.name}" data-index="${index}" data-field="name"></td>
+                        <td><input class="buff-input" type="number" step="0.1" value="${buff.start}" data-index="${index}" data-field="start"></td>
+                        <td><input class="buff-input" type="number" step="0.1" value="${buff.end}" data-index="${index}" data-field="end"></td>
+                        <td>
+                            <select class="buff-input" data-index="${index}" data-field="type">
+                                <option value="atkPercent" ${buff.type === 'atkPercent' ? 'selected' : ''}>攻击力%加成</option>
+                                <option value="sdDmg" ${buff.type === 'sdDmg' ? 'selected' : ''}>星超导增伤</option>
+                                <option value="sdCritDmg" ${buff.type === 'sdCritDmg' ? 'selected' : ''}>星超导爆伤</option>
+                                <option value="resistance" ${buff.type === 'resistance' ? 'selected' : ''}>减抗</option>
+                                <option value="critRate" ${buff.type === 'critRate' ? 'selected' : ''}>暴击率</option>
+                                <option value="critDmg" ${buff.type === 'critDmg' ? 'selected' : ''}>暴击伤害</option>
+                                <option value="ascend" ${buff.type === 'ascend' ? 'selected' : ''}>擢升</option>
+                                <option value="flatDmg" ${buff.type === 'flatDmg' ? 'selected' : ''}>额外数值</option>
+                            </select>
+                        </td>
+                        <td><input class="buff-input" type="number" step="0.01" value="${buff.value}" data-index="${index}" data-field="value"></td>
+                        <td><button class="btn-remove" data-index="${index}">&times;</button></td>
+                    </tr>`;
+                });
+                buffBody.innerHTML = html;
+                document.querySelectorAll('#buffBody .buff-input').forEach(input => {
+                    input.addEventListener('change', function() {
+                        const index = parseInt(this.dataset.index);
+                        const field = this.dataset.field;
+                        let val = this.value;
+                        if (field === 'start' || field === 'end') val = parseFloat(val) || 0;
+                        else if (field === 'value') val = parseFloat(val) || 0;
+                        userBuffs[index][field] = val;
+                        renderBuffTable();
+                        saveData();
+                    });
+                });
+                document.querySelectorAll('#buffBody .btn-remove').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        userBuffs.splice(parseInt(this.dataset.index), 1);
+                        renderBuffTable();
+                        saveData();
+                    });
+                });
+            }
+
+            function addBuff() {
+                const name = newBuffName.value.trim() || '未命名';
+                const start = parseFloat(newBuffStart.value);
+                const end = parseFloat(newBuffEnd.value);
+                const type = newBuffType.value;
+                const value = parseFloat(newBuffValue.value);
+                if (isNaN(start) || isNaN(end) || isNaN(value)) { alert('请正确填写'); return; }
+                if (start >= end) { alert('起始必须小于结束'); return; }
+                userBuffs.push({ name, start, end, type, value });
+                renderBuffTable();
+                saveData();
+                newBuffName.value = newBuffStart.value = newBuffEnd.value = newBuffValue.value = '';
+            }
+
+            function toggleBuffManager() {
+                const isHidden = buffManager.style.display === 'none' || buffManager.style.display === '';
+                buffManager.style.display = isHidden ? 'block' : 'none';
+                toggleBuffBtn.textContent = isHidden ? '收起' : '展开';
+            }
+
+            // ---------- 传统增伤映射 ----------
+            const COEFF_TO_TRADITIONAL_DMG = {
+                1.0: 0.20, 1.45: 0.29, 1.5: 0.30, 1.55: 0.31, 1.6: 0.32,
+                1.65: 0.33, 1.7: 0.34, 1.75: 0.35, 1.8: 0.36, 1.85: 0.37,
+                1.9: 0.38, 1.95: 0.39, 2.0: 0.40
+            };
+            const COEFF_KEYS = Object.keys(COEFF_TO_TRADITIONAL_DMG).map(Number).sort((a,b)=>a-b);
+
+            function getTraditionalDmgByCoefficient(coeff) {
+                if (isNaN(coeff) || coeff === null) return 0.20;
+                if (coeff in COEFF_TO_TRADITIONAL_DMG) return COEFF_TO_TRADITIONAL_DMG[coeff];
+                let closest = COEFF_KEYS[0];
+                let minDiff = Math.abs(coeff - closest);
+                for (let k of COEFF_KEYS) {
+                    const diff = Math.abs(coeff - k);
+                    if (diff < minDiff) { minDiff = diff; closest = k; }
+                }
+                return COEFF_TO_TRADITIONAL_DMG[closest];
+            }
+
+            // ---------- 抗性公式 ----------
+            function calcResistMultiplier(finalResist) {
+                if (finalResist < 0) return 1 - finalResist / 2;
+                else if (finalResist <= 0.75) return 1 - finalResist;
+                else return 1 / (4 * finalResist + 1);
+            }
+
+            // ---------- 单次伤害计算 ----------
+            function calcSingleEvent(t, m1, m2, params) {
+                const {
+                    totalAtk, critRate, critDmgNormal, critDmgSd, em, coeff, baseBuff, eleDmg,
+                    sdDmgBuff, resistMultiplier, ascendBuff, flatDmg, additiveM2, isC6
+                } = params;
+                const def = 0.5;
+                const resist = resistMultiplier;
+                const critFactorNormal = 1 + critRate * critDmgNormal;
+                const critFactorSd = 1 + critRate * critDmgSd;
+                const traditionalDmgBonus = 1 + eleDmg;
+                // dmg1 (传统冰伤) 不受擢升影响
+                const dmg1 = totalAtk * m1 * traditionalDmgBonus * critFactorNormal * def * resist;
+                // dmg2 (星超导) 受擢升影响
+                const modifiedM2 = m2 + (additiveM2 || 0);
+                const emFactor = 1 + (6 * em) / (em + 2000) + sdDmgBuff;
+                const sdReactionCoeff = coeff;
+                // 擢升乘区：基础1 + 擢升Buff + (C6时额外0.2)
+                const ascendMultiplier = 1 + ascendBuff + (isC6 ? 0.2 : 0);
+                const dmg2 = totalAtk * modifiedM2 * baseBuff * emFactor * sdReactionCoeff * critFactorSd * resist * ascendMultiplier;
+                const total = dmg1 + dmg2 + flatDmg;
+                return {
+                    dmg1, dmg2, total,
+                    resistMultiplier: resist,
+                    ascendMultiplier: ascendMultiplier,
+                    flatDmg: flatDmg,
+                    additiveM2: additiveM2 || 0,
+                    modifiedM2: modifiedM2,
+                    critFactorNormal, critFactorSd,
+                    critDmgNormal, critDmgSd
+                };
+            }
+
+            // ---------- 完整计算 ----------
+            function computeFull() {
+                const baseAtk = parseFloat(baseAtkInput.value) || 0;
+                const weaponAtk = parseFloat(weaponAtkInput.value) || 0;
+                const totalBaseAtk = baseAtk + weaponAtk;
+                let critRate = parseFloat(critRateInput.value) || 0;
+                let critDmg = parseFloat(critDmgInput.value) || 0;
+                const flatAtk = parseFloat(flatAtkInput.value) || 0;
+                const atkPercentBase = parseFloat(atkPercentInput.value) || 0;
+                const em = parseFloat(emInput.value) || 0;
+                const coeff = parseFloat(sdCoeffInput.value);
+                const sdCoeff = isNaN(coeff) ? 1.0 : coeff;
+                const baseBuff = parseFloat(baseBuffInput.value) || 1;
+                const sdCritDmgBase = parseFloat(sdCritDmgInput.value) || 0;
+                const sdDmgBonusBase = parseFloat(sdDmgBonusInput.value) || 0;
+                const constellation = constellationSelect.value;
+                const isC6 = constellation === 'c6';
+
+                const offset = parseFloat(startTimeInput.value) || 0;
+                const endTime = parseFloat(endTimeInput.value) || 22;
+
+                const eleDmg = getTraditionalDmgByCoefficient(sdCoeff);
+                const BASE_RESIST = 0.1;
+
+                // 获取基础事件（无偏移）
+                const baseEvents = getBaseSkillEvents();
+
+                // 生成 C4 额外攻击事件（仅在 C4+）
+                const isC4Plus = constellation === 'c4' || constellation === 'c5' || constellation === 'c6';
+                let c4ExtraEvents = [];
+                if (isC4Plus) {
+                    const firstStart = baseEvents[0];
+                    const firstEnd = firstStart.t + firstStart.duration;
+                    let lastEEnd = 0;
+                    for (let i = baseEvents.length - 1; i >= 0; i--) {
+                        if (baseEvents[i].name === 'e') {
+                            lastEEnd = baseEvents[i].t + baseEvents[i].duration;
+                            break;
+                        }
+                    }
+                    let triggerTime = firstEnd;
+                    while (triggerTime <= lastEEnd + 1e-9) {
+                        c4ExtraEvents.push({
+                            t: triggerTime,
+                            duration: 0,
+                            m1: 0,
+                            m2: 1.25,
+                            name: 'C4额外',
+                            tag: 'c4',
+                            originalIndex: -1,
+                            isC4Extra: true
+                        });
+                        triggerTime += 4.0;
+                    }
+                }
+
+                // 统计所有 z 技能的原始索引（仅 m2>0）
+                const zIndices = [];
+                baseEvents.forEach((evt, idx) => {
+                    if (evt.name === 'z' && evt.m2 > 0) zIndices.push(idx);
+                });
+
+                // 构建偏移后的事件，并保留原始索引
+                let skillEvents = baseEvents.map((evt, idx) => {
+                    const newEvt = { ...evt, originalIndex: idx, isC4Extra: false };
+                    newEvt.t = evt.t + offset;
+                    newEvt.hitTime = newEvt.t + evt.duration;
+                    return newEvt;
+                });
+
+                // 添加 C4 额外事件（偏移）
+                c4ExtraEvents.forEach(evt => {
+                    const newEvt = { ...evt, originalIndex: -1, isC4Extra: true };
+                    newEvt.t = evt.t + offset;
+                    newEvt.hitTime = newEvt.t + evt.duration;
+                    skillEvents.push(newEvt);
+                });
+
+                skillEvents.sort((a, b) => a.hitTime - b.hitTime);
+
+                const filteredEvents = skillEvents.filter(evt => evt.hitTime >= offset && evt.hitTime <= endTime);
+
+                const details = [];
+                let totalDamage = 0;
+
+                // 遍历每个事件
+                filteredEvents.forEach((evt) => {
+                    const hitTime = evt.hitTime;
+                    const startT = evt.t;
+                    const duration = evt.duration;
+                    const m1 = evt.m1;
+                    const m2 = evt.m2;
+                    const skillName = evt.name || '?';
+                    const skillTag = evt.tag || '';
+                    const isC4 = evt.isC4Extra || false;
+
+                    let atkPercentBuff = atkPercentBase;
+                    let sdDmgBuff = sdDmgBonusBase;
+                    let sdCritDmgBuff = sdCritDmgBase;
+                    let totalResistReduction = 0;
+                    let critRateBuff = 0;
+                    let critDmgBuff = 0;
+                    let ascendBuff = 0;
+                    let flatDmgBuff = 0;
+                    const activeBuffs = [];
+
+                    for (let buff of userBuffs) {
+                        if (hitTime >= buff.start && hitTime <= buff.end) {
+                            activeBuffs.push(buff.name || `${buff.type}:${buff.value}`);
+                            if (buff.type === 'atkPercent') atkPercentBuff += buff.value;
+                            else if (buff.type === 'sdDmg') sdDmgBuff += buff.value;
+                            else if (buff.type === 'sdCritDmg') sdCritDmgBuff += buff.value;
+                            else if (buff.type === 'resistance') totalResistReduction += buff.value;
+                            else if (buff.type === 'critRate') critRateBuff += buff.value;
+                            else if (buff.type === 'critDmg') critDmgBuff += buff.value;
+                            else if (buff.type === 'ascend') ascendBuff += buff.value;
+                            else if (buff.type === 'flatDmg') flatDmgBuff += buff.value;
+                        }
+                    }
+
+                    // C1+ 固定增伤（C4额外攻击不吃）
+                    let c1Fixed = 0;
+                    if (constellation !== 'c0' && !isC4) {
+                        c1Fixed = 0.30;
+                    }
+                    sdDmgBuff += c1Fixed;
+
+                    // C2+ z爆伤加成（C4额外攻击不吃）
+                    let zCritBonus = 0;
+                    if (constellation !== 'c0' && constellation !== 'c1' && !isC4) {
+                        if (evt.name === 'z' && evt.m2 > 0 && !isC4) {
+                            const pos = zIndices.indexOf(evt.originalIndex);
+                            if (pos !== -1) {
+                                const zIndex = pos + 1;
+                                zCritBonus = getZCritDmgBonus(zIndex);
+                            }
+                        }
+                    }
+                    let totalSdCritDmg;
+                    if (isC4) {
+                        totalSdCritDmg = critDmg + critDmgBuff;
+                    } else {
+                        totalSdCritDmg = critDmg + critDmgBuff + sdCritDmgBuff + zCritBonus;
+                    }
+
+                    const finalCritRate = Math.min(critRate + critRateBuff, 1.0);
+                    const finalCritDmgNormal = critDmg + critDmgBuff;
+                    const finalCritDmgSd = totalSdCritDmg;
+                    const finalResist = BASE_RESIST + totalResistReduction;
+                    const resistMultiplier = calcResistMultiplier(finalResist);
+                    const totalAtk = (totalBaseAtk * (1 + atkPercentBuff)) + flatAtk;
+
+                    // 计算主事件伤害
+                    const params = {
+                        totalAtk, critRate: finalCritRate, critDmgNormal: finalCritDmgNormal, critDmgSd: finalCritDmgSd,
+                        em, coeff: sdCoeff, baseBuff, eleDmg, sdDmgBuff, resistMultiplier, ascendBuff, flatDmg: flatDmgBuff,
+                        additiveM2: 0, isC6: isC6
+                    };
+                    const result = calcSingleEvent(hitTime, m1, m2, params);
+                    totalDamage += result.total;
+
+                    // 构建主事件详情
+                    const detail = {
+                        hitTime, startTime: startT, duration, skillName, skillTag, m1, m2,
+                        modifiedM2: result.modifiedM2, totalAtk, dmg1: result.dmg1, dmg2: result.dmg2, total: result.total,
+                        activeBuffs, atkPercentBuff, sdDmgBuff,
+                        sdCritDmgBuff: isC4 ? 0 : (totalSdCritDmg - critDmg - critDmgBuff),
+                        critRateBuff, critDmgBuff, ascendBuff, flatDmgBuff,
+                        finalCritRate, finalCritDmgNormal, finalCritDmgSd,
+                        totalResistReduction, finalResist, resistMultiplier: result.resistMultiplier,
+                        critFactorNormal: result.critFactorNormal, critFactorSd: result.critFactorSd,
+                        traditionalDmgBonus: 1 + eleDmg, eleDmg, coeff: sdCoeff,
+                        emFactor: 1 + (6 * em) / (em + 2000) + sdDmgBuff,
+                        sdReactionCoeff: sdCoeff, finalBaseBuff: baseBuff, def: 0.5,
+                        ascendMultiplier: result.ascendMultiplier, flatDmgApplied: result.flatDmg,
+                        additiveM2: result.additiveM2, isSdEvent: m2 > 0,
+                        hasDamage: (m1 > 0 || m2 > 0),
+                        constellation: constellation,
+                        constellationSdBuff: c1Fixed,
+                        zCritBonus: isC4 ? 0 : zCritBonus,
+                        isC4Extra: isC4,
+                        isC6Extra: false,
+                        c6ExtraForZ: false,
+                        extraType: 'main'
+                    };
+                    details.push(detail);
+
+                    // ---- C6 额外伤害逻辑 ----
+                    if (isC6 && evt.name === 'z' && evt.m2 > 0 && !isC4) {
+                        const pos = zIndices.indexOf(evt.originalIndex);
+                        if (pos !== -1) {
+                            const zIndex = pos + 1;
+                            // 判断 zIndex 是否在 [3,4,5,6,9,10,11,12] 中
+                            const c6ZSet = [3,4,5,6,9,10,11,12];
+                            if (c6ZSet.includes(zIndex)) {
+                                // 生成 C6 额外伤害，继承主事件的所有参数，但 m2=0.8，m1=0
+                                const c6Params = { ...params };
+                                // 使用与主事件相同的加成，但设置 m2=0.8，m1=0
+                                const c6Result = calcSingleEvent(hitTime, 0, 0.8, c6Params);
+                                totalDamage += c6Result.total;
+                                // 记录额外伤害详情
+                                const c6Detail = {
+                                    hitTime, startTime: startT, duration: 0,
+                                    skillName: 'C6额外',
+                                    skillTag: 'c6',
+                                    m1: 0,
+                                    m2: 0.8,
+                                    modifiedM2: 0.8,
+                                    totalAtk: c6Params.totalAtk,
+                                    dmg1: c6Result.dmg1,
+                                    dmg2: c6Result.dmg2,
+                                    total: c6Result.total,
+                                    activeBuffs: detail.activeBuffs,
+                                    atkPercentBuff: detail.atkPercentBuff,
+                                    sdDmgBuff: detail.sdDmgBuff,
+                                    sdCritDmgBuff: detail.sdCritDmgBuff,
+                                    critRateBuff: detail.critRateBuff,
+                                    critDmgBuff: detail.critDmgBuff,
+                                    ascendBuff: detail.ascendBuff,
+                                    flatDmgBuff: detail.flatDmgBuff,
+                                    finalCritRate: detail.finalCritRate,
+                                    finalCritDmgNormal: detail.finalCritDmgNormal,
+                                    finalCritDmgSd: detail.finalCritDmgSd,
+                                    totalResistReduction: detail.totalResistReduction,
+                                    finalResist: detail.finalResist,
+                                    resistMultiplier: c6Result.resistMultiplier,
+                                    critFactorNormal: c6Result.critFactorNormal,
+                                    critFactorSd: c6Result.critFactorSd,
+                                    traditionalDmgBonus: detail.traditionalDmgBonus,
+                                    eleDmg: detail.eleDmg,
+                                    coeff: detail.coeff,
+                                    emFactor: detail.emFactor,
+                                    sdReactionCoeff: detail.sdReactionCoeff,
+                                    finalBaseBuff: detail.finalBaseBuff,
+                                    def: detail.def,
+                                    ascendMultiplier: c6Result.ascendMultiplier,
+                                    flatDmgApplied: c6Result.flatDmg,
+                                    additiveM2: 0,
+                                    isSdEvent: true,
+                                    hasDamage: true,
+                                    constellation: constellation,
+                                    constellationSdBuff: detail.constellationSdBuff,
+                                    zCritBonus: detail.zCritBonus,
+                                    isC4Extra: false,
+                                    isC6Extra: true,
+                                    c6ExtraForZ: zIndex,
+                                    extraType: 'c6'
+                                };
+                                details.push(c6Detail);
+                            }
+                        }
+                    }
+                });
+
+                return { totalDamage, details, eleDmg, coeff: sdCoeff, userBuffs, startTime: offset, endTime, constellation };
+            }
+
+            function updateTotalDisplay() {
+                const result = computeFull();
+                totalDisplay.textContent = result.totalDamage.toFixed(0);
+                saveData();
+            }
+
+            function updateEleDmgDisplay() {
+                const coeff = parseFloat(sdCoeffInput.value);
+                const sdCoeff = isNaN(coeff) ? 1.0 : coeff;
+                const eleDmg = getTraditionalDmgByCoefficient(sdCoeff);
+                eleDmgDisplay.value = (eleDmg * 100).toFixed(0) + '%';
+            }
+
+            // ---------- 生成流程文本 ----------
+            function generateFlowText() {
+                const result = computeFull();
+                const lines = [];
+                const coeff = result.coeff;
+                const eleDmg = result.eleDmg;
+                const startTime = result.startTime;
+                const endTime = result.endTime;
+                const constellation = result.constellation;
+
+                lines.push('═══════════════════════════════════════════════');
+                lines.push('桑多涅 · 星超导伤害计算流程');
+                lines.push('═══════════════════════════════════════════════');
+                const baseAtk = parseFloat(baseAtkInput.value) || 0;
+                const weaponAtk = parseFloat(weaponAtkInput.value) || 0;
+                const isC1plus = constellation !== 'c0';
+                const isC2plus = constellation !== 'c0' && constellation !== 'c1';
+                const isC4plus = constellation === 'c4' || constellation === 'c5' || constellation === 'c6';
+                const isC6 = constellation === 'c6';
+                const isQ_C5plus = constellation === 'c5' || constellation === 'c6';
+                const isZ_C3plus = constellation === 'c3' || constellation === 'c4' || constellation === 'c5' || constellation === 'c6';
+                const zDesc = isZ_C3plus ? '倍率1=1.03, 倍率2=1.957' : '倍率1=0.85, 倍率2=1.615';
+                const qDesc = isQ_C5plus ? '倍率1=5.6238, 倍率2=9.3726' : '倍率1=1.5879, 倍率2=7.9392';
+                lines.push(`  命座: ${constellation.toUpperCase()} ${isC1plus ? '(C1+增伤+30%)' : ''} ${isC2plus ? '(C2+ z爆伤循环)' : ''} ${isC4plus ? '(C4+ 额外攻击)' : ''} ${isC6 ? '(C6: 擢升+0.2, z额外伤害)' : ''}`);
+                lines.push(`  z倍率: ${zDesc}`);
+                lines.push(`  q倍率: ${qDesc}`);
+                if (isC6) {
+                    lines.push(`  ★ C6 擢升乘区基础值从1提升至1.2`);
+                    lines.push(`  ★ C6 z额外伤害: 第3/4/5/6/9/10/11/12次z触发, 倍率2=0.8, 继承z全部加成`);
+                }
+                lines.push(`  基础攻击: ${baseAtk} + ${weaponAtk} = ${baseAtk + weaponAtk}`);
+                lines.push(`  暴击率: ${parseFloat(critRateInput.value) || 0}  暴伤: ${parseFloat(critDmgInput.value) || 0}`);
+                lines.push(`  绿字攻击: ${parseFloat(flatAtkInput.value) || 0}`);
+                lines.push(`  攻击%加成: ${parseFloat(atkPercentInput.value) || 0}`);
+                lines.push(`  元素精通: ${parseFloat(emInput.value) || 0}`);
+                lines.push(`  星超导系数: ${coeff}  → 传统增伤识别: ${(eleDmg * 100).toFixed(0)}%`);
+                lines.push(`  基础提升%: ${parseFloat(baseBuffInput.value) || 0}`);
+                lines.push(`  星超导爆伤加成(基础): ${parseFloat(sdCritDmgInput.value) || 0}`);
+                lines.push(`  星超导增伤加成(基础): ${parseFloat(sdDmgBonusInput.value) || 0}`);
+                if (isC1plus) lines.push(`  ★ C1+ 固定星超导增伤: +30% (额外攻击不生效)`);
+                if (isC2plus) lines.push(`  ★ C2+ z技能星超导爆伤循环: 1:+60%,2:+80%,3-6:+100%,7:+60%,8:+80%,9-12:+100% (额外攻击不生效)`);
+                if (isC4plus) lines.push(`  ★ C4+ 额外攻击: 倍率2=1.25, 首次起手后触发, 每4s一次, 不吃C1/C2/星超导爆伤`);
+                lines.push(`  ⏱ 时间偏移: +${startTime}s → 所有技能时间已平移`);
+                lines.push(`  ⏱ 截止时间: ${endTime}s (仅计算 ≤ 此时间的事件)`);
+                lines.push('───────────────────────────────────────────────');
+                lines.push('【用户 Buff 列表】');
+                if (result.userBuffs.length === 0) lines.push('  无');
+                else result.userBuffs.forEach(b => lines.push(`  ${b.name} : ${b.start}s~${b.end}s, ${b.type} = ${b.value}`));
+                lines.push('───────────────────────────────────────────────');
+                lines.push('【时间轴】严格按您指定的循环和持续时间');
+                lines.push('  C0: 起手 zzz e q 起手 zzz e 起手 zzz e  (总15s)');
+                lines.push('  C1+: 起手 zzzzzz e q 起手 zzzzzz e  (总16.5s)');
+                lines.push('  起手0.5s，z/e 1s，q 1.5s，伤害在“起始+持续”时判定');
+                lines.push('【抗性计算】怪物基础抗性 10% (0.1)');
+                lines.push('  抗性系数 = R<0 ? 1-R/2 : R≤0.75 ? 1-R : 1/(4R+1)');
+                lines.push('  防御系数 = 0.5 (仅传统冰伤)');
+                lines.push('  传统增伤倍率 = 1 + 识别值');
+                lines.push('  星超导增伤 = 基础 + Buff + C1+固定(如有，额外攻击不加)');
+                lines.push('  ★ 星超导暴击期望 = 1 + 暴击率 × (普通暴伤 + 星超导爆伤 + z加成(如有) )');
+                lines.push('  ★ 擢升乘区 = 1 + 擢升Buff + (C6?0.2:0)');
+                lines.push('  额外攻击仅使用普通暴伤，不吃星超导爆伤和z加成。');
+                lines.push('  擢升乘区 = 1 + 擢升Buff总和');
+                lines.push('  额外数值 = 直接加到总伤害');
+                lines.push('───────────────────────────────────────────────');
+
+                if (result.details.length === 0) {
+                    lines.push('⚠ 窗口内无伤害事件，总伤害为 0');
+                } else {
+                    let eventCount = 0;
+                    result.details.forEach((d) => {
+                        if (!d.hasDamage) {
+                            lines.push(`\n⏱ ${d.hitTime.toFixed(1)}s  [${d.skillName}] 无伤害`);
+                            return;
+                        }
+                        eventCount++;
+                        const tagMap = { z: '⚔️', e: '🌀', q: '💥', c4: '💢', c6: '✨' };
+                        const icon = tagMap[d.skillTag] || '•';
+                        let extraInfo = '';
+                        if (d.isC6Extra) {
+                            extraInfo = ` (触发自第${d.c6ExtraForZ}次z)`;
+                        }
+                        lines.push(`\n─── ${icon} [${d.skillName.toUpperCase()}]${extraInfo}  伤害 ${d.hitTime.toFixed(1)}s ───`);
+                        if (d.isSdEvent) {
+                            lines.push(`  ⭐ 星超导事件`);
+                            if (d.zCritBonus > 0) lines.push(`  ★ z爆伤加成: +${(d.zCritBonus * 100).toFixed(0)}%`);
+                            if (d.isC4Extra) lines.push(`  ★ C4额外攻击 (不吃C1/C2/星超导爆伤)`);
+                            if (d.isC6Extra) lines.push(`  ★ C6额外攻击 (继承z全部加成)`);
+                        }
+                        const buffsActive = d.activeBuffs.length ? d.activeBuffs.join(', ') : '无';
+                        lines.push(`  活跃BUFF: ${buffsActive}`);
+                        lines.push(`  攻击%加成(总) = ${(d.atkPercentBuff * 100).toFixed(1)}%`);
+                        lines.push(`  星超导增伤(总) = ${(d.sdDmgBuff * 100).toFixed(1)}%${d.constellationSdBuff && !d.isC4Extra ? ' (含C1+固定+30%)' : ''}`);
+                        if (d.isC4Extra) {
+                            lines.push(`  星超导额外爆伤 = 0 (C4额外攻击不吃)`);
+                        } else {
+                            lines.push(`  星超导额外爆伤 = ${(d.sdCritDmgBuff * 100).toFixed(1)}%${d.zCritBonus > 0 ? ` + z加成${(d.zCritBonus * 100).toFixed(0)}%` : ''}`);
+                        }
+                        lines.push(`  暴击率BUFF = ${(d.critRateBuff * 100).toFixed(1)}% → 最终 ${(d.finalCritRate * 100).toFixed(1)}%`);
+                        lines.push(`  普通暴伤BUFF = ${(d.critDmgBuff * 100).toFixed(1)}% → 最终普通暴伤 ${(d.finalCritDmgNormal * 100).toFixed(1)}%`);
+                        lines.push(`  星超导总暴伤 = ${(d.finalCritDmgSd * 100).toFixed(1)}%`);
+                        lines.push(`  擢升BUFF = ${(d.ascendBuff * 100).toFixed(1)}% → 乘区 ${d.ascendMultiplier.toFixed(4)}`);
+                        lines.push(`  额外数值 = ${d.flatDmgBuff.toFixed(2)}`);
+                        lines.push(`  总攻击力 = ${d.totalAtk.toFixed(2)}`);
+                        lines.push(`  倍率1 (冰) = ${d.m1.toFixed(4)}  倍率2 (星超导) = ${d.m2.toFixed(4)}`);
+                        if (d.additiveM2 !== 0) lines.push(`  倍率2修正: +${d.additiveM2.toFixed(1)} → ${d.modifiedM2.toFixed(4)}`);
+                        lines.push(`  抗性: 减抗 ${(d.totalResistReduction * 100).toFixed(1)}% → R=${(d.finalResist * 100).toFixed(1)}% → 系数 ${d.resistMultiplier.toFixed(4)}`);
+                        lines.push(`  传统增伤 = ${(d.eleDmg * 100).toFixed(0)}% → 倍率 ${d.traditionalDmgBonus.toFixed(4)}`);
+                        lines.push(`  传统冰伤暴击期望 = ${d.critFactorNormal.toFixed(4)}`);
+                        lines.push(`  星超导暴击期望 = ${d.critFactorSd.toFixed(4)}`);
+                        if (d.m1 > 0) {
+                            lines.push(`  传统冰伤 = ${d.totalAtk.toFixed(2)}×${d.m1.toFixed(4)}×${d.traditionalDmgBonus.toFixed(4)}×${d.critFactorNormal.toFixed(4)}×0.5×${d.resistMultiplier.toFixed(4)} = ${d.dmg1.toFixed(2)}`);
+                        }
+                        lines.push(`  精通乘区 = ${d.emFactor.toFixed(4)}  反应系数 = ${d.sdReactionCoeff}`);
+                        lines.push(`  星超导伤 = ${d.totalAtk.toFixed(2)}×${d.modifiedM2.toFixed(4)}×${d.finalBaseBuff.toFixed(4)}×${d.emFactor.toFixed(4)}×${d.sdReactionCoeff}×${d.critFactorSd.toFixed(4)}×${d.resistMultiplier.toFixed(4)}×${d.ascendMultiplier.toFixed(4)} = ${d.dmg2.toFixed(2)}`);
+                        lines.push(`  该次总伤 = ${d.dmg1.toFixed(2)} + ${d.dmg2.toFixed(2)} + ${d.flatDmgApplied.toFixed(2)} = ${d.total.toFixed(2)}`);
+                    });
+                    lines.push(`\n───────────────────────────────────────────────`);
+                    lines.push(`  共 ${eventCount} 个伤害事件，总伤害: ${result.totalDamage.toFixed(0)}`);
+                }
+                lines.push('═══════════════════════════════════════════════');
+                return lines.join('\n');
+            }
+
+            function showFlowModal() {
+                modalContent.textContent = generateFlowText();
+                modalOverlay.classList.add('active');
+            }
+
+            function closeModal() {
+                modalOverlay.classList.remove('active');
+            }
+
+            // ---------- 事件绑定 ----------
+            calcBtn.addEventListener('click', function() {
+                updateTotalDisplay();
+                saveData();
+            });
+            showFlowBtn.addEventListener('click', showFlowModal);
+            modalCloseBtn.addEventListener('click', closeModal);
+            modalOverlay.addEventListener('click', function(e) {
+                if (e.target === modalOverlay) closeModal();
+            });
+
+            addBuffBtn.addEventListener('click', addBuff);
+            toggleBuffBtn.addEventListener('click', toggleBuffManager);
+
+            const allParamInputs = document.querySelectorAll('.param-grid input, .param-grid select');
+            allParamInputs.forEach(el => {
+                el.addEventListener('input', function() {
+                    updateEleDmgDisplay();
+                    saveData();
+                });
+                el.addEventListener('change', function() {
+                    updateEleDmgDisplay();
+                    saveData();
+                });
+            });
+
+            sdCoeffInput.addEventListener('input', function() {
+                updateEleDmgDisplay();
+                saveData();
+            });
+
+            window.addEventListener('DOMContentLoaded', function() {
+                const loaded = loadData();
+                if (!loaded) initDefaultBuffs();
+                else renderBuffTable();
+                updateEleDmgDisplay();
+                updateTotalDisplay();
+                buffManager.style.display = 'none';
+                toggleBuffBtn.textContent = '展开';
+            });
+
+        })();
+    </script>
+</body>
+</html>
