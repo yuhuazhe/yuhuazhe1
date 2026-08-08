@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>羽化哲</title>
+    <title>奥黛塔计算器</title>
     <style>
         * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, system-ui, sans-serif; }
         body { background: #0d1117; margin: 20px; display: flex; justify-content: center; color: #c9d1d9; }
@@ -60,7 +60,7 @@
 <body>
 <div class="container">
     <h1>奥黛塔v1测试版</h1>
-    <div class="sub">怪物基础抗性 10%（适用c0奥-c3奥）</div>
+    <div class="sub">怪物基础抗性 10%</div>
 
     <div class="param-grid">
         <div class="row">
@@ -70,7 +70,6 @@
                 <option value="c1">C1</option>
                 <option value="c2">C2</option>
                 <option value="c3">C3</option>
-                <!-- 可扩展 C4 等 -->
             </select>
         </div>
         <div class="row">
@@ -162,6 +161,7 @@
                 <option value="critDmg">暴击伤害</option>
                 <option value="ascend">擢升</option>
                 <option value="flatDmg">额外数值</option>
+                <option value="em">元素精通</option>
             </select>
             <input type="number" id="newBuffValue" placeholder="数值" step="0.01" style="flex:1;">
             <button class="add-btn" id="addBuffBtn">添加</button>
@@ -216,12 +216,12 @@
             { t: 20, m1: 0.7747, m2: 0.4864 }
         ];
 
-        // ---------- C3 及以上倍率（右侧表格，严格按行顺序） ----------
+        // ---------- C3 及以上倍率 ----------
         const rawEventsC3 = [
-            { t: 0, m1: 2.2967, m2: 0 },          // 229.67% , 无第二倍率
-            { t: 2, m1: 6.1098, m2: 6.4974 },     // 203.66%*3 , 649.74%
-            { t: 4, m1: 0.9146, m2: 0.5743 },     // 91.46% , 57.43%
-            { t: 6, m1: 1.0936, m2: 0.6866 },     // 109.36% , 68.66%
+            { t: 0, m1: 2.2967, m2: 0 },
+            { t: 2, m1: 6.1098, m2: 6.4974 },
+            { t: 4, m1: 0.9146, m2: 0.5743 },
+            { t: 6, m1: 1.0936, m2: 0.6866 },
             { t: 8, m1: 0.9146, m2: 0.5743 },
             { t: 10, m1: 1.0936, m2: 0.6866 },
             { t: 12, m1: 0.9146, m2: 0.5743 },
@@ -231,7 +231,6 @@
             { t: 20, m1: 0.9146, m2: 0.5743 }
         ];
 
-        // 判断命座是否 >= C3（支持 c3, c4, ...）
         function isC3OrAbove(constellation) {
             if (!constellation || constellation.length < 2 || constellation[0] !== 'c') return false;
             const num = parseInt(constellation.substring(1), 10);
@@ -354,6 +353,7 @@
                             <option value="critDmg" ${buff.type==='critDmg'?'selected':''}>暴击伤害</option>
                             <option value="ascend" ${buff.type==='ascend'?'selected':''}>擢升</option>
                             <option value="flatDmg" ${buff.type==='flatDmg'?'selected':''}>额外数值</option>
+                            <option value="em" ${buff.type==='em'?'selected':''}>元素精通</option>
                         </select>
                     </td>
                     <td><input class="buff-input" type="number" step="0.01" value="${buff.value}" data-index="${idx}" data-field="value"></td>
@@ -383,19 +383,31 @@
             });
         }
 
-        // ---------- 添加 Buff ----------
+        // ---------- 添加 Buff （完整功能，已修复） ----------
         function addBuff() {
             const name = newBuffName.value.trim() || '未命名';
             const start = parseFloat(newBuffStart.value);
             const end = parseFloat(newBuffEnd.value);
             const type = newBuffType.value;
             const value = parseFloat(newBuffValue.value);
-            if (isNaN(start) || isNaN(end) || isNaN(value)) { alert('请正确填写'); return; }
-            if (start >= end) { alert('起始必须小于结束'); return; }
+
+            if (isNaN(start) || isNaN(end) || isNaN(value)) {
+                alert('起始时间、结束时间和数值都必须填写有效数字！');
+                return;
+            }
+            if (start > end) {
+                alert('起始时间不能大于结束时间！');
+                return;
+            }
+
             userBuffs.push({ name, start, end, type, value });
             renderBuffTable();
             saveData();
-            newBuffName.value = newBuffStart.value = newBuffEnd.value = newBuffValue.value = '';
+            // 清空输入框
+            newBuffName.value = '';
+            newBuffStart.value = '';
+            newBuffEnd.value = '';
+            newBuffValue.value = '';
         }
 
         // ---------- 展开/收起 ----------
@@ -475,7 +487,7 @@
             let critDmg = parseFloat(critDmgInput.value) || 0;
             const flatAtk = parseFloat(flatAtkInput.value) || 0;
             const atkPercentBase = parseFloat(atkPercentInput.value) || 0;
-            const em = parseFloat(emInput.value) || 0;
+            const baseEm = parseFloat(emInput.value) || 0;
             const coeff = parseFloat(sdCoeffInput.value);
             const sdCoeff = isNaN(coeff) ? 1.0 : coeff;
             const baseBuff = parseFloat(baseBuffInput.value) || 1;
@@ -511,6 +523,7 @@
                 const m1 = evt.m1;
                 const m2 = evt.m2;
                 const globalSdIndex = evt.globalSdIndex;
+                const displayTime = t + startTime;   // ★ 显示时间（用于 Buff 判定）
                 const inWindow = (t <= endTime);
 
                 let atkPercentBuff = atkPercentBase;
@@ -521,33 +534,36 @@
                 let critDmgBuff = 0;
                 let ascendBuff = 0;
                 let flatDmgBuff = 0;
+                let emBuff = 0;
                 const activeBuffs = [];
+                const atkBuffDetails = [];
+                const emBuffDetails = [];
 
+                // ★★★ 核心修改：Buff 判定基于 displayTime ★★★
                 for (let buff of userBuffs) {
-                    if (t >= buff.start && t <= buff.end) {
+                    if (displayTime >= buff.start && displayTime <= buff.end) {
                         activeBuffs.push(buff.name || `${buff.type}:${buff.value}`);
-                        if (buff.type === 'atkPercent') atkPercentBuff += buff.value;
-                        else if (buff.type === 'sdDmg') sdDmgBuff += buff.value;
-                        else if (buff.type === 'sdCritDmg') sdCritDmgBuff += buff.value;
-                        else if (buff.type === 'resistance') totalResistReduction += buff.value;
-                        else if (buff.type === 'critRate') critRateBuff += buff.value;
-                        else if (buff.type === 'critDmg') critDmgBuff += buff.value;
-                        else if (buff.type === 'ascend') ascendBuff += buff.value;
-                        else if (buff.type === 'flatDmg') flatDmgBuff += buff.value;
-                    }
-                }
-
-                let additiveM2 = 0;
-                if (m2 > 0) {
-                    if (globalSdIndex === 1) {
-                        if (constellation === 'c0') {
-                            sdDmgBuff += 0.60;
-                        } else if (constellation === 'c1' || constellation === 'c2' || isC3OrAbove(constellation)) {
-                            additiveM2 = 3.0;
-                            sdDmgBuff += 0.90;
+                        if (buff.type === 'atkPercent') {
+                            atkPercentBuff += buff.value;
+                            atkBuffDetails.push({ name: buff.name, value: buff.value });
+                        } else if (buff.type === 'sdDmg') {
+                            sdDmgBuff += buff.value;
+                        } else if (buff.type === 'sdCritDmg') {
+                            sdCritDmgBuff += buff.value;
+                        } else if (buff.type === 'resistance') {
+                            totalResistReduction += buff.value;
+                        } else if (buff.type === 'critRate') {
+                            critRateBuff += buff.value;
+                        } else if (buff.type === 'critDmg') {
+                            critDmgBuff += buff.value;
+                        } else if (buff.type === 'ascend') {
+                            ascendBuff += buff.value;
+                        } else if (buff.type === 'flatDmg') {
+                            flatDmgBuff += buff.value;
+                        } else if (buff.type === 'em') {
+                            emBuff += buff.value;
+                            emBuffDetails.push({ name: buff.name, value: buff.value });
                         }
-                    } else if (globalSdIndex === 2) {
-                        sdDmgBuff += 0.30;
                     }
                 }
 
@@ -563,8 +579,27 @@
                         else if (delta <= 4) c2AtkBonus = 0.14;
                         else c2AtkBonus = 0;
                     }
+                    if (c2AtkBonus > 0) {
+                        atkPercentBuff += c2AtkBonus;
+                        atkBuffDetails.push({ name: 'C2攻击加成', value: c2AtkBonus });
+                    }
                 }
-                atkPercentBuff += c2AtkBonus;
+
+                const finalEm = baseEm + emBuff;
+
+                let additiveM2 = 0;
+                if (m2 > 0) {
+                    if (globalSdIndex === 1) {
+                        if (constellation === 'c0') {
+                            sdDmgBuff += 0.60;
+                        } else if (constellation === 'c1' || constellation === 'c2' || isC3OrAbove(constellation)) {
+                            additiveM2 = 3.0;
+                            sdDmgBuff += 0.90;
+                        }
+                    } else if (globalSdIndex === 2) {
+                        sdDmgBuff += 0.30;
+                    }
+                }
 
                 const totalResist = BASE_RESIST + totalResistReduction - extraResistReduction;
                 const resistMultiplier = calcResistMultiplier(totalResist);
@@ -572,7 +607,7 @@
                 const finalCritRate = critRate + critRateBuff;
                 const finalCritDmg = critDmg + critDmgBuff;
                 const finalSdCritDmg = sdCritDmgBuff;
-                const totalAtk = (totalBaseAtk * (1 + atkPercentBuff)) + flatAtk;
+                const totalAtk = (totalBaseAtk * atkPercentBuff) + flatAtk;
 
                 let result = null;
                 if (inWindow) {
@@ -580,7 +615,7 @@
                         totalAtk,
                         critRate: finalCritRate,
                         critDmg: finalCritDmg,
-                        em,
+                        em: finalEm,
                         coeff: sdCoeff,
                         baseBuff: finalBaseBuff,
                         eleDmg,
@@ -597,7 +632,6 @@
                     result = { dmg1: 0, dmg2: 0, total: 0, lawN: 0, lawBonus: 0, lawMultiplier: 1, resistMultiplier: 1, ascendMultiplier: 1, flatDmg: 0, additiveM2: 0, modifiedM2: m2, critFactor1: 1, critFactor2: 1, totalCritDmgForSd: 0, emFactor: 1, traditionalDmgBonus: 1, baseBuff: 1, sdDmgBuff: 0, sdCritDmg: 0 };
                 }
 
-                const displayTime = t + startTime;
                 details.push({
                     time: t,
                     displayTime: displayTime,
@@ -609,6 +643,7 @@
                     total: result.total,
                     activeBuffs,
                     atkPercentBuff,
+                    atkBuffDetails,
                     sdDmgBuff,
                     sdCritDmgBuff,
                     critRateBuff,
@@ -646,8 +681,12 @@
                     sdCritDmg: result.sdCritDmg,
                     totalBaseAtk: totalBaseAtk,
                     flatAtk: flatAtk,
-                    em: em,
-                    baseBuffValue: baseBuff
+                    baseEm: baseEm,
+                    emBuff: emBuff,
+                    emBuffDetails: emBuffDetails,
+                    finalEm: finalEm,
+                    baseBuffValue: baseBuff,
+                    atkPercentBase: atkPercentBase
                 });
             });
 
@@ -687,7 +726,7 @@
             lines.push(`基础暴击率: ${parseFloat(critRateInput.value)||0}, 基础暴伤: ${parseFloat(critDmgInput.value)||0}`);
             lines.push(`绿字攻击: ${parseFloat(flatAtkInput.value)||0}`);
             lines.push(`基础攻击%加成: ${parseFloat(atkPercentInput.value)||0}`);
-            lines.push(`元素精通: ${parseFloat(emInput.value)||0}`);
+            lines.push(`基础元素精通: ${parseFloat(emInput.value)||0}`);
             lines.push(`星超导系数: ${coeff}`);
             lines.push(`基础提升%: ${parseFloat(baseBuffInput.value)||0} ${(constellation==='c1'||constellation==='c2'||isC3OrAbove(constellation))?'+ 0.20 (C1/C2/C3+)':''}`);
             lines.push(`星超导爆伤加成(基础): ${parseFloat(sdCritDmgInput.value)||0}`);
@@ -701,6 +740,8 @@
             lines.push('【用户自定义 Buff】');
             if (result.userBuffs.length === 0) lines.push('  无');
             else result.userBuffs.forEach(b => lines.push(`  ${b.name} : ${b.start}s ~ ${b.end}s, ${b.type} = ${b.value}`));
+            lines.push('--------------------------------------------------');
+            lines.push('【Buff 判定说明】Buff 生效基于“显示时间” (原始时间 + 起始偏移)，与您设定的时间轴一致。');
             lines.push('--------------------------------------------------');
             lines.push('【抗性】基础10%，累加减抗后按公式计算');
             lines.push('【法则】独立乘区 = 1 + min( max(0, ⌊(总攻击−1000)/100⌋) × 1.5%, 30% )');
@@ -732,7 +773,22 @@
                         const atkPercentTotal = d.atkPercentBuff;
                         const flatAtkVal = d.flatAtk;
                         const totalAtk = d.totalAtk;
-                        lines.push(`  【总攻击力】基础 ${baseAtkTotal.toFixed(2)} × (1 + ${(atkPercentTotal*100).toFixed(1)}%) + ${flatAtkVal.toFixed(2)} = ${totalAtk.toFixed(2)}`);
+                        lines.push(`  【总攻击力】基础 ${baseAtkTotal.toFixed(2)} × ${(atkPercentTotal*100).toFixed(1)}% + ${flatAtkVal.toFixed(2)} = ${totalAtk.toFixed(2)}`);
+
+                        let atkDetailsStr = `基础 ${(d.atkPercentBase*100).toFixed(1)}%`;
+                        for (let item of d.atkBuffDetails) {
+                            atkDetailsStr += ` + ${item.name} ${(item.value*100).toFixed(1)}%`;
+                        }
+                        atkDetailsStr += ` = ${(atkPercentTotal*100).toFixed(1)}%`;
+                        lines.push(`  【攻击力%加成明细】${atkDetailsStr}`);
+
+                        let emDetailsStr = `基础 ${d.baseEm}`;
+                        for (let item of d.emBuffDetails) {
+                            emDetailsStr += ` + ${item.name} ${item.value}`;
+                        }
+                        emDetailsStr += ` = ${d.finalEm}`;
+                        lines.push(`  【元素精通明细】${emDetailsStr}`);
+
                         const tradBonus = d.traditionalDmgBonus;
                         lines.push(`  【传统增伤倍率】1 + ${(d.eleDmg*100).toFixed(0)}% = ${tradBonus.toFixed(4)}`);
                         const cr = d.finalCritRate;
@@ -752,7 +808,7 @@
                         const lawMult = d.lawMultiplier;
                         lines.push(`  【法则独立乘区】((总攻击-1000)/100)取整 = ${lawN} → 加成 ${(lawBonus*100).toFixed(1)}% → 乘区 = ${lawMult.toFixed(4)}`);
                         const emFactor = d.emFactor;
-                        const emVal = d.em;
+                        const emVal = d.finalEm;
                         const sdDmg = d.sdDmgBuff;
                         lines.push(`  【精通/增伤乘区】1 + (6×${emVal})/(${emVal}+2000) + ${(sdDmg*100).toFixed(1)}% = ${emFactor.toFixed(4)}`);
                         lines.push(`  【反应系数】${d.sdReactionCoeff}`);
