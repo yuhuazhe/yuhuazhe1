@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>羽化哲</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        body {
+            background-color: #0b0b0e;
+            color:#e2e2e8;
+            padding:32px 16px;
+        }
+        .container {
+            max-width: 1024px;
+            margin: 0 auto;
+        }
+        h1.main-title {
+            text-align: center;
+            font-size: clamp(24px,4vw,34px);
+            font-weight:700;
+            margin-bottom: 6px;
+        }
+        .sub-title {
+            text-align:center;
+            color:#9494a3;
+            font-size:15px;
+            margin-bottom:40px;
+        }
+        /* 元素同一行横向 */
+        .elem-row {
+            display:flex;
+            justify-content:center;
+            gap:40px;
+            flex-wrap:wrap;
+            margin-bottom:36px;
+        }
+        .elem-item{
+            font-size:22px;
+            font-weight:600;
+        }
+        .fire{color:#ff6347;}
+        .water{color:#42a5ff;}
+        .ice{color:#b0e4ff;}
+
+        /* 板块标题单独一行 */
+        .part-title {
+            text-align:center;
+            font-size:18px;
+            margin:32px 0 20px;
+            color:#ccccdd;
+        }
+
+        /* 角色横向排列容器 */
+        .role-horizontal-wrap {
+            display:flex;
+            justify-content:center;
+            gap:24px;
+            flex-wrap:wrap;
+            margin-bottom:36px;
+        }
+        .role-card {
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            gap:8px;
+            width:120px;
+        }
+        .role-icon {
+            width:80px;
+            height:80px;
+            background:#1f1f29;
+            border-radius:8px;
+        }
+        .role-icon img {
+            width:100%;
+            height:100%;
+            object-fit:contain;
+        }
+        .role-name {
+            font-size:14px;
+            text-align:center;
+        }
+
+        /* 怪物竖向（参考截图样式：图标‑名称‑描述，全部居中） */
+        .vertical-monster {
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            gap:12px;
+            margin-bottom:42px;
+        }
+        .monster-icon {
+            width:90px;
+            height:90px;
+            background:#1f1f29;
+            border-radius:8px;
+        }
+        .monster-icon img {
+            width:100%;
+            height:100%;
+            object-fit:contain;
+        }
+        .monster-name {
+            font-size:17px;
+            font-weight:600;
+            text-align:center;
+        }
+        .monster-desc {
+            max-width:720px;
+            text-align:center;
+            font-size:14px;
+            color:#b4b4c2;
+            line-height:1.7;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 class="main-title">7.0版本9月1日</h1>
+    <div class="sub-title">怪物源自网络收集，暂无法提供血量信息以及小怪信息</div>
+
+    <!-- 元素同一行 -->
+    <div class="elem-row">
+        <div class="elem-item fire">水</div>
+        <div class="elem-item water">雷</div>
+        <div class="elem-item ice">草</div>
+    </div>
+
+    <!-- 开幕角色：横向展示 -->
+    <h3 class="part-title">开幕角色</h3>
+    <div class="role-horizontal-wrap">
+        <div class="role-card">
+            <div class="role-icon"><img src="11.webp" alt=""></div>
+            <div class="role-name">哥伦比亚</div>
+        </div>
+        <div class="role-card">
+            <div class="role-icon"><img src="12.webp" alt=""></div>
+            <div class="role-name">行秋</div>
+        </div>
+    
+     <div class="role-card">
+            <div class="role-icon"><img src="13.webp" alt=""></div>
+            <div class="role-name">赛诺</div>
+        </div>
+
+    <div class="role-card">
+            <div class="role-icon"><img src="14.webp" alt=""></div>
+            <div class="role-name">久岐忍</div>
+        </div>
+
+    <div class="role-card">
+            <div class="role-icon"><img src="15.webp" alt=""></div>
+            <div class="role-name">菈乌玛</div>
+        </div>
+        <div class="role-card">
+            <div class="role-icon"><img src="16.webp" alt=""></div>
+            <div class="role-name">卡维</div>
+        </div>
+
+
+
+
+
+    </div>
+
+
+
+
+
+
+
+
+    <!-- 特邀角色：横向展示 -->
+    <h3 class="part-title">特邀角色</h3>
+    <div class="role-horizontal-wrap">
+        <div class="role-card">
+            <div class="role-icon"><img src="17.webp" alt=""></div>
+            <div class="role-name">奥黛塔</div>
+        </div>
+        <div class="role-card">
+            <div class="role-icon"><img src="18.webp" alt=""></div>
+            <div class="role-name">桑多涅</div>
+        </div>
+        <div class="role-card">
+            <div class="role-icon"><img src="19.webp" alt=""></div>
+            <div class="role-name">砂糖</div>
+        </div>
+        <div class="role-card">
+            <div class="role-icon"><img src="20.webp" alt=""></div>
+            <div class="role-name">尼可</div>
+        </div>
+        
+
+
+
+
+
+    </div>
+
+    <!-- 第一幕怪物：竖向（截图样式，图标+名称+描述） -->
+    <h3 class="part-title">第三幕怪物</h3>
+    <div class="vertical-monster">
+        <div class="monster-icon"><img src="21.webp" alt=""></div>
+        <div class="monster-name">翠翎恐蕈</div>
+
+       <p>蕈兽进化之后的形态。承受雷元素攻击与激化反应时，会积累「活性化」状态;受到火元素攻击，「活性化」则会减少。</p>
+       <p>在「活性化」状态积累满后，将进入活化状态。活化状态的翠翎恐蕈会进行更加猛烈的攻击，直到力竭。</p>
+        <p>不处于活化状态时，若翠翎恐蕈因为火元素陷入燃烧状态，则会变得枯焦，会向四周散播孢子，产生蕈兽以摆脱这种状态。</p>
+       
+    </div>
+
+    <!-- 第二幕怪物：竖向 -->
+    <h3 class="part-title">第六幕怪物</h3>
+    <div class="vertical-monster">
+        <div class="monster-icon"><img src="22.webp" alt=""></div>
+        <div class="monster-name">铁甲熔火帝皇</div>
+       <p>经历过无数年月的成长，超越了几乎一切原海异种的重甲蟹之王。</p>
+        <p>身躯上方高处的熔火双角是火元素的身体器官，使其能够进行更猛烈的元素攻击，并且拥有更强的防御能力。</p>
+       <p>在进行部分攻击时，它的熔火双角会更贴近地面，是利用元素反应消除其中火元素的好时机。</p>
+
+           
+           
+    </div>
+
+    <h3 class="part-title">第八幕怪物</h3>
+    <div class="vertical-monster">
+        <div class="monster-icon"><img src="23.webp" alt=""></div>
+        <div class="monster-name">历经百战的皮皮潘偶像</div>
+       <p>战斗中，会创造多顶帽子，并将本体隐藏于其中一顶帽子下，随后快速变换帽子的位置。</p>
+        <p>变换一定次数后，如果本体所隐藏的帽子受到感电或月感电伤害，则会使所有帽子位置的变换暂时停止。</p>
+<p>对本体所隐藏的帽子造成一定伤害即可将所有帽子破坏，从而使本体现身，受到一次高额伤害，并陷入一段时间的虚弱状态;</p>
+<p>感电或月感电反应对帽子有着更高的破坏效率。帽子被破坏时本体所受到的伤害，会基于帽子受到水元素伤害、雷元素伤害、感电或月感电伤害而提高。</p>
+
+           
+           
+    </div>
+     <h3 class="part-title">第十幕怪物</h3>
+    <div class="vertical-monster">
+        <div class="monster-icon"><img src="24.webp" alt=""></div>
+        <div class="monster-name">蕴光月幻蝶</div>
+
+       <p>在蕴光的魔物中也是最为强大的一类，其「蕴光之茧」所造成的影响相较其余蕴光魔物亦更为显著，及时通过治疗令生命值达到上限即可自「蕴光之茧」中破茧而出。</p>
+        <p>蕴光的魔物有种种神奇之处，甚至有传言，该种魔物能在特定环境下进行自身元素类型的变化…</p>
+
+
+
+
+
+        
+
+
+ <h3 class="part-title">圣牌一怪物</h3>
+    <div class="role-horizontal-wrap">
+        <div class="role-card">
+            <div class="role-icon"><img src="25.1.webp" alt=""></div>
+            <div class="role-name">黯色空壳·旗令</div>
+        </div>
+         <div class="role-card">
+            <div class="role-icon"><img src="25.webp" alt=""></div>
+            <div class="role-name">黯色空壳·破阵</div>
+        </div>
+         <div class="role-card">
+            <div class="role-icon"><img src="25.2.webp" alt=""></div>
+            <div class="role-name">黯色空壳·近卫</div>
+            </div>
+        
+       <p>在此关卡中坚持战斗至倒计时结束，队伍中仍有角色未倒下，即可通过挑战。每次击败敌人后可减少挑战倒计时。</p>
+<p>挑战开始后，队伍中所有角色将持续小幅损失生命值。</p>
+
+</div>
+
+
+
+ <h3 class="part-title">圣牌二怪物</h3>
+    <div class="vertical-monster">
+        <div class="monster-icon"><img src="26.webp" alt=""></div>
+        
+        <div class="monster-name">历经百战的深海龙蜥·原种</div>
+
+       <p>历经百战的深海龙蜥·原种除了会使用「涤魔喷吐」进行攻击外，还会展开「涤魔领域」。</p>
+        <p>受到「涤魔喷吐」伤害或进入「涤魔领域」后，角色将流失一定的元素能量。</p>
+        <p>若角色的元素能量不足，将损失生命值。</p>
+<p>破除历经百战的深海龙蜥·原种的护罩后，「涤魔领域」将失效</p>
+
+
+
+
+
+
+
+
+
+        
+       
+    </div>
+
+
+
+
+
+
+
+
+</div>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #6366f1 #111118;
+        }
+        *::-webkit-scrollbar {
+            width: 6px;
+        }
+        *::-webkit-scrollbar-thumb {
+            background: #6366f1;
+            border-radius: 3px;
+        }
+        body {
+            background: #0b0b12;
+            color: #e2e8f0;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        .card-container {
+            background: #14141f;
+            border-radius: 16px;
+            border: 1px solid #27273a;
+        }
+        .boss-img-box {
+            width: 180px;
+            height: 180px;
+            margin: 0 auto;
+            border-radius: 12px;
+            overflow: hidden;
+            background: radial-gradient(circle, #3b2050 0%, transparent 70%);
+        }
+        .tag-ok {
+            background: #166534;
+            color: #bbf7d0;
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 13px;
+        }
+        .tag-no {
+            background: #7f1d1d;
+            color: #fecdd3;
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 13px;
+        }
+        .title-purple {
+            color: #c084fc;
+            font-weight: 600;
+        }
+        .text-red-hp {
+            color: #fb7185;
+        }
+        .divider-line {
+            width: 80px;
+            height: 1px;
+            background: #444466;
+            margin: 16px auto;
+        }
+        .list-item li {
+            margin-bottom: 12px;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- 标题区 -->
+        <div class="text-center mb-10">
+            <h1 class="text-3xl md:text-4xl font-bold text-violet-300 mb-2">幽境危战-7.0版本</h1>
+            <p class="text-gray-400"></p>
+        </div>
+
+        <!-- 三BOSS横向容器 电脑端横排 手机竖排 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- BOSS1：嵌合翼骏狮·摧枯伟力 -->
+            <div class="card-container p-6">
+                <div class="boss-img-box mb-4">
+                    <img src="1.png" class="w-full h-full object-cover">
+                </div>
+                <div class="text-center">
+                    <h2 class="text-xl font-semibold title-purple">嵌合翼骏狮·摧枯伟力</h2>
+                    <p class="text-sm text-gray-400 mt-1"></p>
+                    <p class="text-red-hp mt-2 text-lg">N5:10748446 / N6:23349702</p>
+                    <div class="flex justify-center gap-3 mt-3">
+                        <span class="tag-ok">冰元素角色 ✔</span>
+                    </div>
+                </div>
+                <div class="divider-line"></div>
+                <div>
+                    <h3 class="text-center text-lg font-medium text-fuchsia-300 mb-4">BOSS机制</h3>
+                    <ul class="list-disc pl-5 list-item text-sm">
+                        <li>强敌开局会展开40U雷元素护盾，若强敌正处于「翔裂星枭」的影响之下，在强敌释放雷元素冲击波时将扣除16U护盾，并掉落6个雷元素微粒，破盾时，会以超过画面中所受到的100%雷伤+30%其他伤害，对强敌造成真实伤害，并使其瘫痪13s，此时强敌失去外部抗性，并将风属性抗性降至-120%，其余全降低60%。</li>
+                        <li>战后，强敌阶段二觉醒，尝试牵引引场上的5个风能量球以恢复力量；风能量球可被火/雷/水元素伤害击碎，亦可通过令强敌入裂隙击碎的影响，使其无法吸收风能量球，此时将掉落6个风元素微粒。若风能量球阶段时我们未收取3个风能量球，也将进入瘫痪状态。</li>
+                    </ul>
+                </div>
+                <div class="divider-line"></div>
+                <div>
+                    <h3 class="text-center text-lg font-medium text-fuchsia-300 mb-4">首领特性</h3>
+                    <ul class="list-disc pl-5 list-item text-sm">
+                        <li><strong>唤乱·掣雷</strong><br>受到驰乱的影响，战斗开始时，强敌将以雷元素之力为引，生成坚韧的雷元素护盾，护盾大幅削减元素伤害；同时，风元素之力灌注于雷元素之中，释放大范围雷元素风暴，若通过元素反应击破护盾后，短暂时间力量会重新回流，使护盾快速恢复，若无法反应击破护盾，则根据所剩余护盾比例，同步削减对应冰/水元素抗性，持续整场战斗，并根据护盾所剩余比例，受到一次高额反震伤害，超触发反应会提高护盾破碎时的反震。</li>
+                        <li><strong>翔风·裂袭</strong><br>受到驰乱的影响，战斗中，强敌将以风元素的力量为引，飞在空中快速盘旋，发起猛烈的风斩攻击，高额的风属性伤害，元素护盾开启后，空中盘旋生成的风暴可以击碎场上的雷/火/水元素实体；亦可通过令强敌入裂隙的影响，使其无法吸收风能量，若无法吸收风能量球，此时将掉落6个风元素微粒，将立刻陷入瘫痪，同时大量吸收冰元素与风元素抗性大幅降低。</li>
+                        <li>生物概念的产物，是被弃置的合成兽之一。在驰乱数百年的曲曲中，其驾驭元素的威能及狂暴——雷电与风暴在它的控制下齐啸奔腾，所过之处寸草不留。</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- BOSS2：历经百战的风役人·谵谑芒锋 -->
+            <div class="card-container p-6">
+                <div class="boss-img-box mb-4">
+                    <img src="2.png""历经百战的风役人·谵谑芒锋" class="w-full h-full object-cover">
+                </div>
+                <div class="text-center">
+                    <h2 class="text-xl font-semibold title-purple">历经百战的风役人·谵谑芒锋</h2>
+                    <p class="text-sm text-gray-400 mt-1"></p>
+                    <p class="text-red-hp mt-2 text-lg">N5:8068956 / N6:17506995</p>
+                    <div class="flex justify-center gap-3 mt-3">
+                        <span class="tag-ok">生命之契角色 | 护盾角色元素角色 ✔</span>
+                    </div>
+                </div>
+                <div class="divider-line"></div>
+                <div>
+                    <h3 class="text-center text-lg font-medium text-fuchsia-300 mb-4">BOSS机制</h3>
+                    <ul class="list-disc pl-5 list-item text-sm">
+                        <li>冻结抵抗90%，抗打断能力全面增强，无法被角色技能打断，且具有大量快速位移技能。</li>
+                        <li>没有护盾时，施放「墨杀」并生成护盾；等同于22.5%生命值，被破盾时损失等量生命值。</li>
+                        <li>护盾生成时，为全体角色施加27100 / 29028生命之契，且存在期间每秒额外施加8130 / 8708生命之契（N5/N6）</li>
+                    </ul>
+                </div>
+                <div class="divider-line"></div>
+                <div>
+                    <h3 class="text-center text-lg font-medium text-fuchsia-300 mb-4">首领特性</h3>
+                    <ul class="list-disc pl-5 list-item text-sm">
+                        <li><strong>溃疾墨杀</strong><br>战斗中，每消耗一定比例的生命，进行「墨杀」；命中角色时，该敌人自身恢复一定比例的生命值，并向命中的角色造成大量伤害。</li>
+                        <li><strong>浮沧论剑·破墨</strong><br>护盾存在的期间，该敌人的打断力与抗打断力大幅提升，且可在空中发动高速冲刺后释放墨刃，护盾存在期间，准备进行「墨杀」阶段；护盾血量清空；生成护盾后，敌人会全力突进。</li>
+                        <li>墨人当中自愧的剑客，依墨令与多任的长官，她们既可以与士兵进退，也能独自奔赴所有带有「靶子」的任务，自身的记忆都已被刻在剑鞘所有，徒留一刃久经战事的死灰本能，向一切见者展露杀意。</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- BOSS3：重拳出击鸭·重甲武库 -->
+            <div class="card-container p-6">
+                <div class="boss-img-box mb-4">
+                    <img src="3.png""重拳出击鸭·重甲武库" class="w-full h-full object-cover">
+                </div>
+                <div class="text-center">
+                    <h2 class="text-xl font-semibold title-purple">重拳出击鸭·重甲武库</h2>
+                    <p class="text-sm text-gray-400 mt-1"></p>
+                    <p class="text-red-hp mt-2 text-lg">N5:13114773 / N6:25925712</p>
+                    <div class="flex justify-center gap-3 mt-3">
+                        <span class="tag-ok">水雷元素反应 ✔</span>
+                        <span class="tag-ok">雷元素角色 ✔</span>
+                    </div>
+                </div>
+                <div class="divider-line"></div>
+                <div>
+                    <h3 class="text-center text-lg font-medium text-fuchsia-300 mb-4">BOSS机制</h3>
+                    <ul class="list-disc pl-5 list-item text-sm">
+                        <li>冲鸭机关存在期间，自身全部抗性+210%，每个冲鸭机关具有强效25%最大生命值，全抗10%</li>
+                        <li>冲鸭机关无法被集束，也不会被击飞。受到感电/月感电伤害+150%（增伤区）。</li>
+                        <li>每个冲鸭机关击破时，其受到伤害的20%，会转化为对首领伤害，每只冲鸭机关记录的伤害不会超过其最大生命的20%，全部击破后首领护盾消失，进入12s瘫痪，全抗性为10%，雷元素抗性-50%，约45s后首领会重新展开护盾</li>
+                    </ul>
+                </div>
+                <div class="divider-line"></div>
+                <div>
+                    <h3 class="text-center text-lg font-medium text-fuchsia-300 mb-4">首领特性</h3>
+                    <ul class="list-disc pl-5 list-item text-sm">
+                        <li><strong>「全装甲天鸭」模式</strong><br>受到电磁脉冲，战斗开始后，强敌会进入「全装甲天鸭」模式，进攻欲望上升，并为自身与生成的冲鸭机关提供护盾，还会召唤新的冲鸭机关进行骚扰。</li>
+                        <li><strong>低时冲鸭机关</strong><br>通过多次造成感电或超导电伤害，或直接对冲鸭机关造成足量伤害，可干扰它的运行逻辑。通过这种方式瓦解它的护盾后，首领可直接击破；进入「全装甲天鸭」模式，因过载而性能衰减，即使它蕴藏的雷元素抗性在一段时间内大幅降低。</li>
+                        <li><strong>快速瘫痪机制</strong><br>受电磁脉冲影响，冲鸭机关变更加强，需击破多只或造成大量感电或超导电伤害，使其过载重伤才能使其运行。击破时会释放冲击波对周围造成高额雷元素伤害，全部击破首领护盾消失，此时首领的雷元素抗性大幅降低。</li>
+                        <li>由废弃的金属与机关轴承拼凑而成、造型奇特的机甲鸭，似乎是因为制造者的偏好而被赋予了鸭子外形；庞大的外壳，固然只是毫无实战价值的玩具鸭。在出力与抗打击性能方面都毫不逊色，依然是一只只会大战出故障的机甲鸭。在地脉极强雷元素的浸泡下，该机关已然化为了满载载武备与装甲的机动工厂，略有不慎，蜂拥而至的冲鸭机关便会如钢蜂般将挑战者淹没。</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
