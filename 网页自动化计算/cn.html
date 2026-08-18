@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>羽化哲</title>
+    <style>
+        /* ==================== 基础样式 & 充能计算器核心 ==================== */
+        body {
+            background: url('1.png') no-repeat center center fixed; 
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            font-family: "Microsoft YaHei", -apple-system, sans-serif;
+            color: #ecf0f1;
+            box-sizing: border-box;
+        }
+
+        /* 主容器：全局上下布局 */
+        .calculator-container {
+            width: 100%;
+            max-width: 100%;
+            background: rgba(18, 26, 42, 0.6);
+            backdrop-filter: blur(20px) saturate(150%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column; 
+            gap: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+            box-sizing: border-box;
+        }
+
+        .panel {
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .panel-header {
+            font-size: 16px;
+            font-weight: bold;
+            color: #8cb8e6;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .reset-btn, .help-btn, .timeline-btn {
+            background: transparent;
+            color: #b0c4de;
+            border: 1px solid #444;
+            padding: 4px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: 0.2s;
+        }
+        .reset-btn:hover, .help-btn:hover { background: rgba(255,255,255,0.1); }
+        .help-btn { border-color: #6688bb; color: #8cb8e6; }
+        .timeline-btn { border-color: #aa66bb; color: #d4b0e6; }
+        .timeline-btn:hover { background: rgba(170, 102, 187, 0.2); }
+
+        /* ==================== 充能计算器粒子表格 ==================== */
+        .particle-table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 4px;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .particle-table-wrapper::-webkit-scrollbar { display: none; }
+
+        .grid-row {
+            display: grid;
+            grid-template-columns: 90px repeat(6, 1fr);
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 12px;
+            min-width: 650px;
+        }
+        .grid-row:last-child { margin-bottom: 0; }
+
+        .grid-row.header {
+            color: #b9cef0;
+            font-size: 14px;
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-weight: bold;
+        }
+
+        .label-text { color: #d1d8e0; font-size: 15px; text-align: left; }
+
+        .number-control {
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+            border: 1px solid #445566;
+            overflow: hidden;
+            width: 100%;
+            height: 34px;
+        }
+        .number-control button {
+            background: #2a3a4a; border: none; color: #ecf0f1; width: 30px;
+            height: 100%; cursor: pointer; font-size: 16px; transition: 0.2s;
+            touch-action: manipulation;
+        }
+        .number-control button:active { background: #4a5a6a; }
+        .number-control input {
+            background: transparent; border: none; color: #ecf0f1;
+            width: 100%; text-align: center; height: 100%; font-size: 15px;
+            outline: none; appearance: textfield;
+        }
+        .number-control input::-webkit-outer-spin-button,
+        .number-control input::-webkit-inner-spin-button {
+            -webkit-appearance: none; margin: 0;
+        }
+
+        /* 手机端缩放 */
+        @media (max-width: 1023px) {
+            .grid-row { grid-template-columns: 75px repeat(6, 1fr); min-width: 580px; gap: 8px; }
+            .grid-row.header { font-size: 12px; }
+            .label-text { font-size: 14px; }
+            .number-control { height: 30px; }
+            .number-control button { width: 26px; }
+        }
+        @media (max-width: 480px) {
+            .grid-row { grid-template-columns: 65px repeat(6, 1fr); min-width: 520px; gap: 6px; }
+            .label-text { font-size: 12px; }
+            .grid-row.header { font-size: 11px; }
+            .number-control { height: 28px; }
+            .number-control button { width: 24px; font-size: 14px; }
+            .number-control input { font-size: 13px; }
+        }
+
+        /* 配置信息 网格 */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .setting-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .setting-item label { font-size: 14px; color: #b0c4de; }
+        .setting-item select, .setting-item .number-control { width: 100%; }
+
+        /* 结果区 */
+        .result-status {
+            padding: 12px; border-radius: 8px; text-align: center; margin-bottom: 16px;
+            display: flex; justify-content: center; align-items: center; gap: 8px; font-weight: bold;
+        }
+        .result-status.fail { background: rgba(220, 50, 50, 0.4); border: 1px solid #aa3333; color: #ffaaaa; }
+        .result-status.success { background: rgba(50, 220, 50, 0.4); border: 1px solid #33aa33; color: #aaffaa; }
+
+        .result-row {
+            display: flex; justify-content: space-between; padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05); color: #aab5c9; font-size: 14px;
+        }
+        .result-row:last-child { border-bottom: none; }
+        .result-row .value { color: #ecf0f1; font-weight: bold; }
+        .result-row .value.infinity { color: #ff8888; font-size: 20px; }
+
+
+        /* ==================== 【说明】模态框 ==================== */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px);
+            justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-content {
+            background: rgba(18, 26, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px; padding: 24px; max-width: 600px; width: 90%;
+            max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.8); position: relative;
+        }
+        .modal-content h3 { color: #8cb8e6; margin-top: 0; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+        .modal-content ul { padding-left: 20px; line-height: 1.8; font-size: 14px; color: #d1d8e0; }
+        .modal-content ul li { margin-bottom: 8px; }
+        .modal-content .close-btn {
+            position: absolute; top: 15px; right: 15px; background: none; border: none;
+            color: #aab5c9; font-size: 20px; cursor: pointer;
+        }
+        .modal-content .close-btn:hover { color: #fff; }
+        .highlight-code { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-family: monospace; color: #ffd700; }
+
+
+        /* ==================== 【时间轴】特殊样式全屏自适应 ==================== */
+        .timeline-content {
+            max-width: 1200px; width: 95vw; max-height: 90vh;
+        }
+        .timeline-header { 
+            display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
+            background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; margin-bottom: 16px;
+        }
+        .timeline-header input, .timeline-header select, .timeline-header button {
+            background: rgba(0, 0, 0, 0.4); border: 1px solid #445566; border-radius: 6px;
+            color: #ecf0f1; padding: 6px 12px; font-size: 14px; outline: none;
+            height: 34px;
+        }
+        .timeline-header select option { background: #1a2a3a; }
+        .timeline-header input[type="number"] { width: 70px; }
+        .timeline-header input[type="text"] { width: 100px; }
+        .timeline-header input[type="color"] { width: 40px; padding: 2px; cursor: pointer; }
+        .timeline-header .btn-primary { background: #3a527a; border-color: #4a6a9a; cursor: pointer; transition: 0.2s; }
+        .timeline-header .btn-primary:hover { background: #4a6a9a; }
+        .timeline-header .btn-danger { background: #7a3a3a; border-color: #9a4a4a; cursor: pointer; transition: 0.2s; }
+        .timeline-header .btn-danger:hover { background: #9a4a4a; }
+
+        /* 时间轴标尺 */
+        .timeline-ruler-wrapper { width: 100%; overflow-x: auto; padding-bottom: 4px; }
+        .timeline-ruler {
+            display: flex; justify-content: space-between; padding: 0 10px;
+            font-size: 10px; color: #aaa; height: 30px; align-items: flex-end; border-bottom: 1px solid #446;
+            position: relative; min-width: 600px;
+        }
+        .timeline-ruler span { position: relative; display: flex; flex-direction: column; align-items: center; flex: 1; }
+        .timeline-ruler span::after { content: ''; width: 1px; height: 10px; background: #446; margin-top: 4px; }
+        .timeline-ruler span.major::after { height: 16px; background: #668; }
+        .timeline-ruler span.major { font-weight: bold; color: #ccc; }
+
+        /* 时间轴网格 */
+        .timeline-grid {
+            width: 100%; overflow-x: auto; max-height: 400px; overflow-y: auto;
+            position: relative; margin-top: 10px;
+        }
+        .timeline-grid-inner { min-width: 600px; position: relative; }
+
+        .timeline-row {
+            height: 44px; border-bottom: 1px dashed rgba(255,255,255,0.1);
+            display: flex; align-items: center; position: relative;
+        }
+        .timeline-row .role-label {
+            width: 100px; flex-shrink: 0; color: #ddd; font-size: 14px; font-weight: bold;
+            padding-left: 10px; z-index: 2;
+        }
+        .timeline-row .role-slot {
+            flex: 1; height: 100%; position: relative; border-left: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* BUFF 方块 */
+        .timeline-buff {
+            position: absolute; height: 30px; border-radius: 4px; top: 7px;
+            display: flex; align-items: center; justify-content: center; color: #fff;
+            font-size: 11px; cursor: pointer; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+            border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+            transition: transform 0.1s; z-index: 10;
+        }
+        .timeline-buff:hover { transform: scaleY(1.1); z-index: 20; }
+        .timeline-buff .del-buff {
+            position: absolute; top: -8px; right: -8px; background: rgba(255,0,0,0.8);
+            border-radius: 50%; width: 16px; height: 16px; color: #fff; font-weight: bold;
+            display: none; align-items: center; justify-content: center; font-size: 10px;
+        }
+        .timeline-buff:hover .del-buff { display: flex; }
+        
+        /* 大屏PC全屏适应 */
+        @media (min-width: 1024px) {
+            body { padding: 40px; }
+            .calculator-container { padding: 30px; gap: 24px; }
+            .panel { padding: 24px; }
+            .settings-grid { gap: 24px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="calculator-container">
+    <!-- 模块1：微粒 & 晶球吸收 -->
+    <div class="panel">
+        <div class="panel-header">
+            <span>原神角色充能计算器</span>
+            
+            <div class="btn-group">
+                <button class="timeline-btn" onclick="toggleTimeline()">时间轴功能</button>
+                <button class="help-btn" onclick="toggleHelp()">点击查看说明</button>
+                <button class="reset-btn" onclick="resetAll()">恢复按钮</button>
+            </div>
+        </div>
+        
+        <div class="particle-table-wrapper">
+            <div class="grid-row header">
+                <div>吸收类型</div>
+                <div>同元素微粒</div>
+                <div>异元素微粒</div>
+                <div>无元素微粒</div>
+                <div>同元素晶球</div>
+                <div>异元素晶球</div>
+                <div>无元素晶球</div>
+            </div>
+            
+            <!-- 前台吸收 -->
+            <div class="grid-row">
+                <div class="label-text">前台吸收</div>
+                <div class="number-control"><button onclick="changeVal('f_same_p', -1)">-</button><input type="number" id="f_same_p" value="0" min="0" title="前台 同元素微粒"><button onclick="changeVal('f_same_p', 1)">+</button></div>
+                <div class="number-control"><button onclick="changeVal('f_diff_p', -1)">-</button><input type="number" id="f_diff_p" value="0" min="0" title="前台 异元素微粒"><button onclick="changeVal('f_diff_p', 1)">+</button></div>
+                <div class="number-control"><button onclick="changeVal('f_none_p', -1)">-</button><input type="number" id="f_none_p" value="0" min="0" title="前台 无元素微粒"><button onclick="changeVal('f_none_p', 1)">+</button></div>
+                <div class="number-control"><button onclick="changeVal('f_same_o', -1)">-</button><input type="number" id="f_same_o" value="0" min="0" title="前台 同元素晶球"><button onclick="changeVal('f_same_o', 1)">+</button></div>
+                <div class="number-control"><button onclick="changeVal('f_diff_o', -1)">-</button><input type="number" id="f_diff_o" value="0" min="0" title="前台 异元素晶球"><button onclick="changeVal('f_diff_o', 1)">+</button></div>
+                <div class="number-control"><button onclick="changeVal('f_none_o', -1)">-</button><input type="number" id="f_none_o" value="0" min="0" title="前台 无元素晶球"><button onclick="changeVal('f_none_o', 1)">+</button></div>
+            </div>
+
+            <!-- 后台吸收 -->
+            <div class="grid-row">
+                <div class="label-text">后台吸收</div>
+                <div class="number-control"><button onclick="changeVal('b_same_p', -1)">-</button><input type="number" id="b_same_p" value="0" min="0" title="后台 同元素微粒"><button onclick="changeVal('b_same_p', 1)">+</button></div>
+                <div class="number-control"><button onclick="changeVal('b_diff_p', -1)">-</button><input type="number" id="b_diff_p" value="0" min="0" title="后台 异元素微粒"><button onclick="changeVal('b_diff_p', 1)">+</button></div>
+                <div class="number-control"><button onclick="changeVal('b_none_p', -1)">-</button><input type="number" id="b_none_p" value="0" min="0" title="后台 无元素微粒"><button onclick="changeVal('b_none_p', 1)">+</button></div>
+                <div class="number-control"><button onclick="changeVal('b_same_o', -1)">-</button><input type="number" id="b_same_o" value="0" min="0" title="后台 同元素晶球"><button onclick="changeVal('b_same_o', 1)">+</button></div>
+                <div class="number-control"><button onclick="changeVal('b_diff_o', -1)">-</button><input type="number" id="b_diff_o" value="0" min="0" title="后台 异元素晶球"><button onclick="changeVal('b_diff_o', 1)">+</button></div>
+                <div class="number-control"><button onclick="changeVal('b_none_o', -1)">-</button><input type="number" id="b_none_o" value="0" min="0" title="后台 无元素晶球"><button onclick="changeVal('b_none_o', 1)">+</button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模块2：配置信息 -->
+    <div class="panel">
+        
+        <div class="settings-grid">
+            <div class="setting-item">
+                <label>队伍人数</label>
+                <div class="number-control"><button onclick="changeVal('party_size', -1)">-</button><input type="number" id="party_size" value="4" min="1" max="4" title="队伍人数"><button onclick="changeVal('party_size', 1)">+</button></div>
+            </div>
+            <div class="setting-item">
+                <label>所需能量</label>
+                <div class="number-control"><button onclick="changeVal('req_energy', -5)">-</button><input type="number" id="req_energy" value="60" min="0" title="所需能量"><button onclick="changeVal('req_energy', 5)">+</button></div>
+            </div>
+            <div class="setting-item">
+                <label>固定恢复能量</label>
+                <div class="number-control"><button onclick="changeVal('fixed_recovery', -1)">-</button><input type="number" id="fixed_recovery" value="0" min="0" title="固定恢复能量 (如西风武器产球)"><button onclick="changeVal('fixed_recovery', 1)">+</button></div>
+            </div>
+            <div class="setting-item">
+                <label>元素充能效率</label>
+                <div class="number-control"><button onclick="changeVal('er_stat', -5)">-</button><input type="number" id="er_stat" value="100" min="0" title="元素充能效率"><button onclick="changeVal('er_stat', 5)">+</button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模块3：计算结果 -->
+    <div class="panel">
+        <div class="panel-header">
+            <span>计算结果</span>
+        </div>
+        
+        <div id="status_box" class="result-status fail">
+            <span>✖</span> 充能未达标
+        </div>
+
+        <div class="result-row">
+            <span>最低充能需求</span>
+            <span id="min_er_needed" class="value infinity">∞</span>
+        </div>
+        <!-- ★ 已按要求删除了“能量已恢复”这一整行 ★ -->
+    </div>
+</div>
+
+<!-- ==================== 【说明】模态框 ==================== -->
+<div id="helpModal" class="modal-overlay" onclick="toggleHelp(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <button class="close-btn" onclick="toggleHelp()">✕</button>
+        <h3>计算器使用说明</h3>
+        <ul>
+            <li><b>注意：</b><br>
+                <span class="highlight-code">1.本程序为v1测试版，很难确保不出现bug，以及错误，若发现错误请及时反馈</span>
+                <br>
+                2.十分感谢大家使用本程序，以及反馈错误
+                
+            </li>
+            <li><b>输入提示：</b><br>
+                1.按照角色实际的产球数量/接受数量填入即可<br>
+                2.若角色存在固定回能，需要填入对应的输入框
+               
+                
+            </li>
+            <li><b>记忆功能：</b><br>
+                <span class="highlight-code">网页内置记忆代码，并不会因误刷新或二次进入网站时导致数据丢失</span>
+            </li>
+            <li><b>最低充能需求：</b><br>
+                是指在您当前设定的产球环境下，为了让大招刚好充满，角色面板上所需的最低充能效率数值。
+            </li>
+            <li><b>时间轴功能：</b><br>
+                1.由于部分角色或武器，存在触发产球或回能的时间限制，大家可通过时间轴添加对应的触发间隔，可快速得出规定时间内的回能次数，方便大家填入<br>
+                <span class="highlight-code">2.在输入的开始前，记得点击“清空数据”按钮</span>
+                <li><b>回复按钮：</b><br>
+                1.可以点击此按钮实现填入数值的快速清空<br>
+                 <li><b>展示问题：</b><br>
+                1.现阶段更推荐使用电脑，手机端的整体体现并不理想<br>
+                
+                
+            </li>
+        </ul>
+    </div>
+</div>
+
+<!-- ==================== 【时间轴】模态框 ==================== -->
+<div id="timelineModal" class="modal-overlay" onclick="toggleTimeline(event)">
+    <div class="modal-content timeline-content" onclick="event.stopPropagation()">
+        <button class="close-btn" onclick="toggleTimeline()">✕</button>
+        
+        <div class="timeline-header">
+            <button class="btn-primary" onclick="addRole()">+ 添加角色</button>
+            <select id="tlm_role_select"><option>角色1</option></select>
+            
+            <button class="btn-primary" onclick="addBuff()">+ 添加BUFF板块</button>
+            <label>起始时间(s):</label>
+            <input type="number" id="tlm_start" value="" step="0.1" min="0">
+            <label>持续时长(s):</label>
+            <input type="number" id="tlm_duration" value="" step="0.1" min="0.1">
+            <label>回能值:</label>
+            <input type="text" id="tlm_name" value="">
+            <label>颜色:</label>
+            <input type="color" id="tlm_color" value="#4a90e2">
+            
+            <button class="btn-danger" onclick="clearTimeline()">清空全部数据</button>
+        </div>
+
+        <!-- 时间轴标尺 -->
+        <div class="timeline-ruler-wrapper">
+            <div class="timeline-ruler" id="timelineRuler"></div>
+        </div>
+
+        <!-- 时间轴网格 -->
+        <div class="timeline-grid">
+            <div class="timeline-grid-inner" id="timelineGridInner">
+                <!-- JS 动态生成行 -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ==================== 充能计算器逻辑 ====================
+    const ENERGY_VALUES = {
+        'f_same_p': 3.0, 'f_diff_p': 1.2, 'f_none_p': 1.8,
+        'f_same_o': 9.0, 'f_diff_o': 3.6, 'f_none_o': 5.4,
+        'b_same_p': 3.0, 'b_diff_p': 1.2, 'b_none_p': 1.8,
+        'b_same_o': 9.0, 'b_diff_o': 3.6, 'b_none_o': 5.4
+    };
+    const STORAGE_KEY = 'genshin_calc_state_v1';
+
+    function saveState() {
+        const state = {};
+        const inputs = document.querySelectorAll('.calculator-container input[type="number"]');
+        inputs.forEach(input => { state[input.id] = input.value; });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function loadState() {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (!saved) return;
+        try {
+            const state = JSON.parse(saved);
+            for (const [id, val] of Object.entries(state)) {
+                const el = document.getElementById(id);
+                if (el) el.value = val;
+            }
+        } catch (e) {}
+    }
+
+    function changeVal(id, delta) {
+        const input = document.getElementById(id);
+        if (!input) return;
+        let val = parseInt(input.value) + delta;
+        const min = parseInt(input.min) || 0;
+        const max = parseInt(input.max) || 999;
+        if (val < min) val = min; if (val > max) val = max;
+        input.value = val;
+        calculate(); saveState();
+    }
+
+    function resetAll() {
+        const inputs = document.querySelectorAll('.calculator-container input[type="number"]');
+        inputs.forEach(input => {
+            if(input.id === 'party_size') input.value = '4';
+            else if(input.id === 'req_energy') input.value = '60';
+            else if(input.id === 'er_stat') input.value = '100';
+            else input.value = '0';
+        });
+        calculate(); localStorage.removeItem(STORAGE_KEY);
+    }
+
+    function getBackMultiplier(partySize) {
+        if (partySize === 1) return 1.0; if (partySize === 2) return 0.8; if (partySize === 3) return 0.7; return 0.6;
+    }
+
+    function calculate() {
+        const partySize = parseInt(document.getElementById('party_size').value) || 4;
+        const requiredEnergy = parseFloat(document.getElementById('req_energy').value) || 0;
+        const fixedRecovery = parseFloat(document.getElementById('fixed_recovery').value) || 0;
+        const erStat = parseFloat(document.getElementById('er_stat').value) || 100;
+        const backMultiplier = getBackMultiplier(partySize);
+        let baseEnergy = 0;
+        const ids = ['f_same_p', 'f_diff_p', 'f_none_p', 'f_same_o', 'f_diff_o', 'f_none_o',
+                     'b_same_p', 'b_diff_p', 'b_none_p', 'b_same_o', 'b_diff_o', 'b_none_o'];
+        ids.forEach(id => {
+            const count = parseFloat(document.getElementById(id).value) || 0;
+            const baseVal = ENERGY_VALUES[id];
+            const multiplier = id.startsWith('b_') ? backMultiplier : 1.0;
+            baseEnergy += count * baseVal * multiplier;
+        });
+        const totalBaseRecovery = baseEnergy + fixedRecovery;
+        const actualRecovery = totalBaseRecovery * (erStat / 100);
+        const statusBox = document.getElementById('status_box');
+        const minErSpan = document.getElementById('min_er_needed');
+
+        if (actualRecovery >= requiredEnergy && requiredEnergy > 0) {
+            statusBox.className = 'result-status success';
+            statusBox.innerHTML = '<span></span> 充能已达标';
+        } else {
+            statusBox.className = 'result-status fail';
+            statusBox.innerHTML = '<span></span> 充能未达标';
+        }
+        let minER = Infinity;
+        if (totalBaseRecovery > 0 && requiredEnergy > 0) minER = (requiredEnergy / totalBaseRecovery) * 100;
+        if (minER === Infinity) {
+            minErSpan.className = 'value infinity'; minErSpan.innerText = '∞';
+        } else {
+            minErSpan.className = 'value'; minErSpan.innerText = Math.ceil(minER) + '%';
+        }
+        // ★ 已删除了原“能量已恢复”的 JS 更新逻辑 ★
+    }
+
+    // ==================== 模态框控制 ====================
+    function toggleHelp(event) {
+        const modal = document.getElementById('helpModal');
+        modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+    }
+
+    function toggleTimeline(event) {
+        const modal = document.getElementById('timelineModal');
+        // 如果正在打开，则初始化数据
+        if (modal.style.display !== 'flex') {
+            initTimeline();
+        }
+        modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+    }
+
+    // ==================== 时间轴核心逻辑 ====================
+    let timelineData = {
+        roles: ['角色1', '角色2', '角色3'],
+        buffs: []
+    };
+
+    // 预设一些实例数据
+    let buffIdCounter = 0;
+
+    function initTimeline() {
+        // 如果没有数据，添加预设
+        if (timelineData.buffs.length === 0) {
+            timelineData.buffs.push({
+                id: ++buffIdCounter,
+                roleName: '角色1',
+                start: 0.0,
+                duration: 8.0,
+                name: 'BUFF',
+                color: '#4a90e2'
+            });
+            timelineData.buffs.push({
+                id: ++buffIdCounter,
+                roleName: '角色2',
+                start: 4.5,
+                duration: 6.0,
+                name: '爆发',
+                color: '#e25a4a'
+            });
+        }
+        renderTimeline();
+    }
+
+    function addRole() {
+        const name = `角色${timelineData.roles.length + 1}`;
+        timelineData.roles.push(name);
+        renderTimeline();
+    }
+
+    function addBuff() {
+        const select = document.getElementById('tlm_role_select');
+        const roleName = select.value;
+        const start = parseFloat(document.getElementById('tlm_start').value) || 0;
+        const duration = parseFloat(document.getElementById('tlm_duration').value) || 8.0;
+        const name = document.getElementById('tlm_name').value || 'BUFF';
+        const color = document.getElementById('tlm_color').value;
+
+        if(!roleName) { alert('请先添加并选择一个角色！'); return; }
+        if(duration <= 0) { alert('时长必须大于0！'); return; }
+
+        timelineData.buffs.push({
+            id: ++buffIdCounter,
+            roleName: roleName,
+            start: start,
+            duration: duration,
+            name: name,
+            color: color
+        });
+        renderTimeline();
+    }
+
+    function deleteBuff(id) {
+        timelineData.buffs = timelineData.buffs.filter(b => b.id !== id);
+        renderTimeline();
+    }
+
+    function clearTimeline() {
+        if(confirm('确定要清空所有时间轴数据吗？')) {
+            timelineData.roles = ['角色1'];
+            timelineData.buffs = [];
+            renderTimeline();
+        }
+    }
+
+    function renderTimeline() {
+        const select = document.getElementById('tlm_role_select');
+        const ruler = document.getElementById('timelineRuler');
+        const grid = document.getElementById('timelineGridInner');
+        
+        // 更新下拉菜单
+        const currentVal = select.value;
+        select.innerHTML = '';
+        timelineData.roles.forEach(r => {
+            const opt = document.createElement('option');
+            opt.value = r; opt.textContent = r;
+            if(r === currentVal) opt.selected = true;
+            select.appendChild(opt);
+        });
+        if(timelineData.roles.length === 0) {
+            select.innerHTML = '<option>请添加角色</option>';
+        }
+
+        // 渲染标尺 (0秒 到 30秒)
+        ruler.innerHTML = '';
+        for(let i = 0; i <= 30; i++) {
+            const span = document.createElement('span');
+            span.textContent = i + 's';
+            if(i % 5 === 0) span.className = 'major';
+            ruler.appendChild(span);
+        }
+
+        // 渲染网格行
+        grid.innerHTML = '';
+        timelineData.roles.forEach(roleName => {
+            const row = document.createElement('div');
+            row.className = 'timeline-row';
+            
+            const label = document.createElement('div');
+            label.className = 'role-label';
+            label.textContent = roleName;
+            row.appendChild(label);
+
+            const slot = document.createElement('div');
+            slot.className = 'role-slot';
+            
+            // 寻找属于此行的BUFF并渲染
+            timelineData.buffs.forEach(buff => {
+                if(buff.roleName === roleName) {
+                    const block = document.createElement('div');
+                    block.className = 'timeline-buff';
+                    // 基于30秒的百分比宽度和位置
+                    const leftPct = Math.max(0, (buff.start / 30) * 100);
+                    const widthPct = Math.min(30 - buff.start, buff.duration) / 30 * 100;
+                    
+                    block.style.left = leftPct + '%';
+                    block.style.width = widthPct + '%';
+                    block.style.backgroundColor = buff.color;
+                    block.title = `${buff.name}\n开始: ${buff.start}s\n持续: ${buff.duration}s`;
+                    block.innerHTML = `
+                        <span style="overflow:hidden;text-overflow:ellipsis;padding:0 5px;width:100%;text-align:center;">${buff.name}</span>
+                        <div class="del-buff" onclick="deleteBuff(${buff.id})">✕</div>
+                    `;
+                    slot.appendChild(block);
+                }
+            });
+
+            row.appendChild(slot);
+            grid.appendChild(row);
+        });
+    }
+
+    // 页面加载事件绑定
+    document.addEventListener('DOMContentLoaded', function() {
+        loadState();
+        const inputs = document.querySelectorAll('.calculator-container input[type="number"]');
+        inputs.forEach(input => {
+            input.addEventListener('input', () => { calculate(); saveState(); });
+            input.addEventListener('change', () => { calculate(); saveState(); });
+        });
+        calculate();
+    });
+</script>
+</body>
+</html>
