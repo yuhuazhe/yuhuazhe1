@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>羽化哲</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background:
+                radial-gradient(circle at top left, rgba(184, 136, 255, 0.45), transparent 35%),
+                radial-gradient(circle at top right, rgba(80, 120, 255, 0.35), transparent 35%),
+                linear-gradient(180deg, #0b0b22 0%, #080818 100%);
+            color: #e8e8f0;
+            font-family: "Microsoft Yahei", "PingFang SC", sans-serif;
+            min-height: 100vh;
+            background-attachment: fixed;
+        }
+
+        .header-wrap {
+            text-align: center;
+            padding: 30px 15px 20px;
+        }
+
+        .header-title {
+            font-size: 42px;
+            color: #b888ff;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-shadow: 0 0 18px rgba(184, 136, 255, 0.8);
+        }
+
+        .header-sub {
+            color: #b0b0d8;
+            font-size: 14px;
+        }
+
+        .page-title-box {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .page-title-box h2 {
+            font-size: 20px;
+            color: #d6c8ff;
+            margin-bottom: 8px;
+        }
+
+        .page-title-box div {
+            font-size: 13px;
+            color: #a0a0c8;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 16px 40px;
+        }
+
+        .monster-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 22px;
+        }
+
+        @media (max-width: 768px) {
+            .monster-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .monster-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 18px;
+
+            background:
+                linear-gradient(135deg,
+                    rgba(35, 55, 90, 0.82),
+                    rgba(22, 38, 64, 0.88));
+
+            border: 1px solid rgba(180, 140, 255, 0.12);
+
+            backdrop-filter: blur(18px) saturate(150%);
+            -webkit-backdrop-filter: blur(18px) saturate(150%);
+
+            box-shadow:
+                0 0 18px rgba(184, 136, 255, 0.08),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+        }
+
+        .card-head {
+            position: relative;
+            padding: 18px 14px 14px;
+            text-align: center;
+            z-index: 2;
+        }
+
+        .monster-image {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 12px;
+            border-radius: 50%;
+            overflow: hidden;
+
+            background:
+                radial-gradient(circle at 30% 30%,
+                    rgba(255, 255, 255, 0.08),
+                    transparent 50%),
+                linear-gradient(180deg,
+                    rgba(90, 60, 140, 0.55),
+                    rgba(30, 50, 80, 0.55));
+
+            border: 1px solid rgba(184, 136, 255, 0.35);
+            box-shadow:
+                0 0 12px rgba(184, 136, 255, 0.5),
+                inset 0 0 12px rgba(255, 255, 255, 0.06);
+        }
+
+        .monster-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .monster-name {
+            font-size: 14px;
+            margin: 8px 0;
+            color: #e2d8ff;
+            line-height: 1.5;
+        }
+
+        .hp-text {
+            color: #ffaaaa;
+            margin: 6px 0;
+            font-size: 13px;
+        }
+
+        .tag-row {
+            font-size: 12px;
+            color: #a0c8ff;
+        }
+
+        .card-body {
+            position: relative;
+            padding: 14px;
+            font-size: 12.5px;
+            line-height: 1.7;
+            color: #e2e8f0;
+
+            background:
+                linear-gradient(180deg,
+                    rgba(18, 30, 50, 0.55),
+                    rgba(10, 18, 30, 0.65));
+
+            border-top: 1px solid rgba(184, 136, 255, 0.06);
+            z-index: 2;
+        }
+
+        .card-body strong {
+            color: #d6b8ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-wrap">
+        <div class="header-title">7.1版本幽境危战</div>
+        
+    </div>
+
+    <div class="page-title-box">
+        
+        <div>备注：知识产权归米哈游所有！！！网站只做引用！！！</div>
+    </div>
+
+    <div class="container">
+        <div class="monster-row">
+
+            <!-- 怪物1：历经百战的矮灵雕刻师·运风成斤 -->
+            <div class="monster-card">
+                <div class="card-head">
+                    <div class="monster-image">
+                        <img src="lt.png" alt="历经百战的矮灵雕刻师·运风成斤" onerror="this.style.display='none'">
+                    </div>
+                    <div class="monster-name">历经百战的矮灵雕刻师·运风成斤</div>
+                    <div class="hp-text">N5：12126454 / N6：29684898</div>
+                    <div class="tag-row">冰元素角色 ✔</div>
+                </div>
+                <div class="card-body">
+                    
+                    <br>
+                    <div><strong>强敌状态 130%全抗</strong></div>
+                    <div>1.入战8s，以及后续每16s，会开始制作2个冰雕，制作时间4s</div>
+                    <div>2.若在制作期间使强敌处于瘫痪/重质的影响，即可打断该过程，将冰雕转化为无序的雕像，该雕像会在短暂延迟后自爆，对强敌造成500000伤害，同时为强敌施加一层降低抗性的buff，每层使强敌降低35%风抗、25其他抗性，该效果至多叠加3层，且持续效果无效，但当冰雕被制作成功，会移除1层该效果</div>
+                    <br>
+                    
+                </div>
+            </div>
+
+            <!-- 怪物2：秘源机兵统御械·毁灭武装 -->
+            <div class="monster-card">
+                <div class="card-head">
+                    <div class="monster-image">
+                        <img src="1.webp" alt="秘源机兵统御械·毁灭武装" onerror="this.style.display='none'">
+                    </div>
+                    <div class="monster-name">秘源机兵统御械·毁灭武装</div>
+                    <div class="hp-text">N5：7606009 /N6： 14916723</div>
+                    <div class="tag-row">冰元素角色 ✔</div>
+                </div>
+                <div class="card-body">
+                    
+                    <br>
+                    <div>1.入战立刻进入强化状态：全抗270%，并逐渐积累能量施放旋转攻击，能量越高伤害越高</div>
+                    <div>2.强化期间，若持续转元素伤害频率不高于0.65一次，则可使其转入低能量状态：状态变为30%，其他抗30%，每次攻击产生等同于36能量的元素微粒</div>
+                    <div>3.强化期间，若侦测到处于夜魂加持状态的角色，将进入特殊状态：全抗110%，改为使用极为强力的直线旋转进行攻击</div>
+                    <br>
+                    
+                </div>
+            </div>
+
+            <!-- 怪物3：游雪的护刃·不绝余音 -->
+            <div class="monster-card">
+                <div class="card-head">
+                    <div class="monster-image">
+                        <img src="2.webp" alt="游雪的护刃·不绝余音" onerror="this.style.display='none'">
+                    </div>
+                    <div class="monster-name">游雪的护刃·不绝余音</div>
+                    <div class="hp-text">N5：10335048 /N6： 21871500</div>
+                    <div class="tag-row">冰元素角色 ✔</div>
+                </div>
+                <div class="card-body">
+                   
+                    <br>
+                    <div>1.强敌的血量为80%时，会展开42U冰元素护盾，护盾存在期间使强敌受到转换的星能的影响，同时护盾转化为15%的血量盾，两种护盾共享20s持续时间，【冰棺】存在期间，强敌会以自身为中心持续对冰元素进行攻击，如果【冰棺】未被击破持续一段时间后，冰棺将会使强敌损失10%生命值+60%持有护盾期间受到的伤害，并提高10s</div>
+                    <div>2.被击破30s，会再次展开冰元素护盾</div>
+                    <br>
+                   
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>
