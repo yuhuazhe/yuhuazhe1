@@ -2,14 +2,17 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Github Pages 加载加速：DNS预解析、预连接 -->
+    <link rel="dns-prefetch" href="//raw.githubusercontent.com">
+    <link rel="preconnect" href="//raw.githubusercontent.com" crossorigin>
     <title>羽化哲</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: system-ui, sans-serif;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
         }
         body {
             min-height: 100vh;
@@ -35,12 +38,12 @@
         /* 顶部固定区域：标题、筛选、表头，固定，不滚动 */
         .fixed-top-area{
             flex-shrink: 0;
-            padding:18px 10px 0 10px;
+            padding:12px 8px 0 8px;
         }
         h1{
             text-align:center;
-            margin-bottom:20px;
-            font-size:clamp(24px,4vw,34px);
+            margin-bottom:14px;
+            font-size:clamp(20px,5vw,32px);
         }
         .filter-box{
             background:rgba(255,255,255,0.06);
@@ -48,10 +51,10 @@
             -webkit-backdrop-filter:blur(12px);
             border:1px solid rgba(255,255,255,0.12);
             border-radius:14px;
-            padding:14px;
-            margin-bottom:18px;
+            padding:12px;
+            margin-bottom:12px;
             display:grid;
-            gap:12px;
+            gap:10px;
         }
         @media(min-width:680px){
             .filter-box{
@@ -72,20 +75,36 @@
             border:1px solid rgba(255,255,255,0.14);
             color:#fff;
             border-radius:8px;
+            font-size:14px;
         }
         .filter-item select option{
             color:#000000;
         }
+
+        /* ========== 移动端表格横向滚动容器 ========== */
+        .table-wrap{
+            overflow-x:auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .table-wrap::-webkit-scrollbar{
+            height:4px;
+        }
+        .table-wrap::-webkit-scrollbar-thumb{
+            background:rgba(255,255,255,0.2);
+            border-radius:4px;
+        }
+
         .table-row-header{
             display:flex;
             align-items:center;
-            gap:10px;
-            padding:14px 16px;
-            border-radius:14px;
+            gap:8px;
+            min-width:920px; /* 强制最小宽度，手机下触发横向滚动 */
+            padding:10px 12px;
+            border-radius:12px;
             backdrop-filter:blur(16px);
             -webkit-backdrop-filter:blur(16px);
             border:1px solid rgba(255,255,255,0.12);
-            margin-bottom:10px;
+            margin-bottom:8px;
             background:rgba(255,255,255,0.09);
         }
         /* 只有这个盒子可以【上下滚动】，隐藏右侧滚动条 */
@@ -93,7 +112,7 @@
             flex:1;
             overflow-y:auto;
             overflow-x:hidden;
-            padding:0 10px 18px 10px;
+            padding:0 8px 12px 8px;
             /* 隐藏滚动条，保留滚动能力 */
             -ms-overflow-style: none;
             scrollbar-width: none;
@@ -104,13 +123,14 @@
         .table-row-item{
             display:flex;
             align-items:center;
-            gap:10px;
-            padding:14px 16px;
-            border-radius:14px;
+            gap:8px;
+            min-width:920px; /* 和表头对齐，手机横向滚动 */
+            padding:10px 12px;
+            border-radius:12px;
             backdrop-filter:blur(16px);
             -webkit-backdrop-filter:blur(16px);
             border:1px solid rgba(255,255,255,0.12);
-            margin-bottom:10px;
+            margin-bottom:8px;
             transition: 0.2s ease;
             background:rgba(255,255,255,0.04);
         }
@@ -119,22 +139,22 @@
             border-color:rgba(255,255,255,0.2);
         }
         .col-avatar{
-            flex:0 0 300px;
+            flex:0 0 220px;
             display:flex;
-            gap:5px;
+            gap:4px;
         }
         .col-t{
             flex:1;
-            min-width:110px;
-            font-size:14px;
+            min-width:90px;
+            font-size:13px;
         }
         .table-row-header .col-t{
             color:#b4c8ff;
             font-weight:bold;
         }
         .avatar-circle{
-            width:70px;
-            height:70px;
+            width:clamp(42px,11vw,70px);
+            height:clamp(42px,11vw,70px);
             border-radius:50%;
             border:2px solid rgba(255,255,255,0.22);
             overflow:hidden;
@@ -150,10 +170,20 @@
             width:auto;
             height:auto;
             object-fit:contain;
+            /* 性能优化 */
+            decoding="async";
+            loading="lazy";
         }
         a{
             color:#74aaff;
             text-decoration:none;
+            font-size:12px;
+        }
+
+        @media (max-width:679px){
+            .col-avatar{
+                flex:0 0 180px;
+            }
         }
     </style>
 </head>
@@ -214,18 +244,21 @@
                 </select>
             </div>
         </div>
-        <div class="table-row-header">
-            <div class="col-avatar" style="flex:0 0 300px;"></div>
-            <div class="col-t">队伍名称</div>
-            <div class="col-t">配置</div>
-            <div class="col-t">金数</div>
-            <div class="col-t">DPS</div>
-            <div class="col-t">满能量</div>
-            <div class="col-t">日期</div>
-            <div class="col-t">视频链接</div>
+        <!-- 表头放进横向滚动容器 -->
+        <div class="table-wrap">
+            <div class="table-row-header">
+                <div class="col-avatar" style="flex:0 0 220px;"></div>
+                <div class="col-t">队伍名称</div>
+                <div class="col-t">配置</div>
+                <div class="col-t">金数</div>
+                <div class="col-t">DPS</div>
+                <div class="col-t">满能量</div>
+                <div class="col-t">日期</div>
+                <div class="col-t">视频链接</div>
+            </div>
         </div>
     </div>
-    <!-- 【只有这里！仅仅允许上下滚动，隐藏右侧滚动条】 -->
+    <!-- 列表内部每一行自带横向最小宽度，列表容器只负责垂直滚动 -->
     <div class="scroll-list-container" id="listBox">
     </div>
 </div>
@@ -237,7 +270,6 @@ const teamMeta = {
         video: "https://b23.tv/YqX2Nog"
     }
 };
-
 let dataList = [
     {
         team:"星扩散队",
@@ -688,22 +720,19 @@ let dataList = [
         configInfo:"v2.3"
     }
 ];
-
 const inpTeam = document.getElementById("inpTeam");
 const selGold = document.getElementById("selGold");
 const selSort = document.getElementById("selSort");
 const listBox = document.getElementById("listBox");
-
 function buildCard(item){
     const meta = teamMeta[item.team] || {avatars:[], video:""};
     // 兼容：单条自身携带优先，否则取公共元数据
     const avatars = item.avatars ?? meta.avatars;
     const videoUrl = item.video ?? meta.video;
-
     let avHtml = "";
     for(let i=0;i<4;i++){
         if(avatars[i]){
-            avHtml += `<div class="avatar-circle"><img src="${avatars[i]}"></div>`;
+            avHtml += `<div class="avatar-circle"><img src="${avatars[i]}" loading="lazy" decoding="async"></div>`;
         }else{
             avHtml += `<div class="avatar-circle"></div>`;
         }
@@ -721,7 +750,6 @@ function buildCard(item){
     <div class="col-t">${vlink}</div>
 </div>`
 }
-
 function render(){
     let arr = JSON.parse(JSON.stringify(dataList));
     const kw = inpTeam.value.trim().toLowerCase();
