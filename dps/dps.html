@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>羽化哲</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, sans-serif;
+        }
+        body {
+            min-height: 100vh;
+            background:#08080c url("1.1.webp") center/cover no-repeat fixed;
+            color:#f2f2f7;
+            padding:0;
+            overflow:hidden;
+        }
+        body::before{
+            content:"";
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,0.6);
+            z-index:-1;
+        }
+        .wrap{
+            max-width:1300px;
+            margin:0 auto;
+            height:100vh;
+            display:flex;
+            flex-direction:column;
+        }
+        /* 顶部固定区域：标题、筛选、表头，固定，不滚动 */
+        .fixed-top-area{
+            flex-shrink: 0;
+            padding:18px 10px 0 10px;
+        }
+        h1{
+            text-align:center;
+            margin-bottom:20px;
+            font-size:clamp(24px,4vw,34px);
+        }
+        .filter-box{
+            background:rgba(255,255,255,0.06);
+            backdrop-filter:blur(12px);
+            -webkit-backdrop-filter:blur(12px);
+            border:1px solid rgba(255,255,255,0.12);
+            border-radius:14px;
+            padding:14px;
+            margin-bottom:18px;
+            display:grid;
+            gap:12px;
+        }
+        @media(min-width:680px){
+            .filter-box{
+                grid-template-columns:1fr 130px 160px 140px;
+            }
+        }
+        .filter-item label{
+            font-size:13px;
+            color:#ccc;
+            display:block;
+            margin-bottom:4px;
+        }
+        .filter-item select,
+        .filter-item input{
+            width:100%;
+            padding:9px;
+            background:rgba(255,255,255,0.07);
+            border:1px solid rgba(255,255,255,0.14);
+            color:#fff;
+            border-radius:8px;
+        }
+        .filter-item select option{
+            color:#000000;
+        }
+        .table-row-header{
+            display:flex;
+            align-items:center;
+            gap:10px;
+            padding:14px 16px;
+            border-radius:14px;
+            backdrop-filter:blur(16px);
+            -webkit-backdrop-filter:blur(16px);
+            border:1px solid rgba(255,255,255,0.12);
+            margin-bottom:10px;
+            background:rgba(255,255,255,0.09);
+        }
+        /* 只有这个盒子可以【上下滚动】，隐藏右侧滚动条 */
+        .scroll-list-container{
+            flex:1;
+            overflow-y:auto;
+            overflow-x:hidden;
+            padding:0 10px 18px 10px;
+            /* 隐藏滚动条，保留滚动能力 */
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .scroll-list-container::-webkit-scrollbar {
+            display: none;
+        }
+        .table-row-item{
+            display:flex;
+            align-items:center;
+            gap:10px;
+            padding:14px 16px;
+            border-radius:14px;
+            backdrop-filter:blur(16px);
+            -webkit-backdrop-filter:blur(16px);
+            border:1px solid rgba(255,255,255,0.12);
+            margin-bottom:10px;
+            transition: 0.2s ease;
+            background:rgba(255,255,255,0.04);
+        }
+        .table-row-item:hover{
+            background:rgba(255,255,255,0.08);
+            border-color:rgba(255,255,255,0.2);
+        }
+        .col-avatar{
+            flex:0 0 300px;
+            display:flex;
+            gap:5px;
+        }
+        .col-t{
+            flex:1;
+            min-width:110px;
+            font-size:14px;
+        }
+        .table-row-header .col-t{
+            color:#b4c8ff;
+            font-weight:bold;
+        }
+        .avatar-circle{
+            width:70px;
+            height:70px;
+            border-radius:50%;
+            border:2px solid rgba(255,255,255,0.22);
+            overflow:hidden;
+            background:rgba(0,0,0,0.35);
+            flex-shrink:0;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+        }
+        .avatar-circle img{
+            max-width:100%;
+            max-height:100%;
+            width:auto;
+            height:auto;
+            object-fit:contain;
+        }
+        a{
+            color:#74aaff;
+            text-decoration:none;
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <!-- 【整块顶部：标题+筛选+表头，永远固定在上方不动！】 -->
+    <div class="fixed-top-area">
+        <h1>理论DPS目录</h1>
+        <div class="filter-box">
+            <div class="filter-item">
+                <label>队伍名称</label>
+                <input id="inpTeam" placeholder="队伍名称">
+            </div>
+            <div class="filter-item">
+                <label>金数选择</label>
+                <select id="selGold">
+                    <option value="all">全部</option>
+                    <option value="0">0金</option>
+                    <option value="1">1金</option>
+                    <option value="2">2金</option>
+                    <option value="3">3金</option>
+                    <option value="4">4金</option>
+                    <option value="5">5金</option>
+                    <option value="6">6金</option>
+                    <option value="7">7金</option>
+                    <option value="8">8金</option>
+                    <option value="9">9金</option>
+                    <option value="10">10金</option>
+                    <option value="11">11金</option>
+                    <option value="12">12金</option>
+                    <option value="13">13金</option>
+                    <option value="14">14金</option>
+                    <option value="15">15金</option>
+                    <option value="16">16金</option>
+                    <option value="17">17金</option>
+                    <option value="18">18金</option>
+                    <option value="19">19金</option>
+                    <option value="20">20金</option>
+                    <option value="21">21金</option>
+                    <option value="22">22金</option>
+                    <option value="23">23金</option>
+                    <option value="24">24金</option>
+                    <option value="25">25金</option>
+                    <option value="26">26金</option>
+                    <option value="27">27金</option>
+                    <option value="28">28金</option>
+                    <option value="29">29金</option>
+                    <option value="30">30金</option>
+                    <option value="31">31金</option>
+                    <option value="32">32金</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label>DPS排序</label>
+                <select id="selSort">
+                    <option value="desc">DPS降序</option>
+                    <option value="asc">DPS升序</option>
+                </select>
+            </div>
+        </div>
+        <div class="table-row-header">
+            <div class="col-avatar" style="flex:0 0 300px;"></div>
+            <div class="col-t">队伍名称</div>
+            <div class="col-t">配置</div>
+            <div class="col-t">金数</div>
+            <div class="col-t">DPS</div>
+            <div class="col-t">满能量</div>
+            <div class="col-t">日期</div>
+            <div class="col-t">视频链接</div>
+        </div>
+    </div>
+    <!-- 【只有这里！仅仅允许上下滚动，隐藏右侧滚动条】 -->
+    <div class="scroll-list-container" id="listBox">
+    </div>
+</div>
+<script>
+// 队伍公共元数据：统一维护头像、视频链接，新增队伍在这里添加
+const teamMeta = {
+    "星扩散队": {
+        avatars: ["tx/wsn.webp","tx/wyns.webp","tx/adt.webp","tx/fls.webp"],
+        video: "https://b23.tv/YqX2Nog"
+    }
+};
+
+let dataList = [
+    {
+        team:"星扩散队",
+        config:"01薇00沃00奥6珐",
+        gold:4,
+        dps:193255,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"00薇00沃00奥6珐",
+        gold:3,
+        dps:162142,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"11薇00沃00奥6珐",
+        gold:5,
+        dps:212709,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"21薇00沃00奥6珐",
+        gold:6,
+        dps:252760,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"61薇00沃00奥6珐",
+        gold:10,
+        dps:428697,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"01薇10沃00奥6珐",
+        gold:5,
+        dps:208062,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"01薇11沃00奥6珐",
+        gold:6,
+        dps:233338,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"01薇20沃00奥6珐",
+        gold:6,
+        dps:236219,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"01薇21沃00奥6珐",
+        gold:7,
+        dps:264060,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"01薇61沃00奥6珐",
+        gold:11,
+        dps:338597,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"11薇01沃00奥6珐",
+        gold:6,
+        dps:212709,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"11薇10沃00奥6珐",
+        gold:6,
+        dps:232114,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"11薇11沃00奥6珐",
+        gold:7,
+        dps:260108,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"11薇20沃00奥6珐",
+        gold:7,
+        dps:261250,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"11薇21沃00奥6珐",
+        gold:8,
+        dps:294245,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"11薇61沃00奥6珐",
+        gold:12,
+        dps:376026,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"21薇01沃00奥6珐",
+        gold:7,
+        dps:280467,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"21薇10沃00奥6珐",
+        gold:7,
+        dps:272094,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"21薇11沃00奥6珐",
+        gold:8,
+        dps:302457,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"21薇20沃00奥6珐",
+        gold:8,
+        dps:306863,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"21薇21沃00奥6珐",
+        gold:9,
+        dps:340750,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"21薇61沃00奥6珐",
+        gold:13,
+        dps:434117,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"61薇01沃00奥6珐",
+        gold:11,
+        dps:469369,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"61薇10沃00奥6珐",
+        gold:11,
+        dps:463039,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"61薇11沃00奥6珐",
+        gold:12,
+        dps:508839,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"61薇20沃00奥6珐",
+        gold:12,
+        dps:523137,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"61薇21沃00奥6珐",
+        gold:13,
+        dps:576037,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"61薇61沃00奥6珐",
+        gold:17,
+        dps:710796,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"01薇00沃20奥6珐",
+        gold:6,
+        dps:256297,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"01薇01沃20奥6珐",
+        gold:7,
+        dps:283353,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"01薇10沃20奥6珐",
+        gold:7,
+        dps:271909,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"01薇11沃20奥6珐",
+        gold:8,
+        dps:303418,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"01薇20沃20奥6珐",
+        gold:8,
+        dps:312924,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"01薇21沃20奥6珐",
+        gold:9,
+        dps:347052,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"01薇61沃20奥6珐",
+        gold:13,
+        dps:443464,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"11薇00沃20奥6珐",
+        gold:7,
+        dps:282090,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"11薇01沃20奥6珐",
+        gold:8,
+        dps:313257,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"11薇10沃20奥6珐",
+        gold:8,
+        dps:302862,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"11薇11沃20奥6珐",
+        gold:9,
+        dps:337324,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"11薇20沃20奥6珐",
+        gold:9,
+        dps:343256,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"11薇21沃20奥6珐",
+        gold:10,
+        dps:382556,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"11薇61沃20奥6珐",
+        gold:14,
+        dps:487863,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"21薇00沃20奥6珐",
+        gold:8,
+        dps:331052,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"21薇01沃20奥6珐",
+        gold:9,
+        dps:363070,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"21薇10沃20奥6珐",
+        gold:9,
+        dps:353707,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"21薇11沃20奥6珐",
+        gold:10,
+        dps:385464,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"21薇20沃20奥6珐",
+        gold:10,
+        dps:401147,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"21薇21沃20奥6珐",
+        gold:11,
+        dps:437331,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"21薇61沃20奥6珐",
+        gold:15,
+        dps:561783,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"61薇00沃20奥6珐",
+        gold:12,
+        dps:557696,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"61薇01沃20奥6珐",
+        gold:13,
+        dps:605269,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"61薇10沃20奥6珐",
+        gold:13,
+        dps:598042,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"61薇11沃20奥6珐",
+        gold:14,
+        dps:629995,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"61薇20沃20奥6珐",
+        gold:14,
+        dps:676744,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"61薇21沃20奥6珐",
+        gold:15,
+        dps:741103,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    },
+    {
+        team:"星扩散队",
+        config:"61薇61沃20奥6珐",
+        gold:19,
+        dps:913524,
+        fullEnergy:"是",
+        configInfo:"v2.3"
+    }
+];
+
+const inpTeam = document.getElementById("inpTeam");
+const selGold = document.getElementById("selGold");
+const selSort = document.getElementById("selSort");
+const listBox = document.getElementById("listBox");
+
+function buildCard(item){
+    const meta = teamMeta[item.team] || {avatars:[], video:""};
+    // 兼容：单条自身携带优先，否则取公共元数据
+    const avatars = item.avatars ?? meta.avatars;
+    const videoUrl = item.video ?? meta.video;
+
+    let avHtml = "";
+    for(let i=0;i<4;i++){
+        if(avatars[i]){
+            avHtml += `<div class="avatar-circle"><img src="${avatars[i]}"></div>`;
+        }else{
+            avHtml += `<div class="avatar-circle"></div>`;
+        }
+    }
+    const vlink = videoUrl ? `<a href="${videoUrl}" target="_blank">${videoUrl}</a>` : "无";
+    return `
+<div class="table-row-item">
+    <div class="col-avatar">${avHtml}</div>
+    <div class="col-t">${item.team}</div>
+    <div class="col-t">${item.config}</div>
+    <div class="col-t">${item.gold}</div>
+    <div class="col-t">${item.dps}</div>
+    <div class="col-t">${item.fullEnergy}</div>
+    <div class="col-t">${item.configInfo}</div>
+    <div class="col-t">${vlink}</div>
+</div>`
+}
+
+function render(){
+    let arr = JSON.parse(JSON.stringify(dataList));
+    const kw = inpTeam.value.trim().toLowerCase();
+    if(kw) arr = arr.filter(x=>x.team.toLowerCase().includes(kw));
+    const g = selGold.value;
+    if(g !== "all"){
+        arr = arr.filter(x=>x.gold===Number(g));
+    }
+    if(selSort.value==="desc") arr.sort((a,b)=>b.dps - a.dps);
+    else arr.sort((a,b)=>a.dps - b.dps);
+    listBox.innerHTML = "";
+    arr.forEach(d=>{
+        listBox.innerHTML += buildCard(d);
+    });
+}
+inpTeam.addEventListener("input",render);
+selGold.addEventListener("change",render);
+selSort.addEventListener("change",render);
+render();
+</script>
+</body>
+</html>

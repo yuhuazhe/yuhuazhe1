@@ -303,7 +303,7 @@
     <div class="header-box glass-box">
         <h1 class="header-title">计算数据</h1>
         <!-- 这里增加id用于JS填充时间，删除固定2026.7.27 -->
-        <p class="header-subtitle">羽化哲 更新至7.0版本V5 最后更新日期：<span id="lastUpdateText">加载中...</span></p>
+        <p class="header-subtitle">羽化哲 更新至7.1版本V2.3 最后更新日期：<span id="lastUpdateText">加载中...</span></p>
         <p class="header-note">所涉及的主C及副c均为30词条<br>最终数据请以正式服为准！！！</p>
         <a href="https://b23.tv/rDCFTFA" target="_blank" style="color:#c78cdf;">羽化哲主页</a>
         
@@ -315,7 +315,7 @@
         <div align="center" style="margin:8px 0;">
             <button class="log-btn" onclick="toggleLog()">快速查找指南</button>
         </div>
-        <h2 style="text-align:center;color:#c78cdf;font-size:24px;margin:10px 0 5px;">距离7.1版本v1数据更新倒计时</h2>
+        <h2 style="text-align:center;color:#c78cdf;font-size:24px;margin:10px 0 5px;">距离7.1版本v3数据更新倒计时</h2>
         <div class="count-box">
             <div class="time-item glass-box">
                 <div class="num" id="day">00</div>
@@ -360,6 +360,9 @@
         </a>
         <a href="zlk/2.html" class="char-card glass-box">
             <div class="char-name">资料库</div>
+        </a>
+        <a href="dps/dps.html" class="char-card glass-box">
+            <div class="char-name">DPS目录（测试中...)</div>
         </a>
       
         </a>
@@ -437,7 +440,7 @@
         }
         // 点击遮罩关闭弹窗
         mask.addEventListener('click', closeLog);
-        const targetTime = new Date(2026, 7, 12, 18, 0, 0);
+        const targetTime = new Date(2026, 7, 24, 18, 0, 0);
         function updateCountDown() {
             const now = new Date().getTime();
             const target = targetTime.getTime();
