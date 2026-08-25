@@ -71,7 +71,6 @@
         .timeline-btn:hover { background: rgba(170, 102, 187, 0.2); }
         .note-btn {border-color:#33bb99;color:#74e2c8;}
         .note-btn:hover{background:rgba(51,187,153,0.2);}
-
         /* ==================== 充能计算器粒子表格 ==================== */
         .particle-table-wrapper {
             width: 100%;
@@ -188,7 +187,6 @@
         }
         .modal-content .close-btn:hover { color: #fff; }
         .highlight-code { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-family: monospace; color: #ffd700; }
-
         /* =====产球记录本弹窗样式===== */
         .team-bar{
             display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.1);
@@ -237,7 +235,6 @@
             padding:3px;
             text-align:center;
         }
-
         /* ==================== 【时间轴】特殊样式全屏自适应 ==================== */
         .timeline-content {
             max-width: 1200px; width: 95vw; max-height: 90vh;
@@ -302,7 +299,6 @@
             display: none; align-items: center; justify-content: center; font-size: 10px;
         }
         .timeline-buff:hover .del-buff { display: flex; }
-
         /* 大屏PC全屏适应 */
         @media (min-width: 1024px) {
             body { padding: 40px; }
@@ -318,7 +314,6 @@
     <div class="panel">
         <div class="panel-header">
             <span>原神角色充能计算器</span>
-
             <div class="btn-group">
                 <button class="note-btn" onclick="toggleNoteModal()">产球记录本</button>
                 <button class="timeline-btn" onclick="toggleTimeline()">时间轴功能</button>
@@ -326,7 +321,6 @@
                 <button class="reset-btn" onclick="resetAll()">恢复按钮</button>
             </div>
         </div>
-
         <div class="particle-table-wrapper">
             <div class="grid-row header">
                 <div>吸收类型</div>
@@ -337,7 +331,6 @@
                 <div>异元素晶球</div>
                 <div>无元素晶球</div>
             </div>
-
             <!-- 前台吸收 -->
             <div class="grid-row">
                 <div class="label-text">前台吸收</div>
@@ -362,7 +355,6 @@
     </div>
     <!-- 模块2：配置信息 -->
     <div class="panel">
-
         <div class="settings-grid">
             <div class="setting-item">
                 <label>队伍人数</label>
@@ -387,7 +379,6 @@
         <div class="panel-header">
             <span>计算结果</span>
         </div>
-
         <div id="status_box" class="result-status fail">
             <span>✖</span> 充能未达标
         </div>
@@ -397,8 +388,7 @@
         </div>
     </div>
 </div>
-
-<!-- ==========【产球记录本弹窗】纯备忘录，移除应用到计算器 ========== -->
+<!-- ==========【产球记录本弹窗】 ========== -->
 <div id="noteModal" class="modal-overlay" onclick="toggleNoteModal(event)">
     <div class="modal-content" onclick="event.stopPropagation()">
         <button class="close-btn" onclick="toggleNoteModal()">✕</button>
@@ -413,44 +403,53 @@
         <div id="noteWrap"></div>
     </div>
 </div>
-
 <!-- ==================== 【说明】模态框 ==================== -->
 <div id="helpModal" class="modal-overlay" onclick="toggleHelp(event)">
     <div class="modal-content" onclick="event.stopPropagation()">
         <button class="close-btn" onclick="toggleHelp()">✕</button>
         <h3>计算器使用说明</h3>
         <ul>
-            <li><b>注意：</b><br>
-                <span class="highlight-code">1.本程序为v2.1测试版，很难确保不出现bug，以及错误，若发现错误请及时反馈</span>
+            <li><b>注意！！！：</b><br>
+                <span class="highlight-code">1.本程序为v2.5测试版，可能存在异常bug或异常显示问题，若发现问题请及时反馈，感谢使用！</span>
                 <br>
+                <span class="highlight-code">最后更新日期：2026.8.25----制作者：幼儿园大班班长</span><br>
                 2.十分感谢大家使用本程序，以及反馈错误
-
             </li>
             <li><b>输入提示：</b><br>
                 1.按照角色实际的产球数量/接受数量填入即可<br>
                 2.若角色存在固定回能，需要填入对应的输入框<br>
-                <span class="highlight-code">3.记录本功能用于记录不同角色在前后台的产球情况，但在填写到计算页面时，要注意区分对应的前后台关系</span>
-
-
+                
             </li>
             <li><b>记忆功能：</b><br>
-                <span class="highlight-code">网页内置记忆代码，并不会因误刷新或二次进入网站时导致数据丢失</span>
+                <span class="highlight-code">网页内置记忆代码，每个队伍独立保存计算器状态、时间轴，刷新或二次进入网站不会丢失</span>
             </li>
             <li><b>最低充能需求：</b><br>
                 是指在您当前设定的产球环境下，为了让大招刚好充满，角色面板上所需的最低充能效率数值。
             </li>
             <li><b>时间轴功能：</b><br>
                 1.由于部分角色或武器，存在触发产球或回能的时间限制，大家可通过时间轴添加对应的触发间隔，可快速得出规定时间内的回能次数，方便大家填入<br>
-                <span class="highlight-code">2.在输入的开始前，记得点击“清空数据”按钮</span>
+                <span class="highlight-code">2.在输入的开始前，记得点击“清空数据”按钮；时间轴跟随队伍持久保存</span>
             </li>
             <li><b>产球记录本：</b><br>
-                支持多队伍，每个队伍4个角色；记录完整前台后台全部微粒晶球，仅作为备忘录，需要手动抄写数值到计算器。
+                1.主要方便大家记录队伍中其他角色的产球情况，以及产球数量<br>
+                2.在记录本切换队伍后，主页面的计算器也会发生变化，便于计算另一只队伍的充能情况<br>
+                3.当进行切换队伍后，原本队伍的主页面充能并不会消失，仅需重新切换回来即可<br>
+                <span class="highlight-code">4.记录本功能用于记录不同角色在前后台的产球情况；每个队伍拥有独立计算器存档与独立时间轴存档，切换队伍自动加载对应数据</span>
             </li>
             <li><b>恢复按钮：</b><br>
-                1.可以点击此按钮实现填入数值的快速清空<br>
+                1.可以点击此按钮实现当前队伍计算器数值的快速清空<br>
             </li>
             <li><b>展示问题：</b><br>
                 1.现阶段更推荐使用电脑，手机端的整体体现并不理想<br>
+            <li><b>联系制作者：</b><br>
+                1.可通过b站私信/粉丝群联系up，并说明具体的情况<br>
+
+
+
+
+
+
+
             </li>
         </ul>
     </div>
@@ -459,11 +458,9 @@
 <div id="timelineModal" class="modal-overlay" onclick="toggleTimeline(event)">
     <div class="modal-content timeline-content" onclick="event.stopPropagation()">
         <button class="close-btn" onclick="toggleTimeline()">✕</button>
-
         <div class="timeline-header">
             <button class="btn-primary" onclick="addRole()">+ 添加角色</button>
             <select id="tlm_role_select"><option>角色1</option></select>
-
             <button class="btn-primary" onclick="addBuff()">+ 添加BUFF板块</button>
             <label>起始时间(s):</label>
             <input type="number" id="tlm_start" value="" step="0.1" min="0">
@@ -473,7 +470,6 @@
             <input type="text" id="tlm_name" value="">
             <label>颜色:</label>
             <input type="color" id="tlm_color" value="#4a90e2">
-
             <button class="btn-danger" onclick="clearTimeline()">清空全部数据</button>
         </div>
         <!-- 时间轴标尺 -->
@@ -496,9 +492,28 @@
         'b_same_p': 3.0, 'b_diff_p': 1.2, 'b_none_p': 1.8,
         'b_same_o': 9.0, 'b_diff_o': 3.6, 'b_none_o': 5.4
     };
-    const STORAGE_KEY = 'genshin_calc_state_v1';
-    const NOTE_STORAGE_KEY = "genshin_note_multi_team_v3";
-
+    const NOTE_STORAGE_KEY = "genshin_note_multi_team_v4";
+    // 计算器全部输入id列表
+    const CALC_INPUT_IDS = [
+        'f_same_p','f_diff_p','f_none_p','f_same_o','f_diff_o','f_none_o',
+        'b_same_p','b_diff_p','b_none_p','b_same_o','b_diff_o','b_none_o',
+        'party_size','req_energy','fixed_recovery','er_stat'
+    ];
+    // 获取空白计算器状态
+    function getEmptyCalcState(){
+        return {
+            'f_same_p':0,'f_diff_p':0,'f_none_p':0,'f_same_o':0,'f_diff_o':0,'f_none_o':0,
+            'b_same_p':0,'b_diff_p':0,'b_none_p':0,'b_same_o':0,'b_diff_o':0,'b_none_o':0,
+            'party_size':4,'req_energy':60,'fixed_recovery':0,'er_stat':100
+        };
+    }
+    // 获取空白时间轴数据
+    function getEmptyTimelineData(){
+        return {
+            roles: ['角色1', '角色2', '角色3'],
+            buffs: []
+        };
+    }
     // 单个角色模板
     function getEmptyRole(){
         return {
@@ -509,17 +524,54 @@
             b_same_o:0, b_diff_o:0, b_none_o:0
         }
     }
-    // 新建队伍模板
+    // 新建队伍模板，附带独立calcState计算器存档 + timelineData时间轴存档
     function getEmptyTeam(name){
         return {
             teamName: name,
-            roles: [getEmptyRole(),getEmptyRole(),getEmptyRole(),getEmptyRole()]
+            roles: [getEmptyRole(),getEmptyRole(),getEmptyRole(),getEmptyRole()],
+            calcState: getEmptyCalcState(),
+            timelineData: getEmptyTimelineData()
         }
     }
-
     // 多队伍全局数据
     let teamList = [getEmptyTeam("队伍1")];
     let currentTeamIndex = 0;
+    let timelineData = getEmptyTimelineData();
+    let buffIdCounter = 1;
+
+    // 把页面当前计算器+当前内存timelineData保存进当前队伍对象
+    function saveCalcToCurrentTeam(){
+        const t = teamList[currentTeamIndex];
+        const s = {};
+        CALC_INPUT_IDS.forEach(id=>{
+            const el = document.getElementById(id);
+            let v = el ? el.value : 0;
+            if(v === "" || v === null || v === undefined){
+                v = "0";
+            }
+            s[id] = v;
+        });
+        t.calcState = s;
+        t.timelineData = JSON.parse(JSON.stringify(timelineData));
+        saveNoteStorage();
+    }
+    // 将队伍的全部状态加载渲染：计算器 + 时间轴
+    function loadTeamAllState(teamObj){
+        //加载计算器
+        const st = teamObj.calcState || getEmptyCalcState();
+        CALC_INPUT_IDS.forEach(id=>{
+            const el = document.getElementById(id);
+            if(el) el.value = st[id] ?? 0;
+        });
+        //加载时间轴
+        timelineData = (teamObj.timelineData) ? JSON.parse(JSON.stringify(teamObj.timelineData)) : getEmptyTimelineData();
+        //重新计算buffIdCounter，防止新增buff id重复
+        const maxId = timelineData.buffs.length > 0 ? timelineData.buffs.reduce((m,b)=>Math.max(m,b.id),0) : 0;
+        buffIdCounter = maxId + 1;
+
+        calculate();
+        renderTimeline();
+    }
 
     function saveNoteStorage(){
         localStorage.setItem(NOTE_STORAGE_KEY,JSON.stringify({teamList,currentTeamIndex}));
@@ -531,20 +583,31 @@
             const obj = JSON.parse(s);
             if(obj.teamList && Array.isArray(obj.teamList) && obj.teamList.length>0){
                 teamList = obj.teamList;
+                // 兼容旧存档，老队伍缺少字段自动补齐
+                teamList.forEach(t=>{
+                    if(!t.calcState) t.calcState = getEmptyCalcState();
+                    if(!t.timelineData) t.timelineData = getEmptyTimelineData();
+                });
                 let idx = Number(obj.currentTeamIndex)||0;
                 if(idx>=teamList.length) idx=0;
                 currentTeamIndex = idx;
             }
-        }catch(e){}
+        }catch(e){console.error(e);}
     }
-
     // 队伍操作
     function createNewTeam(){
-        const newTeam = getEmptyTeam(`队伍${teamList.length+1}`);
+        //取最大编号，防止删除队伍后新建重名
+        let maxNum = 0;
+        teamList.forEach(t=>{
+            const m = /队伍(\d+)/.exec(t.teamName);
+            if(m) maxNum = Math.max(maxNum,Number(m[1]));
+        });
+        const newTeam = getEmptyTeam(`队伍${maxNum+1}`);
         teamList.push(newTeam);
         currentTeamIndex = teamList.length-1;
         saveNoteStorage();
         renderNoteUi();
+        loadTeamAllState(newTeam);
     }
     function renameCurrentTeam(){
         const t = teamList[currentTeamIndex];
@@ -565,14 +628,18 @@
         if(currentTeamIndex >= teamList.length) currentTeamIndex = teamList.length-1;
         saveNoteStorage();
         renderNoteUi();
+        loadTeamAllState(teamList[currentTeamIndex]);
     }
     function switchTeam(){
+        //切换前：把当前页面计算器+时间轴保存给旧队伍
+        saveCalcToCurrentTeam();
         const sel = document.getElementById("teamSelect");
         currentTeamIndex = Number(sel.value);
         saveNoteStorage();
+        //加载选中队伍的全部状态（计算器+时间轴）
+        loadTeamAllState(teamList[currentTeamIndex]);
         renderNoteUi();
     }
-
     function toggleNoteModal(event){
         const modal = document.getElementById("noteModal");
         if(event && event.target === modal){
@@ -584,7 +651,6 @@
         }
         modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
     }
-
     function renderNoteUi(){
         // 渲染队伍下拉选择框
         const sel = document.getElementById("teamSelect");
@@ -596,7 +662,6 @@
             if(idx === currentTeamIndex) opt.selected = true;
             sel.appendChild(opt);
         });
-
         const wrap = document.getElementById("noteWrap");
         wrap.innerHTML = "";
         const curTeam = teamList[currentTeamIndex];
@@ -643,7 +708,6 @@
             wrap.appendChild(div);
         }
     }
-
     function noteChangeName(idx,val){
         teamList[currentTeamIndex].roles[idx].name = val;
         saveNoteStorage();
@@ -652,58 +716,44 @@
         teamList[currentTeamIndex].roles[idx][key] = Number(val)||0;
         saveNoteStorage();
     }
-
-    function saveState() {
-        const state = {};
-        const inputs = document.querySelectorAll('.calculator-container input[type="number"]');
-        inputs.forEach(input => { state[input.id] = input.value; });
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    }
-    function loadState() {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (!saved) return;
-        try {
-            const state = JSON.parse(saved);
-            for (const [id, val] of Object.entries(state)) {
-                const el = document.getElementById(id);
-                if (el) el.value = val;
-            }
-        } catch (e) {}
-    }
     function changeVal(id, delta) {
         const input = document.getElementById(id);
         if (!input) return;
-        let val = parseInt(input.value) + delta;
-        const min = parseInt(input.min) || 0;
-        const max = parseInt(input.max) || 999;
-        if (val < min) val = min; if (val > max) val = max;
+        let val = parseFloat(input.value || 0) + delta;
+        const min = parseFloat(input.min) || 0;
+        const max = parseFloat(input.max) || 999;
+        if (val < min) val = min;
+        if (val > max) val = max;
         input.value = val;
-        calculate(); saveState();
+        calculate();
+        saveCalcToCurrentTeam();
     }
     function resetAll() {
-        const inputs = document.querySelectorAll('.calculator-container input[type="number"]');
-        inputs.forEach(input => {
-            if(input.id === 'party_size') input.value = '4';
-            else if(input.id === 'req_energy') input.value = '60';
-            else if(input.id === 'er_stat') input.value = '100';
-            else input.value = '0';
+        //重置当前队伍计算器，不改动时间轴
+        CALC_INPUT_IDS.forEach(id=>{
+            const el = document.getElementById(id);
+            if(id === 'party_size') el.value = '4';
+            else if(id === 'req_energy') el.value = '60';
+            else if(id === 'er_stat') el.value = '100';
+            else el.value = '0';
         });
-        calculate(); localStorage.removeItem(STORAGE_KEY);
+        calculate();
+        saveCalcToCurrentTeam();
     }
     function getBackMultiplier(partySize) {
         if (partySize === 1) return 1.0; if (partySize === 2) return 0.8; if (partySize === 3) return 0.7; return 0.6;
     }
     function calculate() {
-        const partySize = parseInt(document.getElementById('party_size').value) || 4;
-        const requiredEnergy = parseFloat(document.getElementById('req_energy').value) || 0;
-        const fixedRecovery = parseFloat(document.getElementById('fixed_recovery').value) || 0;
-        const erStat = parseFloat(document.getElementById('er_stat').value) || 100;
+        const partySize = Number(document.getElementById('party_size').value) || 4;
+        const requiredEnergy = Number(document.getElementById('req_energy').value) || 0;
+        const fixedRecovery = Number(document.getElementById('fixed_recovery').value) || 0;
+        const erStat = Number(document.getElementById('er_stat').value) || 100;
         const backMultiplier = getBackMultiplier(partySize);
         let baseEnergy = 0;
         const ids = ['f_same_p', 'f_diff_p', 'f_none_p', 'f_same_o', 'f_diff_o', 'f_none_o',
             'b_same_p', 'b_diff_p', 'b_none_p', 'b_same_o', 'b_diff_o', 'b_none_o'];
         ids.forEach(id => {
-            const count = parseFloat(document.getElementById(id).value) || 0;
+            const count = Number(document.getElementById(id).value) || 0;
             const baseVal = ENERGY_VALUES[id];
             const multiplier = id.startsWith('b_') ? backMultiplier : 1.0;
             baseEnergy += count * baseVal * multiplier;
@@ -714,10 +764,10 @@
         const minErSpan = document.getElementById('min_er_needed');
         if (actualRecovery >= requiredEnergy && requiredEnergy > 0) {
             statusBox.className = 'result-status success';
-            statusBox.innerHTML = '<span></span> 充能已达标';
+            statusBox.innerHTML = '<span>✔</span> 充能已达标';
         } else {
             statusBox.className = 'result-status fail';
-            statusBox.innerHTML = '<span></span> 充能未达标';
+            statusBox.innerHTML = '<span>✖</span> 充能未达标';
         }
         let minER = Infinity;
         if (totalBaseRecovery > 0 && requiredEnergy > 0) minER = (requiredEnergy / totalBaseRecovery) * 100;
@@ -734,42 +784,15 @@
     }
     function toggleTimeline(event) {
         const modal = document.getElementById('timelineModal');
-        if (modal.style.display !== 'flex') {
-            initTimeline();
-        }
         modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
-    }
-    // ==================== 时间轴核心逻辑 ====================
-    let timelineData = {
-        roles: ['角色1', '角色2', '角色3'],
-        buffs: []
-    };
-    let buffIdCounter = 0;
-    function initTimeline() {
-        if (timelineData.buffs.length === 0) {
-            timelineData.buffs.push({
-                id: ++buffIdCounter,
-                roleName: '角色1',
-                start: 0.0,
-                duration: 8.0,
-                name: 'BUFF',
-                color: '#4a90e2'
-            });
-            timelineData.buffs.push({
-                id: ++buffIdCounter,
-                roleName: '角色2',
-                start: 4.5,
-                duration: 6.0,
-                name: '爆发',
-                color: '#e25a4a'
-            });
-        }
         renderTimeline();
     }
+    // ==================== 时间轴核心逻辑 ====================
     function addRole() {
         const name = `角色${timelineData.roles.length + 1}`;
         timelineData.roles.push(name);
         renderTimeline();
+        saveCalcToCurrentTeam();
     }
     function addBuff() {
         const select = document.getElementById('tlm_role_select');
@@ -789,23 +812,26 @@
             color: color
         });
         renderTimeline();
+        saveCalcToCurrentTeam();
     }
     function deleteBuff(id) {
         timelineData.buffs = timelineData.buffs.filter(b => b.id !== id);
         renderTimeline();
+        saveCalcToCurrentTeam();
     }
     function clearTimeline() {
-        if(confirm('确定要清空所有时间轴数据吗？')) {
+        if(confirm('确定要清空当前队伍全部时间轴数据吗？')) {
             timelineData.roles = ['角色1'];
             timelineData.buffs = [];
+            buffIdCounter = 1;
             renderTimeline();
+            saveCalcToCurrentTeam();
         }
     }
     function renderTimeline() {
         const select = document.getElementById('tlm_role_select');
         const ruler = document.getElementById('timelineRuler');
         const grid = document.getElementById('timelineGridInner');
-
         const currentVal = select.value;
         select.innerHTML = '';
         timelineData.roles.forEach(r => {
@@ -828,14 +854,12 @@
         timelineData.roles.forEach(roleName => {
             const row = document.createElement('div');
             row.className = 'timeline-row';
-
             const label = document.createElement('div');
             label.className = 'role-label';
             label.textContent = roleName;
             row.appendChild(label);
             const slot = document.createElement('div');
             slot.className = 'role-slot';
-
             timelineData.buffs.forEach(buff => {
                 if(buff.roleName === roleName) {
                     const block = document.createElement('div');
@@ -860,11 +884,18 @@
     // 页面加载
     document.addEventListener('DOMContentLoaded', function() {
         loadNoteStorage();
-        loadState();
+        // 页面打开加载当前队伍的计算器+时间轴
+        loadTeamAllState(teamList[currentTeamIndex]);
         const inputs = document.querySelectorAll('.calculator-container input[type="number"]');
         inputs.forEach(input => {
-            input.addEventListener('input', () => { calculate(); saveState(); });
-            input.addEventListener('change', () => { calculate(); saveState(); });
+            input.addEventListener('input', () => {
+                calculate();
+                saveCalcToCurrentTeam();
+            });
+            input.addEventListener('change', () => {
+                calculate();
+                saveCalcToCurrentTeam();
+            });
         });
         calculate();
     });
