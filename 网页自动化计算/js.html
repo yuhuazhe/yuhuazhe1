@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>羽化哲</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        :root {
+            --bg: #f0f2f7;
+            --card-bg: #ffffff;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --toolbar-bg: rgba(255,255,255,0.70);
+            --border: #d1d5db;
+            --btn-normal: #f3f4f6;
+            --btn-hover: #e5e7eb;
+            --btn-active: #dde1e8;
+            --accent: #3b82f6;
+            --shadow: 0 4px 18px rgba(0,0,0,0.07);
+            --scrollbar-bg: #e5e7eb;
+        }
+        /*多套主题*/
+        body.theme-dark {
+            --bg: #0f1118;
+            --card-bg: #1a1d28;
+            --text-primary: #e9ebf0;
+            --text-secondary: #9ca3af;
+            --toolbar-bg: rgba(26,29,40,0.72);
+            --border: #313647;
+            --btn-normal: #272b3b;
+            --btn-hover: #32384b;
+            --btn-active: #3c4358;
+            --accent: #60a5fa;
+            --shadow: 0 4px 20px rgba(0,0,0,0.35);
+            --scrollbar-bg: #2c3142;
+        }
+        body.theme-eyecare {
+            --bg: #e8f1e4;
+            --card-bg: #f2f7ee;
+            --text-primary: #222c1e;
+            --text-secondary: #54634d;
+            --toolbar-bg: rgba(242,247,238,0.75);
+            --border: #c2d3b8;
+            --btn-normal: #e1ebdb;
+            --btn-hover: #d4e2cc;
+            --btn-active: #c5d7bb;
+            --accent: #2b8c48;
+            --shadow: 0 4px 16px rgba(43,140,72,0.08);
+            --scrollbar-bg: #c2d3b8;
+        }
+        body.theme-bluegray {
+            --bg: #e9edf4;
+            --card-bg: #f5f7fa;
+            --text-primary: #1f2937;
+            --text-secondary: #64748b;
+            --toolbar-bg: rgba(245,247,250,0.7);
+            --border: #c8d2e2;
+            --btn-normal: #e2e8f0;
+            --btn-hover: #cbd5e1;
+            --btn-active: #b8c8dd;
+            --accent: #2563eb;
+            --shadow: 0 4px 16px rgba(37,99,235,0.09);
+            --scrollbar-bg: #c8d2e2;
+        }
+        body.theme-highcontrast {
+            --bg: #000000;
+            --card-bg: #000000;
+            --text-primary: #ffffff;
+            --text-secondary: #dddddd;
+            --toolbar-bg: rgba(0,0,0,0.85);
+            --border: #ffffff;
+            --btn-normal: #222222;
+            --btn-hover: #444444;
+            --btn-active: #555555;
+            --accent: #00eeff;
+            --shadow: 0 0 0 1px #fff;
+            --scrollbar-bg: #777777;
+        }
+
+        ::-webkit-scrollbar {
+            width:8px;
+            height:8px;
+        }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-bg);
+            border-radius:4px;
+        }
+        body {
+            background: var(--bg);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, Roboto;
+            transition: background 0.3s ease, color 0.3s ease;
+            padding:16px;
+            overflow:hidden;
+        }
+        .app-wrap {
+            width:100%;
+            height:100%;
+            border-radius:16px;
+            overflow:hidden;
+            background: var(--card-bg);
+            box-shadow: var(--shadow);
+            border:1px solid var(--border);
+            display:flex;
+            flex-direction:column;
+        }
+        /*标签栏*/
+        .tab-bar{
+            display:flex;
+            gap:4px;
+            padding:8px 14px;
+            background:var(--toolbar-bg);
+            backdrop-filter: blur(12px);
+            border-bottom:1px solid var(--border);
+            overflow-x:auto;
+            align-items:center;
+        }
+        .tab-item{
+            padding:6px 12px;
+            border-radius:6px;
+            background:var(--btn-normal);
+            border:1px solid transparent;
+            font-size:13px;
+            cursor:pointer;
+            white-space:nowrap;
+            transition:0.18s;
+            display:flex;
+            align-items:center;
+            gap:6px;
+        }
+        .tab-item.active{ border-color:var(--accent); }
+        .tab-item:hover{ background:var(--btn-hover); }
+        .tab-close{ opacity:0.65; }
+        .tab-close:hover{ opacity:1; }
+        .tab-inline-input{
+            background:var(--btn-normal);
+            border:1px solid var(--accent);
+            border-radius:6px;
+            padding:4px 8px;
+            color:var(--text-primary);
+            outline:none;
+            width:110px;
+        }
+        /*主工具栏 word格式按钮*/
+        .toolbar-main{
+            background:var(--toolbar-bg);
+            backdrop-filter: blur(12px);
+            padding:10px 16px;
+            display:flex;
+            gap:6px;
+            flex-wrap:wrap;
+            border-bottom:1px solid var(--border);
+            align-items:center;
+        }
+        button{
+            padding:7px 11px;
+            border:1px solid var(--border);
+            background:var(--btn-normal);
+            color:var(--text-primary);
+            border-radius:7px;
+            cursor:pointer;
+            font-size:13px;
+            transition:0.18s ease;
+        }
+        button:hover{ background:var(--btn-hover); }
+        button:active{ background:var(--btn-active); }
+        select{
+            padding:6px 9px;
+            background:var(--btn-normal);
+            color:var(--text-primary);
+            border:1px solid var(--border);
+            border-radius:7px;
+            outline:none;
+            font-size:13px;
+        }
+        .search-box{
+            padding:6px 10px;
+            border:1px solid var(--border);
+            border-radius:7px;
+            background:var(--btn-normal);
+            color:var(--text-primary);
+            outline:none;
+            font-size:13px;
+            width:170px;
+        }
+        .status-row{
+            margin-left:auto;
+            display:flex;
+            gap:14px;
+            font-size:12.5px;
+            color:var(--text-secondary);
+        }
+        /*富文本编辑区*/
+        #editor{
+            flex:1;
+            width:100%;
+            background:transparent;
+            color:var(--text-primary);
+            border:none;
+            outline:none;
+            padding:24px 26px;
+            overflow:auto;
+            line-height:1.72;
+        }
+        input[type="file"]{ display:none; }
+        .tip-save{
+            position:fixed;
+            bottom:20px;
+            right:20px;
+            padding:8px 14px;
+            border-radius:8px;
+            background:rgba(0,0,0,0.65);
+            color:#fff;
+            font-size:13px;
+            opacity:0;
+            pointer-events:none;
+            transition:0.25s;
+            z-index:99;
+        }
+        .tip-save.show{ opacity:1; }
+
+        /*可拖拽悬浮计算器弹窗*/
+        .calc-popup{
+            position:fixed;
+            width:280px;
+            background:var(--card-bg);
+            border:1px solid var(--border);
+            border-radius:12px;
+            box-shadow:var(--shadow);
+            overflow:hidden;
+            z-index:100;
+            display:none;
+        }
+        .calc-popup.show{ display:block; }
+        .calc-drag-header{
+            padding:8px 12px;
+            background:var(--btn-normal);
+            cursor:move;
+            user-select:none;
+            font-size:13px;
+        }
+        .calc-body{
+            padding:12px;
+        }
+        .calc-display{
+            width:100%;
+            padding:10px;
+            text-align:right;
+            font-size:22px;
+            margin-bottom:10px;
+            background:var(--btn-normal);
+            border-radius:6px;
+            border:none;
+            color:var(--text-primary);
+        }
+        .calc-buttons{
+            display:grid;
+            grid-template-columns: repeat(4,1fr);
+            gap:6px;
+        }
+        .calc-buttons button{
+            padding:10px;
+            font-size:15px;
+        }
+        /*说明弹窗*/
+        .modal-mask{
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,0.45);
+            z-index:200;
+            display:none;
+            align-items:center;
+            justify-content:center;
+        }
+        .modal-mask.show{ display:flex; }
+        .modal-box{
+            width:520px;
+            max-width:92vw;
+            max-height:80vh;
+            overflow:auto;
+            background:var(--card-bg);
+            border:1px solid var(--border);
+            border-radius:12px;
+            padding:20px;
+            box-shadow:var(--shadow);
+        }
+        .modal-box h3{ margin-bottom:12px; }
+        .modal-box p{ margin:6px 0; font-size:14px; color:var(--text-secondary); line-height:1.6;}
+        .modal-close{
+            margin-top:12px;
+        }
+    </style>
+</head>
+<body>
+<div class="app-wrap">
+    <div class="tab-bar" id="tabBar"></div>
+    <div class="toolbar-main">
+        <!-- Word格式功能 -->
+        <button data-cmd="bold" title="加粗 Ctrl+B">B</button>
+        <button data-cmd="italic" title="斜体 Ctrl+I"><i>I</i></button>
+        <button data-cmd="underline" title="下划线 Ctrl+U"><u>U</u></button>
+        <button data-cmd="strikeThrough" title="删除线">S</button>
+        <div style="width:1px;height:24px;background:var(--border);margin:0 4px;"></div>
+        <!--对齐-->
+        <button data-cmd="justifyLeft" title="左对齐">⬅</button>
+        <button data-cmd="justifyCenter" title="居中">⬌</button>
+        <button data-cmd="justifyRight" title="右对齐">➡</button>
+        <div style="width:1px;height:24px;background:var(--border);margin:0 4px;"></div>
+        <button data-cmd="insertUnorderedList">无序列表</button>
+        <button data-cmd="insertOrderedList">有序列表</button>
+        <button data-cmd="undo">撤销</button>
+        <button data-cmd="redo">重做</button>
+        <div style="width:1px;height:24px;background:var(--border);margin:0 4px;"></div>
+
+        <select id="fontFamilySel">
+            <option value="system-ui">系统默认</option>
+            <option value="Microsoft YaHei">微软雅黑</option>
+            <option value="SimSun">宋体</option>
+            <option value="SimHei">黑体</option>
+            <option value="KaiTi">楷体</option>
+            <option value="Arial">Arial</option>
+        </select>
+        <select id="fontSizeSel">
+            <option value="14">14px</option>
+            <option value="16">16px</option>
+            <option value="18">18px</option>
+            <option value="20">20px</option>
+            <option value="22">22px</option>
+        </select>
+        <select id="themeSel">
+            <option value="">默认浅色</option>
+            <option value="theme-dark">暗夜深色</option>
+            <option value="theme-eyecare">护眼绿</option>
+            <option value="theme-bluegray">灰蓝柔和</option>
+            <option value="theme-highcontrast">高对比度</option>
+        </select>
+
+        <div style="width:1px;height:24px;background:var(--border);margin:0 4px;"></div>
+        <button id="newTabBtn">新建笔记</button>
+        <button id="renameTabBtn">重命名</button>
+        <button id="exportBtn">导出TXT</button>
+        <button id="importBtn">导入TXT</button>
+        <input type="file" id="fileInput" accept=".txt"/>
+        <button id="copyAllBtn">复制全部</button>
+        <button id="clearBtn">清空</button>
+        <button id="calcToggleBtn">计算器</button>
+        <button id="aboutBtn">必看说明</button>
+        <input class="search-box" id="searchInput" placeholder="搜索文本...">
+        <div class="status-row">
+            <span>字符：<span id="charCount">0</span></span>
+            <span>单词：<span id="wordCount">0</span></span>
+        </div>
+    </div>
+    <div id="editor" contenteditable="true" placeholder="开始记录你的笔记..."></div>
+</div>
+
+<div class="tip-save" id="saveTip">已自动保存</div>
+<!--可拖拽悬浮计算器-->
+<div class="calc-popup" id="calcPopup">
+    <div class="calc-drag-header" id="calcDragHead">拖动此处移动计算器</div>
+    <div class="calc-body">
+        <input class="calc-display" id="calcDisplay" readonly value="0">
+        <div class="calc-buttons">
+            <button onclick="calcClear()">AC</button>
+            <button onclick="calcBack()">←</button>
+            <button onclick="calcAppend('%')">%</button>
+            <button onclick="calcAppend('/')">÷</button>
+
+            <button onclick="calcAppend('7')">7</button>
+            <button onclick="calcAppend('8')">8</button>
+            <button onclick="calcAppend('9')">9</button>
+            <button onclick="calcAppend('*')">×</button>
+
+            <button onclick="calcAppend('4')">4</button>
+            <button onclick="calcAppend('5')">5</button>
+            <button onclick="calcAppend('6')">6</button>
+            <button onclick="calcAppend('-')">-</button>
+
+            <button onclick="calcAppend('1')">1</button>
+            <button onclick="calcAppend('2')">2</button>
+            <button onclick="calcAppend('3')">3</button>
+            <button onclick="calcAppend('+')">+</button>
+
+            <button onclick="calcAppend('0')">0</button>
+            <button onclick="calcAppend('.')">.</button>
+            <button onclick="calcEqual()">=</button>
+            <button onclick="calcPopupClose()">✕</button>
+        </div>
+    </div>
+</div>
+
+<!--说明弹窗-->
+<div class="modal-mask" id="aboutModal">
+    <div class="modal-box">
+        <h3>使用说明</h3>
+        <p><b>【v1.1版本】【更新日期：2026年8月26日--------制作者：幼儿园大班班长】</p>
+        <p><b>1.记事本内置了记忆代码，并不会因刷新或二次进入网站而导致内容丢失</p>
+        <p><b>2.网站的制作者以及他人，并不会看到你的记录内容。</p>
+        <p><b>3.内容存储在你的浏览器，若你清除浏览器数据则会导致内容清空！！！</p>
+        <p><b>4.感谢使用！！！</p>
+
+        <button class="modal-close" id="closeAboutBtn">关闭</button>
+    </div>
+</div>
+
+<script>
+    const editor = document.getElementById('editor');
+    const charCountEl = document.getElementById('charCount');
+    const wordCountEl = document.getElementById('wordCount');
+    const fontSizeSel = document.getElementById('fontSizeSel');
+    const fontFamilySel = document.getElementById('fontFamilySel');
+    const themeSel = document.getElementById('themeSel');
+    const exportBtn = document.getElementById('exportBtn');
+    const importBtn = document.getElementById('importBtn');
+    const fileInput = document.getElementById('fileInput');
+    const clearBtn = document.getElementById('clearBtn');
+    const copyAllBtn = document.getElementById('copyAllBtn');
+    const newTabBtn = document.getElementById('newTabBtn');
+    const renameTabBtn = document.getElementById('renameTabBtn');
+    const tabBar = document.getElementById('tabBar');
+    const saveTip = document.getElementById('saveTip');
+    const searchInput = document.getElementById('searchInput');
+    const calcToggleBtn = document.getElementById('calcToggleBtn');
+    const calcPopup = document.getElementById('calcPopup');
+    const calcDragHead = document.getElementById('calcDragHead');
+    const calcDisplay = document.getElementById('calcDisplay');
+    const aboutBtn = document.getElementById('aboutBtn');
+    const aboutModal = document.getElementById('aboutModal');
+    const closeAboutBtn = document.getElementById('closeAboutBtn');
+
+    const THEME_KEY = "notepad_theme_v6";
+    const FONTSIZE_KEY = "notepad_fontsize_v6";
+    const FONTFAMILY_KEY = "notepad_fontfamily_v6";
+    const TABS_KEY = "notepad_tabs_v6";
+    const ACTIVE_TAB_KEY = "notepad_active_tab_v6";
+
+    let saveTimer = null;
+    let tabs = [];
+    let activeTabId = null;
+
+    //计算器拖拽逻辑
+    let isCalcDrag = false;
+    let dragOffsetX = 0;
+    let dragOffsetY = 0;
+    calcDragHead.addEventListener('mousedown',(e)=>{
+        isCalcDrag = true;
+        dragOffsetX = e.clientX - calcPopup.offsetLeft;
+        dragOffsetY = e.clientY - calcPopup.offsetTop;
+        calcPopup.style.transition = 'none';
+    })
+    document.addEventListener('mousemove',(e)=>{
+        if(!isCalcDrag) return;
+        let x = e.clientX - dragOffsetX;
+        let y = e.clientY - dragOffsetY;
+        const maxX = window.innerWidth - calcPopup.offsetWidth;
+        const maxY = window.innerHeight - calcPopup.offsetHeight;
+        x = Math.max(0, Math.min(maxX, x));
+        y = Math.max(0, Math.min(maxY, y));
+        calcPopup.style.left = x + 'px';
+        calcPopup.style.top = y + 'px';
+    })
+    document.addEventListener('mouseup',()=>{
+        isCalcDrag = false;
+        calcPopup.style.transition = 'box-shadow 0.3s';
+    })
+
+    function calcPopupClose(){ calcPopup.classList.remove('show'); }
+    calcToggleBtn.onclick = ()=> {
+        calcPopup.classList.toggle('show');
+        if(calcPopup.classList.contains('show')){
+            calcPopup.style.right = '20px';
+            calcPopup.style.bottom = '60px';
+            calcPopup.style.left = '';
+            calcPopup.style.top = '';
+        }
+    };
+    function calcClear(){ calcDisplay.value = "0"; }
+    function calcBack(){
+        if(calcDisplay.value.length<=1){ calcDisplay.value="0";return; }
+        calcDisplay.value = calcDisplay.value.slice(0,-1);
+    }
+    function calcAppend(v){
+        if(calcDisplay.value==="0" && !['+','-','*','/','%','.'].includes(v)) calcDisplay.value="";
+        calcDisplay.value += v;
+    }
+    function calcEqual(){
+        try{
+            let exp = calcDisplay.value.replace(/×/g,"*");
+            let res = Function('"use strict";return ('+exp+')')();
+            calcDisplay.value = Number.isFinite(res) ? res : "错误";
+        }catch(e){ calcDisplay.value="错误"; }
+    }
+
+    //说明弹窗
+    aboutBtn.onclick = ()=> aboutModal.classList.add('show');
+    closeAboutBtn.onclick = ()=> aboutModal.classList.remove('show');
+    aboutModal.onclick = e=>{
+        if(e.target === aboutModal) aboutModal.classList.remove('show');
+    }
+
+    function showSaveTip(){
+        saveTip.classList.add('show');
+        setTimeout(()=>saveTip.classList.remove('show'),1200);
+    }
+
+    function uuid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2); }
+
+    //标签渲染
+    function renderTabs(){
+        tabBar.innerHTML = '';
+        tabs.forEach(tab=>{
+            const div = document.createElement('div');
+            div.className = 'tab-item'+(tab.id===activeTabId?' active':'');
+            div.innerHTML = `<span>${tab.title||'未命名'}</span><span class="tab-close">×</span>`;
+            div.dataset.id = tab.id;
+            div.onclick = (e)=>{
+                if(e.target.classList.contains('tab-close')) closeTab(tab.id);
+                else switchTab(tab.id);
+            }
+            tabBar.appendChild(div);
+        })
+    }
+    function getActiveTab(){ return tabs.find(t=>t.id===activeTabId); }
+
+    function switchTab(tabId){
+        const current = getActiveTab();
+        if(current) current.content = editor.innerHTML;
+        activeTabId = tabId;
+        const tab = getActiveTab();
+        editor.innerHTML = tab.content||'';
+        updateStat();
+        renderTabs();
+        saveTabsStorage();
+    }
+
+    //新建笔记：页面内输入框，不再使用prompt弹窗
+    newTabBtn.onclick = function(){
+        const current = getActiveTab();
+        if(current) current.content = editor.innerHTML;
+
+        const input = document.createElement('input');
+        input.className = "tab-inline-input";
+        input.value = "新建笔记";
+        tabBar.appendChild(input);
+        input.focus();
+        input.select();
+
+        function finishCreate(){
+            const name = input.value.trim() || "未命名笔记";
+            input.remove();
+            const newId = uuid();
+            tabs.push({id:newId, title:name, content:""});
+            activeTabId = newId;
+            editor.innerHTML = '';
+            updateStat();
+            renderTabs();
+            saveTabsStorage();
+        }
+        input.onkeydown = e=>{
+            if(e.key === 'Enter') finishCreate();
+            if(e.key === 'Escape') input.remove();
+        }
+        input.onblur = finishCreate;
+    }
+
+    //重命名，页面内输入框
+    renameTabBtn.onclick = ()=>{
+        const tab = getActiveTab();
+        const input = document.createElement('input');
+        input.className = "tab-inline-input";
+        input.value = tab.title;
+        tabBar.appendChild(input);
+        input.focus();
+        input.select();
+
+        function finishRename(){
+            const name = input.value.trim() || "未命名笔记";
+            input.remove();
+            tab.title = name;
+            renderTabs();
+            saveTabsStorage();
+        }
+        input.onkeydown = e=>{
+            if(e.key === 'Enter') finishRename();
+            if(e.key === 'Escape') input.remove();
+        }
+        input.onblur = finishRename;
+    }
+
+    function closeTab(tabId){
+        if(tabs.length<=1) return alert("至少保留一个笔记标签");
+        const idx = tabs.findIndex(t=>t.id===tabId);
+        tabs.splice(idx,1);
+        if(activeTabId===tabId){
+            activeTabId = tabs[Math.max(0,idx-1)].id;
+            switchTab(activeTabId);
+        }
+        renderTabs();
+        saveTabsStorage();
+    }
+
+    function saveTabsStorage(){
+        localStorage.setItem(TABS_KEY, JSON.stringify(tabs));
+        localStorage.setItem(ACTIVE_TAB_KEY, activeTabId);
+    }
+
+    function loadTabs(){
+        const rawTabs = localStorage.getItem(TABS_KEY);
+        const rawActive = localStorage.getItem(ACTIVE_TAB_KEY);
+        if(rawTabs){ tabs = JSON.parse(rawTabs); }
+        else{
+            tabs = [{id:uuid(),title:"笔记1",content:""}];
+        }
+        activeTabId = rawActive || tabs[0].id;
+        const tab = tabs.find(t=>t.id===activeTabId);
+        if(!tab) activeTabId = tabs[0].id;
+        editor.innerHTML = getActiveTab().content||'';
+        renderTabs();
+    }
+
+    //多主题加载切换
+    function loadTheme(){
+        const saved = localStorage.getItem(THEME_KEY)||"";
+        document.body.className = saved;
+        themeSel.value = saved;
+    }
+    themeSel.onchange = ()=>{
+        const val = themeSel.value;
+        document.body.className = val;
+        localStorage.setItem(THEME_KEY,val);
+    }
+
+    //字号记忆
+    function loadFontSize(){
+        const fs = localStorage.getItem(FONTSIZE_KEY);
+        if(fs){
+            fontSizeSel.value = fs;
+            editor.style.fontSize = fs+'px';
+        }
+    }
+    fontSizeSel.onchange = ()=>{
+        const val = fontSizeSel.value;
+        editor.style.fontSize = val+'px';
+        localStorage.setItem(FONTSIZE_KEY,val);
+    }
+
+    //字体记忆
+    function loadFontFamily(){
+        const ff = localStorage.getItem(FONTFAMILY_KEY);
+        if(ff){
+            fontFamilySel.value = ff;
+            editor.style.fontFamily = ff;
+        }
+    }
+    fontFamilySel.onchange = ()=>{
+        const val = fontFamilySel.value;
+        editor.style.fontFamily = val;
+        localStorage.setItem(FONTFAMILY_KEY,val);
+    }
+
+    //富文本word命令
+    document.querySelectorAll('[data-cmd]').forEach(btn=>{
+        btn.onclick = ()=>{
+            const cmd = btn.dataset.cmd;
+            document.execCommand(cmd,false,null);
+            editor.focus();
+            autoSave();
+        }
+    })
+
+    //自动保存
+    function autoSave(){
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(()=>{
+            const tab = getActiveTab();
+            tab.content = editor.innerHTML;
+            saveTabsStorage();
+            showSaveTip();
+        },550);
+    }
+
+    function updateStat(){
+        const text = editor.innerText;
+        charCountEl.innerText = text.length;
+        const words = text.trim().split(/\s+/).filter(i=>i);
+        wordCountEl.innerText = words.length;
+    }
+
+    editor.addEventListener('input',()=>{
+        autoSave();
+        updateStat();
+    })
+
+    //导出TXT
+    exportBtn.onclick = ()=>{
+        const plainText = editor.innerText;
+        const blob = new Blob([plainText],{type:"text/plain;charset=utf-8"});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${getActiveTab().title}.txt`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    //导入txt
+    importBtn.onclick = ()=>fileInput.click();
+    fileInput.onchange = e=>{
+        const f = e.target.files[0];
+        if(!f) return;
+        const r = new FileReader();
+        r.onload=res=>{
+            editor.innerText = res.target.result;
+            autoSave();
+            updateStat();
+        }
+        r.readAsText(f);
+        fileInput.value = '';
+    }
+
+    //复制全部
+    copyAllBtn.onclick = async ()=>{
+        await navigator.clipboard.writeText(editor.innerText);
+        alert("已复制全部文本");
+    }
+
+    //清空
+    clearBtn.onclick = ()=>{
+        if(confirm("确定清空当前笔记？格式也会丢失！")){
+            editor.innerHTML = "";
+            autoSave();
+            updateStat();
+        }
+    }
+
+    //编辑器内文本查找
+    searchInput.oninput = ()=>{
+        const kw = searchInput.value.trim();
+        if(!kw) return;
+        const sel = window.getSelection();
+        const range = document.createRange();
+        const txt = editor.innerText;
+        const idx = txt.indexOf(kw);
+        if(idx!==-1){
+            const walker = document.createTreeWalker(editor,NodeFilter.SHOW_TEXT);
+            let pos = 0;
+            let node;
+            while(node=walker.nextNode()){
+                if(pos+node.length>idx){
+                    range.setStart(node,idx-pos);
+                    range.setEnd(node,idx-pos+kw.length);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                    break;
+                }
+                pos+=node.length;
+            }
+        }
+    }
+
+    //快捷键 Ctrl+S保存
+    document.addEventListener('keydown',e=>{
+        if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='s'){
+            e.preventDefault();
+            autoSave();
+        }
+    })
+
+    //初始化
+    loadTheme();
+    loadFontSize();
+    loadFontFamily();
+    loadTabs();
+    updateStat();
+</script>
+</body>
+</html>
