@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>原神时间表</title>
+    <!-- 引入html2canvas用于DOM转图片 -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -75,9 +77,13 @@
         .person-name span {
             color: #89b4fa;
         }
+        .btn-group{
+            display:flex;
+            gap:12px;
+            justify-content:center;
+            margin-bottom:24px;
+        }
         .btn-desc {
-            display: block;
-            margin: 0 auto 24px;
             padding: 8px 22px;
             background: rgba(60,100,180,0.3);
             border: 1px solid rgba(137,180,250,0.4);
@@ -89,6 +95,10 @@
         }
         .btn-desc:hover {
             background: rgba(60,100,180,0.5);
+        }
+        .btn-desc:disabled{
+            opacity:0.45;
+            cursor:not-allowed;
         }
         .countdown-box {
             text-align: center;
@@ -120,6 +130,11 @@
             border-radius: 8px;
             border-left: 3px solid rgba(137,180,250,0.5);
         }
+        /* 已经过期但还保留2天的条目，换个边框颜色做区分 */
+        .timeline-item.passed {
+            border-left: 3px solid rgba(180,180,180,0.5);
+            opacity:0.75;
+        }
         .timeline-name {
             font-size: 15px;
             color: #eee;
@@ -127,6 +142,11 @@
         .timeline-date {
             font-size: 15px;
             color: #a0b8e0;
+        }
+        .empty-tip{
+            text-align:center;
+            padding:20px;
+            color:#aaa;
         }
         .modal-mask {
             position: fixed;
@@ -192,6 +212,9 @@
             .contributor-row {
                 gap: 40px;
             }
+            .btn-group{
+                flex-wrap:wrap;
+            }
             .countdown-title {
                 font-size: 14px;
             }
@@ -214,7 +237,7 @@
 </head>
 <body>
     <h1 class="main-title">原神时间表</h1>
-    <div class="time-axis-wrap">
+    <div class="time-axis-wrap" id="captureWrap">
         <!-- 贡献者区域：单独头像对应单独名字，上下对齐 -->
         <div class="contributor-block">
             <div class="contributor-label">贡献者</div>
@@ -229,17 +252,16 @@
                 </div>
             </div>
         </div>
-
-        <button class="btn-desc" id="openModalBtn">查看说明</button>
-
+        <div class="btn-group">
+            <button class="btn-desc" id="openModalBtn">查看说明</button>
+            <button class="btn-desc" id="downloadImgBtn">下载时间点图片</button>
+        </div>
         <div class="countdown-box">
             <div class="countdown-title">距离下一版本时间点倒计时</div>
             <div class="countdown-text" id="countdownDom">加载中...</div>
         </div>
-
         <div class="timeline-list" id="timelineList"></div>
     </div>
-
     <!-- 说明弹窗 -->
     <div class="modal-mask" id="descModal">
         <div class="modal-box">
@@ -249,12 +271,12 @@
                 2. 倒计时仅反映到达该天凌晨的剩余时间，而非到达具体的开启时间<br>
                 3. 以上时间为按照以往来做的推算，若有特殊变动，请以变动为准<br>
                 4. 若该角色无v5测试版本，则v4则会在v3的同周的周四进行<br>
-                5. 在此感谢金鱼提供的帮助
+                5. 节点结束后会保留显示2天，之后自动隐藏；在此感谢金鱼提供的帮助<br>
+                6. 支持下载当前页面时间轴为png图片
             </div>
             <button class="modal-close" id="closeModalBtn">关闭</button>
         </div>
     </div>
-
     <script>
         const timeNodeList = [
             {name:"7.0版本前瞻", date:"2026-07-31"},
@@ -326,19 +348,59 @@
             {name:"7.8版本开启", date:"2027-07-14"}
         ];
         const timelineWrap = document.getElementById("timelineList");
+        const TWO_DAY_MS = 2 * 24 * 60 * 60 * 1000; // 2天毫秒数
+        const captureWrap = document.getElementById("captureWrap");
+        const downloadBtn = document.getElementById("downloadImgBtn");
+
         function renderTimeline(){
+            const nowTime = new Date().getTime();
+            // 过滤：节点日期 + 2天 大于当前时间才保留显示
+            const showList = timeNodeList.filter(item=>{
+                const target = new Date(item.date).getTime();
+                const expireHide = target + TWO_DAY_MS;
+                return nowTime < expireHide;
+            });
             let htmlStr = "";
-            timeNodeList.forEach(item=>{
-                htmlStr += `
-                    <div class="timeline-item">
-                        <div class="timeline-name">${item.name}</div>
-                        <div class="timeline-date">${item.date}</div>
-                    </div>
-                `;
-            })
+            if(showList.length === 0){
+                htmlStr = `<div class="empty-tip">暂无后续时间节点</div>`;
+            }else{
+                showList.forEach(item=>{
+                    const target = new Date(item.date).getTime();
+                    const isPassed = nowTime >= target;
+                    const passClass = isPassed ? 'passed' : '';
+                    htmlStr += `
+                        <div class="timeline-item ${passClass}">
+                            <div class="timeline-name">${item.name}</div>
+                            <div class="timeline-date">${item.date}</div>
+                        </div>
+                    `;
+                })
+            }
             timelineWrap.innerHTML = htmlStr;
         }
-        renderTimeline();
+
+        // 下载图片功能
+        downloadBtn.addEventListener('click', async ()=>{
+            downloadBtn.disabled = true;
+            downloadBtn.innerText = "生成中…";
+            try{
+                const canvas = await html2canvas(captureWrap, {
+                    useCORS:true,
+                    backgroundColor:null,
+                    scale:2
+                });
+                const link = document.createElement('a');
+                link.download = "原神时间表.png";
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+            }catch(e){
+                alert("图片生成失败："+e.message);
+            }finally{
+                downloadBtn.disabled = false;
+                downloadBtn.innerText = "下载时间点图片";
+            }
+        });
+
         // 弹窗控制
         const modal = document.getElementById("descModal");
         document.getElementById("openModalBtn").addEventListener("click",()=>{
@@ -350,10 +412,12 @@
         modal.addEventListener("click",(e)=>{
             if(e.target === modal) modal.style.display = "none";
         })
+
         // 倒计时逻辑
         const countdownDom = document.getElementById("countdownDom");
         function getNextTargetTime(){
             const nowTime = new Date().getTime();
+            // 倒计时只取还没到的节点，已经到期的不作为下一个目标
             const futureNodes = timeNodeList.filter(item=>{
                 const target = new Date(item.date).getTime();
                 return target > nowTime;
@@ -362,6 +426,7 @@
             return futureNodes[0];
         }
         function updateCountdown(){
+            renderTimeline(); // 每秒刷新列表，过期2天后自动移除
             const targetNode = getNextTargetTime();
             if(!targetNode){
                 countdownDom.innerText = "所有时间节点已全部过期";
