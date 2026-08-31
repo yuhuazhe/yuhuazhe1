@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>羽化哲</title>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Microsoft YaHei",sans-serif;}
+body{
+    background:#14171c;
+    color:#e9edf2;
+    padding:10px;
+    max-width:1320px;
+    margin:0 auto;
+    background-image: radial-gradient(circle at 10% 20%, #222832 0%, #14171c 70%);
+}
+.version-info{
+    font-size:11px;
+    color:#8892a0;
+    margin-bottom:8px;
+    position:relative;
+    z-index:3;
+}
+/* 平铺重复背景水印，截图可以捕获 */
+#captureWrap{
+    position:relative;
+}
+#captureWrap::before{
+    content:"羽化哲";
+    position:absolute;
+    inset:0;
+    z-index:1;
+    pointer-events:none;
+    user-select:none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='160'%3E%3Ctext x='10' y='80' font-size='28' font-weight='bold' fill='rgba(255,255,255,0.08)' transform='rotate(-18 110 80)'%3E羽化哲%3C/text%3E%3C/svg%3E");
+    background-repeat:repeat;
+    opacity:0.85;
+}
+/* 自定义底图层，截图会捕获 */
+#customBgLayer{
+    position:absolute;
+    inset:0;
+    z-index:0;
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+    opacity:0.35;
+    pointer-events:none;
+}
+/*右下角独立水印*/
+.watermark-corner{
+    position:absolute;
+    right:16px;
+    bottom:16px;
+    font-size:30px;
+    font-weight:bold;
+    color:rgba(255,255,255,0.14);
+    text-shadow:0 0 4px rgba(0,0,0,0.75);
+    pointer-events:none;
+    transform:rotate(-10deg);
+    user-select:none;
+    z-index:2;
+}
+/*头部信息栏*/
+.info-bar{
+    display:grid;
+    grid-template-columns:1fr 1fr 2fr;
+    gap:8px;
+    margin-bottom:10px;
+    position:relative;
+    z-index:3;
+}
+.info-item{
+    background:rgba(42,48,58,0.20);
+    backdrop-filter:blur(16px);
+    -webkit-backdrop-filter:blur(16px);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:6px;
+}
+.info-item label{
+    font-size:12px;
+    display:block;
+    margin-bottom:3px;
+    color:#cccccc;
+}
+.info-item input,.info-item textarea{
+    width:100%;
+    background:rgba(28,32,38,0.30);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+    border:1px solid rgba(255,255,255,0.10);
+    color:#fff;
+    padding:3px 6px;
+    border-radius:3px;
+    font-size:12px;
+}
+.info-item textarea{
+    resize:none;
+    height:44px;
+}
+.info-item input:focus,.info-item textarea:focus{
+    outline:none;
+    border-color:rgba(120,180,255,0.55);
+    box-shadow:0 0 0 2px rgba(100,170,255,0.2);
+}
+.btn-bar{
+    margin-bottom:10px;
+    display:flex;
+    gap:8px;
+    position:relative;
+    z-index:3;
+}
+.download-btn,.clear-memory-btn{
+    padding:6px 14px;
+    font-size:12px;
+    border-radius:4px;
+    border:1px solid rgba(255,255,255,0.12);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    color:#fff;
+    cursor:pointer;
+    transition: all 0.18s ease;
+    box-shadow:0 3px 10px rgba(0,0,0,0.25);
+}
+.download-btn{
+    background:rgba(70,130,210,0.25);
+}
+.clear-memory-btn{
+    background:rgba(190,70,70,0.25);
+}
+.download-btn:hover{
+    background:rgba(85,150,235,0.40);
+    transform:translateY(-1px);
+    box-shadow:0 5px 14px rgba(0,0,0,0.32);
+}
+.clear-memory-btn:hover{
+    background:rgba(210,80,80,0.40);
+    transform:translateY(-1px);
+    box-shadow:0 5px 14px rgba(0,0,0,0.32);
+}
+.download-btn:active,.clear-memory-btn:active{
+    transform:translateY(1px);
+    box-shadow:inset 0 2px 6px rgba(0,0,0,0.35);
+}
+.main-grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap:8px;
+    margin-bottom:10px;
+    position:relative;
+    z-index:3;
+}
+.panel{
+    background:rgba(42,48,58,0.20);
+    backdrop-filter:blur(16px);
+    -webkit-backdrop-filter:blur(16px);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:6px;
+    overflow:hidden;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.panel:hover{
+    box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+    transform: translateY(-1px);
+}
+.panel:active{
+    transform: translateY(0px);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+}
+.panel-header{
+    background:rgba(52,59,70,0.30);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    padding:5px 8px;
+    font-size:13px;
+    font-weight:bold;
+    color:#ffffff;
+    border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.row{
+    display:flex;
+    align-items:center;
+    padding:3px 7px;
+    border-bottom:1px solid rgba(255,255,255,0.04);
+    transition:background 0.15s;
+}
+.row:nth-child(even){
+    background:rgba(50,56,66,0.12);
+}
+.row:hover{
+    background:rgba(80,90,110,0.18);
+}
+.row-label{
+    flex:1;
+    font-size:12px;
+    padding-right:6px;
+}
+.row input{
+    width:74px;
+    background:rgba(28,32,38,0.30);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+    border:1px solid rgba(255,255,255,0.10);
+    color:#fff;
+    padding:2px 4px;
+    border-radius:3px;
+    font-size:12px;
+    transition:border 0.18s ease, box-shadow 0.18s ease;
+}
+.row input:focus{
+    outline:none;
+    border-color:rgba(120,180,255,0.55);
+    box-shadow:0 0 0 2px rgba(100,170,255,0.2);
+}
+.result-wrap{
+    background:rgba(60,40,40,0.22);
+    backdrop-filter:blur(16px);
+    -webkit-backdrop-filter:blur(16px);
+    border:1px solid rgba(255,140,140,0.12);
+    border-radius:6px;
+    padding:8px 10px;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    position:relative;
+    z-index:3;
+}
+.result-wrap:hover{
+    box-shadow:0 6px 18px rgba(0,0,0,0.35);
+    transform: translateY(-1px);
+}
+.result-title{
+    font-size:13px;
+    font-weight:bold;
+    color:#ff9c9c;
+    margin-bottom:6px;
+}
+.result-grid{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap:4px 8px;
+}
+.result-item{
+    display:flex;
+    align-items:center;
+}
+.result-name{
+    font-size:12px;
+    margin-right:6px;
+}
+.result-val{
+    color:#ff7070;
+    font-weight:bold;
+    font-size:13px;
+}
+.tip-text{
+    margin-top:6px;
+    font-size:11px;
+    color:#99a2ad;
+    line-height:1.3;
+    position:relative;
+    z-index:3;
+}
+.sub-header{
+    background:rgba(47,53,61,0.25);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+    padding:4px 7px;
+    font-size:12px;
+    font-weight:bold;
+    border-bottom:1px solid rgba(255,255,255,0.05);
+    margin-top:4px;
+}
+@media(max-width:1100px){
+    .main-grid{
+        grid-template-columns:1fr 1fr;
+        gap:10px;
+    }
+    .info-bar{
+        grid-template-columns:1fr;
+    }
+}
+@media(max-width:650px){
+    .main-grid{
+        grid-template-columns:1fr;
+    }
+    .result-grid{
+        grid-template-columns:1fr 1fr;
+    }
+}
+</style>
+</head>
+<body>
+<div class="version-info">版本：V1.2｜更新时间：2026‑08‑31｜作者：幼儿园大班班长</div>
+<div class="btn-bar">
+    <button class="download-btn" onclick="downloadScreenshot()">下载面板图PNG</button>
+    <button class="clear-memory-btn" onclick="clearAllMemory()">清空数据</button>
+</div>
+<div id="captureWrap">
+    <div id="customBgLayer"></div>
+    <div class="info-bar">
+        <div class="info-item">
+            <label>角色名称</label>
+            <input id="charName" type="text" placeholder="输入角色名">
+        </div>
+        <div class="info-item">
+            <label>队伍名称</label>
+            <input id="teamName" type="text" placeholder="输入队伍名">
+        </div>
+        <div class="info-item">
+            <label>备注</label>
+            <textarea id="noteText" placeholder="填写备注信息"></textarea>
+        </div>
+    </div>
+<div class="main-grid">
+    <div class="panel">
+        <div class="panel-header">一、角色基础属性</div>
+        <div class="row"><span class="row-label">基础攻击力</span><input id="baseAtk" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">基础生命值</span><input id="baseHp" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">基础防御力</span><input id="baseDef" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">突破暴击率</span><input id="breakCritRate" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">突破暴击伤害</span><input id="breakCritDmg" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">突破攻击力%</span><input id="breakAtkPer" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">突破生命值%</span><input id="breakHpPer" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">突破防御力%</span><input id="breakDefPer" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">突破元素精通</span><input id="breakEm" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">突破充能效率</span><input id="breakEr" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">突破属性增伤</span><input id="breakDmg" value="" oninput="calcAll();saveLocal();"></div>
+    </div>
+    <div class="panel">
+        <div class="panel-header">二、武器属性</div>
+        <div class="row"><span class="row-label">武器基础白值攻击</span><input id="weaponBaseAtk" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">武器固定数值攻击</span><input id="weaponMainAtk" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">武器副词条‑暴击率</span><input id="weaponCritRateSub" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">武器副词条‑暴击伤害</span><input id="weaponCritDmgSub" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">武器副词条‑固定攻击</span><input id="weaponAtkSub" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">武器副词条‑生命值</span><input id="weaponHpSub" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">武器副词条‑防御力</span><input id="weaponDefSub" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">武器副词条‑增伤</span><input id="weaponDmgSub" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">武器副词条‑元素精通</span><input id="weaponEmSub" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">武器副词条‑充能效率</span><input id="weaponErSub" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">武器被动‑暴击率</span><input id="weaponCritRatePass" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">武器被动‑暴击伤害</span><input id="weaponCritDmgPass" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">武器被动‑攻击百分比</span><input id="weaponAtkPerPass" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">武器被动‑生命百分比</span><input id="weaponHpPerPass" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">武器被动‑防御百分比</span><input id="weaponDefPerPass" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">武器被动‑伤害加成</span><input id="weaponDmgPass" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">武器被动‑元素精通</span><input id="weaponEmPass" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">武器被动‑充能效率</span><input id="weaponErPass" value="" oninput="calcAll();saveLocal();"></div>
+    </div>
+    <div class="panel">
+        <div class="panel-header">三、圣遗物主属性配置</div>
+        <div class="row"><span class="row-label">暴击率头部(0/1)</span><input id="artMainCritRate" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">爆伤头部(0/1)</span><input id="artMainCritDmg" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">攻击百分比沙漏</span><input id="artMainAtkPer" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">生命百分比沙漏</span><input id="artMainHpPer" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">元素精通</span><input id="artMainEm" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">元素杯子</span><input id="artMainDmg" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">防御百分比</span><input id="artMainDefPer" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">充能效率</span><input id="artMainEr" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">治疗加成</span><input id="artMainHeal" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="sub-header">四、圣遗物副词条数量</div>
+        <div class="row"><span class="row-label">暴击率词条数</span><input id="artSubCritRateCnt" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">暴击伤害词条数</span><input id="artSubCritDmgCnt" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">攻击%词条数</span><input id="artSubAtkPerCnt" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">生命%词条数</span><input id="artSubHpPerCnt" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">元素精通词条</span><input id="artSubEmCnt" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">充能词条数</span><input id="artSubErCnt" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">防御%词条</span><input id="artSubDefPerCnt" value="" oninput="calcAll();saveLocal();"></div>
+    </div>
+    <div class="panel">
+        <div class="panel-header">五、圣遗物套装效果</div>
+        <div class="row"><span class="row-label">套装暴击率加成</span><input id="artSetCritRate" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">套装攻击%加成</span><input id="artSetAtkPer" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">套装生命%加成</span><input id="artSetHpPer" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">套装防御%加成</span><input id="artSetDefPer" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">套装属性增伤</span><input id="artSetDmg" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">套装元素精通</span><input id="artSetEm" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">套装充能效率</span><input id="artSetEr" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">圣遗物精通额外收益</span><input id="artEmBonus" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="sub-header">六、队伍辅助buff</div>
+        <div class="row"><span class="row-label">队伍暴击率加成</span><input id="teamCritRate" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">队伍暴击伤害加成</span><input id="teamCritDmg" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">队伍攻击百分比</span><input id="teamAtkPer" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">队伍生命百分比</span><input id="teamHpPer" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">队伍防御百分比</span><input id="teamDefPer" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">队伍增伤加成</span><input id="teamDmg" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">队伍元素精通</span><input id="teamEm" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">队伍固定攻击力</span><input id="teamAtkFlat" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">队伍固定防御力</span><input id="teamDefFlat" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">队伍固定生命值</span><input id="teamHpFlat" value="" oninput="calcAll();saveLocal();"></div>
+        <div class="row"><span class="row-label">队伍充能效率</span><input id="teamEr" value="" oninput="calcAll();saveLocal();"></div>
+    </div>
+</div>
+<div class="result-wrap">
+    <div class="result-title">最终面板结算结果</div>
+    <div class="result-grid">
+        <div class="result-item"><span class="result-name">基础+武器白值</span><span class="result-val" id="resBaseAtk"></span></div>
+        <div class="result-item"><span class="result-name">总面板攻击力</span><span class="result-val" id="resAtk"></span></div>
+        <div class="result-item"><span class="result-name">总面板生命值</span><span class="result-val" id="resHp"></span></div>
+        <div class="result-item"><span class="result-name">总面板防御力</span><span class="result-val" id="resDef"></span></div>
+        <div class="result-item"><span class="result-name">暴击率</span><span class="result-val" id="resCritRate"></span></div>
+        <div class="result-item"><span class="result-name">暴击伤害</span><span class="result-val" id="resCritDmg"></span></div>
+        <div class="result-item"><span class="result-name">伤害加成总和</span><span class="result-val" id="resDmgTotal"></span></div>
+        <div class="result-item"><span class="result-name">总元素精通</span><span class="result-val" id="resEm"></span></div>
+        <div class="result-item"><span class="result-name">元素充能效率</span><span class="result-val" id="resEr"></span></div>
+    </div>
+</div>
+<div class="tip-text">输入均为小数，例24%填写0.24；若出现误差请反馈，有助于修改</div>
+<div class="watermark-corner">羽化哲</div>
+</div>
+<script>
+// ==========在这里修改底图，填入图片URL，留空则不显示底图==========
+const bgUrl = "1.1.";
+//需要保存的全部输入框id列表
+const saveIdList = [
+    'charName','teamName','noteText',
+    'baseAtk','baseHp','baseDef','breakCritRate','breakCritDmg','breakAtkPer','breakHpPer','breakDefPer','breakEm','breakEr','breakDmg',
+    'weaponBaseAtk','weaponMainAtk','weaponCritRateSub','weaponCritDmgSub','weaponAtkSub','weaponHpSub','weaponDefSub','weaponDmgSub','weaponEmSub','weaponErSub',
+    'weaponCritRatePass','weaponCritDmgPass','weaponAtkPerPass','weaponHpPerPass','weaponDefPerPass','weaponDmgPass','weaponEmPass','weaponErPass',
+    'artMainCritRate','artMainCritDmg','artMainAtkPer','artMainHpPer','artMainEm','artMainDmg','artMainDefPer','artMainEr','artMainHeal',
+    'artSubCritRateCnt','artSubCritDmgCnt','artSubAtkPerCnt','artSubHpPerCnt','artSubEmCnt','artSubErCnt','artSubDefPerCnt',
+    'artSetCritRate','artSetAtkPer','artSetHpPer','artSetDefPer','artSetDmg','artSetEm','artSetEr','artEmBonus',
+    'teamCritRate','teamCritDmg','teamAtkPer','teamHpPer','teamDefPer','teamDmg','teamEm','teamAtkFlat','teamDefFlat','teamHpFlat','teamEr'
+];
+//保存到本地存储
+function saveLocal(){
+    const data = {};
+    saveIdList.forEach(id=>{
+        const el = document.getElementById(id);
+        if(el) data[id] = el.value;
+    })
+    localStorage.setItem("roleCalcData",JSON.stringify(data));
+}
+//读取本地存储恢复表单
+function loadLocal(){
+    const str = localStorage.getItem("roleCalcData");
+    if(!str) return;
+    try{
+        const data = JSON.parse(str);
+        saveIdList.forEach(id=>{
+            const el = document.getElementById(id);
+            if(el && data.hasOwnProperty(id)) el.value = data[id];
+        })
+    }catch(e){console.log("读取记忆失败",e)}
+}
+//清空全部本地记忆
+function clearAllMemory(){
+    if(!confirm("确定要清空全部本地记忆数据吗？此操作不可恢复！")) return;
+    localStorage.removeItem("roleCalcData");
+    saveIdList.forEach(id=>{
+        const el = document.getElementById(id);
+        if(el) el.value = "";
+    })
+    calcAll();
+}
+async function downloadScreenshot(){
+    const targetDom = document.getElementById('captureWrap');
+    const cornerWm = document.querySelector('.watermark-corner');
+    const originColor = cornerWm.style.color;
+    cornerWm.style.color = "rgba(255,255,255,0.28)";
+    try{
+        const canvas = await html2canvas(targetDom,{
+            scale:2,
+            useCORS:true,
+            backgroundColor:'#14171c',
+            logging:false
+        });
+        cornerWm.style.color = originColor;
+        const imgUrl = canvas.toDataURL("image/png");
+        const a = document.createElement('a');
+        a.href = imgUrl;
+        a.download = "角色面板_截图.png";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+    }catch(err){
+        cornerWm.style.color = originColor;
+        alert("截图失败："+err.message);
+    }
+}
+function calcAll() {
+    const baseAtk = Number(document.getElementById('baseAtk').value);
+    const baseHp = Number(document.getElementById('baseHp').value);
+    const baseDef = Number(document.getElementById('baseDef').value);
+    const breakCritRate = Number(document.getElementById('breakCritRate').value);
+    const breakCritDmg = Number(document.getElementById('breakCritDmg').value);
+    const breakAtkPer = Number(document.getElementById('breakAtkPer').value);
+    const breakHpPer = Number(document.getElementById('breakHpPer').value);
+    const breakDefPer = Number(document.getElementById('breakDefPer').value);
+    const breakEm = Number(document.getElementById('breakEm').value);
+    const breakEr = Number(document.getElementById('breakEr').value);
+    const breakDmg = Number(document.getElementById('breakDmg').value);
+    const weaponBaseAtk = Number(document.getElementById('weaponBaseAtk').value);
+    const weaponMainAtk = Number(document.getElementById('weaponMainAtk').value);
+    const weaponCritRateSub = Number(document.getElementById('weaponCritRateSub').value);
+    const weaponCritDmgSub = Number(document.getElementById('weaponCritDmgSub').value);
+    const weaponAtkSub = Number(document.getElementById('weaponAtkSub').value);
+    const weaponHpSub = Number(document.getElementById('weaponHpSub').value);
+    const weaponDefSub = Number(document.getElementById('weaponDefSub').value);
+    const weaponDmgSub = Number(document.getElementById('weaponDmgSub').value);
+    const weaponEmSub = Number(document.getElementById('weaponEmSub').value);
+    const weaponErSub = Number(document.getElementById('weaponErSub').value);
+    const weaponCritRatePass = Number(document.getElementById('weaponCritRatePass').value);
+    const weaponCritDmgPass = Number(document.getElementById('weaponCritDmgPass').value);
+    const weaponAtkPerPass = Number(document.getElementById('weaponAtkPerPass').value);
+    const weaponHpPerPass = Number(document.getElementById('weaponHpPerPass').value);
+    const weaponDefPerPass = Number(document.getElementById('weaponDefPerPass').value);
+    const weaponDmgPass = Number(document.getElementById('weaponDmgPass').value);
+    const weaponEmPass = Number(document.getElementById('weaponEmPass').value);
+    const weaponErPass = Number(document.getElementById('weaponErPass').value);
+    const artMainCritRate = Number(document.getElementById('artMainCritRate').value);
+    const artMainCritDmg = Number(document.getElementById('artMainCritDmg').value);
+    const artMainAtkPer = Number(document.getElementById('artMainAtkPer').value);
+    const artMainHpPer = Number(document.getElementById('artMainHpPer').value);
+    const artMainEm = Number(document.getElementById('artMainEm').value);
+    const artMainDmg = Number(document.getElementById('artMainDmg').value);
+    const artMainDefPer = Number(document.getElementById('artMainDefPer').value);
+    const artMainEr = Number(document.getElementById('artMainEr').value);
+    const artSubCritRateCnt = Number(document.getElementById('artSubCritRateCnt').value);
+    const artSubCritDmgCnt = Number(document.getElementById('artSubCritDmgCnt').value);
+    const artSubAtkPerCnt = Number(document.getElementById('artSubAtkPerCnt').value);
+    const artSubHpPerCnt = Number(document.getElementById('artSubHpPerCnt').value);
+    const artSubEmCnt = Number(document.getElementById('artSubEmCnt').value);
+    const artSubErCnt = Number(document.getElementById('artSubErCnt').value);
+    const artSubDefPerCnt = Number(document.getElementById('artSubDefPerCnt').value);
+    const artSetCritRate = Number(document.getElementById('artSetCritRate').value);
+    const artSetAtkPer = Number(document.getElementById('artSetAtkPer').value);
+    const artSetHpPer = Number(document.getElementById('artSetHpPer').value);
+    const artSetDefPer = Number(document.getElementById('artSetDefPer').value);
+    const artSetDmg = Number(document.getElementById('artSetDmg').value);
+    const artSetEm = Number(document.getElementById('artSetEm').value);
+    const artSetEr = Number(document.getElementById('artSetEr').value);
+    const artEmBonus = Number(document.getElementById('artEmBonus').value);
+    const teamCritRate = Number(document.getElementById('teamCritRate').value);
+    const teamCritDmg = Number(document.getElementById('teamCritDmg').value);
+    const teamAtkPer = Number(document.getElementById('teamAtkPer').value);
+    const teamHpPer = Number(document.getElementById('teamHpPer').value);
+    const teamDefPer = Number(document.getElementById('teamDefPer').value);
+    const teamDmg = Number(document.getElementById('teamDmg').value);
+    const teamEm = Number(document.getElementById('teamEm').value);
+    const teamAtkFlat = Number(document.getElementById('teamAtkFlat').value);
+    const teamDefFlat = Number(document.getElementById('teamDefFlat').value);
+    const teamHpFlat = Number(document.getElementById('teamHpFlat').value);
+    const teamEr = Number(document.getElementById('teamEr').value);
+    const subCritRateSingle = 0.033;
+    const subCritDmgSingle = 0.066;
+    const subAtkPerSingle = 0.05;
+    const subHpPerSingle = 0.05;
+    const subEmSingle = 20;
+    const subErSingle = 0.055;
+    const subDefPerSingle = 0.062;
+    let totalCritRate = breakCritRate + weaponCritRateSub + weaponCritRatePass + artSubCritRateCnt*subCritRateSingle + artMainCritRate*0.311 + artSetCritRate + teamCritRate+0.05;
+    let totalCritDmg = breakCritDmg + weaponCritDmgSub + weaponCritDmgPass + artSubCritDmgCnt*subCritDmgSingle + artMainCritDmg*0.622+ teamCritDmg+0.5;
+    let totalAtkPer = breakAtkPer + weaponAtkPerPass + artSubAtkPerCnt*subAtkPerSingle + artMainAtkPer*0.466 + artSetAtkPer + teamAtkPer;
+    let totalFlatAtk = weaponAtkSub + weaponMainAtk + teamAtkFlat+311;
+    let panelAtk = (baseAtk + weaponBaseAtk)*(1+totalAtkPer)+totalFlatAtk;
+    let totalHpPer = breakHpPer + weaponHpPerPass + artSubHpPerCnt*subHpPerSingle + artMainHpPer*0.466 + artSetHpPer + teamHpPer;
+    let flatHp = weaponHpSub + teamHpFlat+4780;
+    let panelHp = baseHp*(1+totalHpPer)+flatHp;
+    let totalDefPer = breakDefPer + weaponDefPerPass + artSubDefPerCnt*subDefPerSingle + artMainDefPer*0.466 + artSetDefPer + teamDefPer;
+    let flatDef = weaponDefSub + teamDefFlat;
+    let panelDef = baseDef*(1+totalDefPer)+flatDef;
+    let totalEm = breakEm + weaponEmSub + weaponEmPass + artSubEmCnt*subEmSingle + artMainEm*187 + artSetEm + teamEm;
+    
+    let totalErBonus = breakEr + weaponErSub + weaponErPass + artSubErCnt*subErSingle + artMainEr*0.518 + artSetEr + teamEr;
+    let totalEr = 1 + totalErBonus;
+
+    let totalDmgBonus = breakDmg + weaponDmgSub + weaponDmgPass + artMainDmg*0.466 + artSetDmg + teamDmg;
+    document.getElementById('resBaseAtk').innerText = (baseAtk+weaponBaseAtk).toFixed(0);
+    document.getElementById('resAtk').innerText = panelAtk.toFixed(1);
+    document.getElementById('resHp').innerText = panelHp.toFixed(1);
+    document.getElementById('resDef').innerText = panelDef.toFixed(1);
+    document.getElementById('resCritRate').innerText = (totalCritRate*100).toFixed(2)+"%";
+    document.getElementById('resCritDmg').innerText = (totalCritDmg*100).toFixed(2)+"%";
+    document.getElementById('resDmgTotal').innerText = (totalDmgBonus*100).toFixed(2)+"%";
+    document.getElementById('resEm').innerText = totalEm.toFixed(0);
+    document.getElementById('resEr').innerText = (totalEr*100).toFixed(2)+"%";
+}
+
+window.onload = function(){
+    loadLocal();
+    calcAll();
+    //设置底图
+    const bgLayer = document.getElementById("customBgLayer");
+    if(bgUrl){
+        bgLayer.style.backgroundImage = `url(${bgUrl})`;
+    }
+    //文本框也要监听变化保存记忆
+    document.getElementById("charName").addEventListener("input",saveLocal);
+    document.getElementById("teamName").addEventListener("input",saveLocal);
+    document.getElementById("noteText").addEventListener("input",saveLocal);
+}
+</script>
+</body>
+</html>
