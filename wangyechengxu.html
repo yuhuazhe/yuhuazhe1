@@ -17,39 +17,62 @@ body{
     color:#e6e6f2;
 }
 .wrap{
-    max-width:920px;
+    max-width:680px; /* 缩小整体容器宽度，原来920 */
     margin:0 auto;
     display:flex;
     flex-direction:column;
-    gap:32px;
+    gap:18px;
 }
 .version-box{
     background:#151526;
     border:1px solid #323255;
     border-radius:14px;
-    padding:35px 22px;
-    text-align:center;
+    padding:22px 20px; /* 缩小内边距 */
+    text-align:center; /* 强制居中 */
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+}
+.version-box:hover{
+    border-color:#9157c2;
+    box-shadow: 0 0 14px rgba(145, 87, 194, 0.25), 0 4px 12px rgba(0,0,0,0.4);
+    transform: translateY(-2px);
+    background:#18182c;
 }
 .version-box a{
-    font-size:22px;
+    font-size:20px; /* 字号适当缩小 */
     color:#e9ccff;
     text-decoration:none;
     transition:0.2s;
+    display:block;
+    margin-bottom:6px;
 }
 .version-box a:hover{
     color:#ffd8ff;
     text-shadow:0 0 8px #b378dd;
 }
+.version-box p{
+    font-size:14px;
+    color:#b8b8d8;
+    line-height:1.5;
+}
+
 /*手机适配*/
 @media(max-width:600px){
     body{
         padding:20px 10px;
     }
+    .wrap{
+        gap:14px;
+    }
     .version-box{
-        padding:28px 15px;
+        padding:18px 14px;
+        border-radius:12px;
     }
     .version-box a{
-        font-size:19px;
+        font-size:17px;
+    }
+    .version-box p{
+        font-size:13px;
     }
 }
 </style>
@@ -59,17 +82,15 @@ body{
      <div class="version-box">
         <a href="网页自动化计算/p.html">原神BUFF排轴工具</a>
         <p>版本：v1.1---2026.8.4发布</p>
-
     </div>
     <div class="version-box">
         <a href="网页自动化计算/cn.html">原神角色充能计算器</a>
         <p>版本：v2.5---2026.8.25更新，增加记录本，多队伍切换功能</p>
-
     </div>
-
-
-
-
+    <div class="version-box">
+        <a href="网页自动化计算/msjs.html">幽境通关成绩（秒数）计算器</a>
+        <p>作者：茜茜---版本：v1.2---2026.9.9发布</p>
+    </div>
     <div class="version-box">
         <a href="网页自动化计算/mb.html">角色面板计算</a>
         <p>版本：v1.2---2026.8.31更新，优化布局，增加下载功能</p>
@@ -77,26 +98,13 @@ body{
     
     <div class="version-box">
         <a href="网页自动化计算/kangxingxishu.html">抗性/防御系数计算</a>
+        <p>版本：v1.1----2026.6.27发布</p>
     </div>
-
-    <div class="version-box">
-        <a href="网页自动化计算/ctjs.html">圣遗物词条计算器</a>
-    </div>
+    
  <div class="version-box">
         <a href="网页自动化计算/js.html">记事本</a>
          <p>版本：v1.1---2026.8.26发布</p>
     </div>
-
-
-
-
-
-
-
-
-
-
-
 </div>
 </body>
 </html>

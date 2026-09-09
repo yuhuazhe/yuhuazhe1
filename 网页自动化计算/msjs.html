@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>通关成绩（秒数）计算器</title>
+<style>
+  :root {
+    --bg: #0f1420;
+    --card: rgba(26, 34, 51, 0.45);
+    --card-stronger: rgba(35, 46, 69, 0.55);
+    --card-soft: rgba(35, 46, 69, 0.35);
+    --border: rgba(51, 64, 92, 0.45);
+    --border-strong: rgba(51, 64, 92, 0.75);
+    --text: #e8edf5;
+    --muted: #9aa7bd;
+    --accent: #5b9aff;
+    --accent-hover: #3b82f6;
+    --ok: #34d399;
+    --err: #f87171;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    background:
+      radial-gradient(1200px 600px at 50% -10%, rgba(27, 42, 74, 0.9), transparent 60%),
+      radial-gradient(900px 500px at 80% 20%, rgba(59, 130, 246, 0.18), transparent 60%),
+      radial-gradient(900px 500px at 20% 90%, rgba(52, 211, 153, 0.10), transparent 60%),
+      var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
+    padding: 28px 16px 48px;
+  }
+  .card {
+    width: 100%;
+    max-width: 720px;
+    background: var(--card);
+    backdrop-filter: blur(22px) saturate(140%);
+    -webkit-backdrop-filter: blur(22px) saturate(140%);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 32px 30px 34px;
+    box-shadow:
+      0 24px 60px rgba(0, 0, 0, 0.45),
+      0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+      0 1px 0 rgba(255, 255, 255, 0.08) inset;
+  }
+  h1 { margin: 0 0 6px; font-size: 24px; letter-spacing: .5px; }
+  .sub { color: var(--muted); font-size: 14px; margin: 0 0 28px; line-height: 1.6; }
+  .field { margin-bottom: 18px; }
+  label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  input[type="number"] {
+    width: 100%;
+    padding: 12px 14px;
+    background: var(--card-soft);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    font-size: 15px;
+    outline: none;
+    transition: border-color .15s, box-shadow .15s, background .15s;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  input[type="number"]:focus {
+    border-color: var(--accent);
+    background: var(--card-stronger);
+    box-shadow: 0 0 0 3px rgba(91, 154, 255, 0.18);
+  }
+  .row-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  #rows { display: flex; flex-direction: column; gap: 12px; margin: 6px 0 18px; }
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    background: var(--card-soft);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+  .row .pair { display: flex; flex-direction: column; gap: 4px; }
+  .row .pair label { font-size: 12px; margin: 0; }
+  .row input[type="number"] { padding: 10px 12px; font-size: 14px; }
+
+  button {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(91, 154, 255, 0.95), rgba(59, 130, 246, 0.95));
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 2px;
+    transition: background .15s, transform .05s, box-shadow .15s;
+    box-shadow: 0 10px 24px rgba(59, 130, 246, 0.25);
+  }
+  button:hover { background: linear-gradient(135deg, rgba(59, 130, 246, 0.95), rgba(37, 99, 235, 0.95)); }
+  button:active { transform: translateY(1px); }
+
+  .hint {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 8px;
+    line-height: 1.6;
+  }
+  .result {
+    margin-top: 24px;
+    padding: 18px;
+    border-radius: 14px;
+    background: rgba(52, 211, 153, 0.08);
+    border: 1px solid rgba(52, 211, 153, 0.35);
+    color: var(--ok);
+    font-size: 15px;
+    line-height: 1.7;
+    display: none;
+    word-break: break-all;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+  .result .big { font-size: 30px; font-weight: 700; }
+  .result .muted-line { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  .error {
+    margin-top: 20px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: rgba(248, 113, 113, 0.08);
+    border: 1px solid rgba(248, 113, 113, 0.4);
+    color: var(--err);
+    font-size: 14px;
+    display: none;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  /* 底部功能按钮组 */
+  .footer-buttons{
+    margin-top: 32px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+  }
+  .footer-buttons button{
+    letter-spacing: normal;
+    font-weight: 500;
+    font-size: 14px;
+    background: rgba(91, 154, 255, 0.18);
+    border: 1px solid rgba(91, 154, 255, 0.45);
+    color: #e8f1ff;
+    box-shadow: none;
+  }
+  .footer-buttons button:hover{
+    background: rgba(91, 154, 255, 0.32);
+  }
+
+  /* 弹窗模态框 */
+  .modal-overlay{
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    z-index: 999;
+  }
+  .modal-overlay.active{ display: flex; }
+  .modal-box{
+    width: 100%;
+    max-width: 520px;
+    max-height: 80vh;
+    overflow-y: auto;
+    background: rgba(26, 34, 51, 0.72);
+    border: 1px solid var(--border-strong);
+    border-radius: 18px;
+    padding: 24px;
+    color: var(--text);
+    backdrop-filter: blur(22px) saturate(140%);
+    -webkit-backdrop-filter: blur(22px) saturate(140%);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+  }
+  .modal-box h3{
+    margin: 0 0 14px;
+    font-size: 18px;
+  }
+  .modal-box .modal-content{
+    font-size: 14px;
+    line-height: 1.75;
+    color: #d1d9e8;
+  }
+  .modal-close{
+    margin-top: 18px;
+  }
+
+  /* 电脑端稍大 */
+  @media (min-width: 900px) {
+    body { padding: 40px 24px 60px; }
+    .card { padding: 36px 38px 40px; }
+    h1 { font-size: 26px; }
+    .row-grid { gap: 16px; }
+    .field { margin-bottom: 20px; }
+  }
+
+  /* 手机端适配 */
+  @media (max-width: 640px){
+    .card { padding: 24px 20px 28px; }
+    h1 { font-size: 22px; }
+    .row-grid { grid-template-columns: 1fr; gap: 14px; }
+    .row { grid-template-columns: 1fr; }
+    .footer-buttons { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>通关成绩（秒数）计算器</h1>
+    <p class="sub">按「木桩 DPS + 常驻减抗 + 抗性变化 + 有效血量」模拟计算通关秒数</p>
+    <div class="row-grid">
+      <div class="field">
+        <label for="dps_self">10 抗性 110 级千星木桩 DPS（单位:万）</label>
+        <input type="number" id="dps_self" step="any" placeholder="例如 25000">
+      </div>
+      <div class="field">
+        <label for="Dr">配队常驻减抗</label>
+        <input type="number" id="Dr" step="any" placeholder="例如 40">
+      </div>
+    </div>
+    <div class="row-grid">
+      <div class="field">
+        <label for="n">怪物抗性变化次数</label>
+        <input type="number" id="n" step="1" min="1" value="1" placeholder="例如 2">
+      </div>
+      <div class="field">
+        <label for="hp">怪物有效输出血量（单位:万）</label>
+        <input type="number" id="hp" step="any" placeholder="例如 2000000">
+      </div>
+    </div>
+    <div id="rows"></div>
+    <button onclick="compute()">计 算</button>
+    <div id="error" class="error"></div>
+    <div id="result" class="result"></div>
+    <p class="hint">
+      提示：抗性变化次数改变后会自动生成对应行。开局进场的初始抗性算作第 1 次，时间点通常填 0；
+      机制扣除的血量不算有效输出血量。每个时间点之后的抗性会持续到下一个时间点（或通关）为止。
+    </p>
+
+    <div class="footer-buttons">
+      <button onclick="window.open(' https://b23.tv/2EV4JZH','_blank')">贡献者：茜茜</button>
+      <button onclick="window.open('https://www.bilibili.com/video/BV1JiYE6TE1y/?share_source=copy_web&vd_source=6e5cb5b69570b2af23368904f350dd2f','_blank')">教学视频</button>
+      <button onclick="openModal()">说明</button>
+    </div>
+  </div>
+
+  <!-- 弹窗 -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-box">
+      <h3>计算器说明</h3>
+      <div class="modal-content">
+        <p>版本：v1.2----网站部署时间：2026.9.9</p>
+        
+        <p>1.本计算器由“茜茜”独立制作完成！</p>
+        <p>2.班长仅做部分优化，并提供部署及展示协助！</p>
+        <p>3.计算器的最终解释权归“茜茜”所有，若有疑问请联系创作者！</p>
+        <p>4.若网站出现了异常展示或bug，请联系网站创作者！</p>
+        <p>5.所填写内容并不会因二次进入网站/刷新导致填写内容消失！可放心使用！</p>
+        
+        <p>⚠本工具为理论模拟，实际游戏会受技能循环、暴击波动、buff波动、操作等因素影响，结果仅供参考。</p>
+      </div>
+      <button class="modal-close" onclick="closeModal()">关闭</button>
+    </div>
+  </div>
+
+<script>
+// ================= 与原始 C++ 程序一致的公式 =================
+function Dr_cnt(dr) {
+  dr = dr / 100;
+  if (dr > 0.75) return 1 / (dr * 4 + 1);
+  if (dr > 0)    return 1 - dr;
+  return 1 - 0.5 * dr;
+}
+
+// 本地存储key
+const STORAGE_KEY = "msjs_calc_data";
+
+// 保存表单到localStorage
+function saveFormData(){
+  const data = {
+    dps_self: document.getElementById('dps_self').value,
+    Dr: document.getElementById('Dr').value,
+    n: document.getElementById('n').value,
+    hp: document.getElementById('hp').value,
+    rows: []
+  };
+  document.querySelectorAll('#rows .row').forEach(row=>{
+    data.rows.push({
+      t: row.querySelector('.t').value,
+      r: row.querySelector('.r').value
+    })
+  })
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+// 从localStorage恢复表单
+function restoreFormData(){
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if(!raw) return;
+  try{
+    const d = JSON.parse(raw);
+    document.getElementById('dps_self').value = d.dps_self ?? '';
+    document.getElementById('Dr').value = d.Dr ?? '';
+    document.getElementById('n').value = d.n ?? 1;
+    document.getElementById('hp').value = d.hp ?? '';
+    renderRows();
+    const rowEls = document.querySelectorAll('#rows .row');
+    if(d.rows){
+      for(let i=0;i<rowEls.length && i<d.rows.length;i++){
+        rowEls[i].querySelector('.t').value = d.rows[i].t ?? '';
+        rowEls[i].querySelector('.r').value = d.rows[i].r ?? '';
+      }
+    }
+  }catch(e){
+    console.log("恢复数据失败", e);
+  }
+}
+
+// 绑定自动保存事件
+function bindAutoSave(){
+  const inputs = document.querySelectorAll('#dps_self,#Dr,#n,#hp');
+  inputs.forEach(el=>{
+    el.removeEventListener('input', saveFormData);
+    el.addEventListener('input', saveFormData);
+  })
+  document.querySelectorAll('#rows .t, #rows .r').forEach(inp=>{
+    inp.removeEventListener('input', saveFormData);
+    inp.addEventListener('input', saveFormData);
+  })
+}
+
+// ================= 动态生成抗性输入行 =================
+const rowsEl = document.getElementById('rows');
+function renderRows() {
+  const n = Math.max(0, parseInt(document.getElementById('n').value, 10) || 0);
+  const old = [];
+  rowsEl.querySelectorAll('.row').forEach((row) => {
+    old.push({ t: row.querySelector('.t').value, r: row.querySelector('.r').value });
+  });
+  rowsEl.innerHTML = '';
+  for (let i = 0; i < n; i++) {
+    const div = document.createElement('div');
+    div.className = 'row';
+    const firstLabel = (i === 0) ? '初始抗性时间点（秒）' : '第' + (i + 1) + '次抗性变化时间点（秒）';
+    div.innerHTML =
+      '<div class="pair">' +
+        '<label>' + firstLabel + '</label>' +
+        '<input type="number" step="any" class="t" placeholder="时间点" value="' +
+          (old[i] ? old[i].t : '') + '">' +
+      '</div>' +
+      '<div class="pair">' +
+        '<label>对应抗性</label>' +
+        '<input type="number" step="any" class="r" placeholder="抗性" value="' +
+          (old[i] ? old[i].r : '') + '">' +
+      '</div>';
+    rowsEl.appendChild(div);
+  }
+  bindAutoSave();
+}
+document.getElementById('n').addEventListener('input', renderRows);
+renderRows();
+
+// ================= 弹窗控制 =================
+function openModal(){
+  document.getElementById('modalOverlay').classList.add('active');
+}
+function closeModal(){
+  document.getElementById('modalOverlay').classList.remove('active');
+}
+document.getElementById('modalOverlay').addEventListener('click', function(e){
+  if(e.target === this) closeModal();
+})
+
+// ================= 计算 =================
+function showError(msg) {
+  const err = document.getElementById('error');
+  err.textContent = msg;
+  err.style.display = 'block';
+  document.getElementById('result').style.display = 'none';
+}
+function compute() {
+  const errorEl = document.getElementById('error');
+  const resultEl = document.getElementById('result');
+  errorEl.style.display = 'none';
+  resultEl.style.display = 'none';
+  const dps_self = parseFloat(document.getElementById('dps_self').value);
+  const Dr       = parseFloat(document.getElementById('Dr').value);
+  const n        = parseInt(document.getElementById('n').value, 10);
+  const hp       = parseFloat(document.getElementById('hp').value);
+  if (isNaN(dps_self) || dps_self <= 0) return showError('请正确填写「木桩 DPS」（需大于 0）。');
+  if (isNaN(Dr))                        return showError('请正确填写「配队常驻减抗」。');
+  if (isNaN(n) || n < 1)                return showError('「抗性变化次数」必须是不小于 1 的整数。');
+  if (isNaN(hp) || hp <= 0)             return showError('请正确填写「怪物有效输出血量」（需大于 0）。');
+  const times = [];
+  const resist = [];
+  const rowEls = rowsEl.querySelectorAll('.row');
+  for (let i = 0; i < n; i++) {
+    const t = parseFloat(rowEls[i].querySelector('.t').value);
+    const r = parseFloat(rowEls[i].querySelector('.r').value);
+    if (isNaN(t) || isNaN(r)) return showError('第 ' + (i + 1) + ' 次抗性变化的时间点或抗性未填写完整。');
+    times.push(t);
+    resist.push(r);
+    if (i > 0 && times[i] < times[i - 1]) return showError('抗性变化时间点必须按从小到大填写。');
+  }
+  const Dr_self = Dr_cnt(10 - Dr);
+  if (!(Dr_self > 0)) return showError('减抗导致木桩有效系数为 0，无法计算。');
+  let hp_remain = hp;
+  let ans = 0;
+  let j = 0;
+  while (hp_remain > 0 && j < n) {
+    const Dr_rate_now = Dr_cnt(resist[j] - Dr);
+    const dps_now = dps_self / Dr_self * Dr_rate_now;
+    if (!(dps_now > 0)) return showError('第 ' + (j + 1) + ' 段的有效伤害为 0，无法计算。');
+    if (j === n - 1) {
+      ans += hp_remain / dps_now;
+      hp_remain = 0;
+    } else {
+      const seg_dur = times[j + 1] - times[j];
+      if (seg_dur < 0) return showError('抗性变化时间点必须按从小到大填写。');
+      const seg_dmg = dps_now * seg_dur;
+      if (hp_remain <= seg_dmg) {
+        ans += hp_remain / dps_now;
+        hp_remain = 0;
+      } else {
+        ans += seg_dur;
+        hp_remain -= seg_dmg;
+        j++;
+      }
+    }
+  }
+  if (hp_remain > 0) return showError('伤害不足以在有限时间内打完该怪物。');
+  const secs = ans;
+  const h = Math.floor(secs / 3600);
+  const m = Math.floor((secs % 3600) / 60);
+  const s = secs % 60;
+  let readable = '';
+  if (h > 0) readable += h + ' 小时 ';
+  if (m > 0 || h > 0) readable += m + ' 分 ';
+  readable += s.toFixed(2) + ' 秒';
+  resultEl.innerHTML =
+    '通关成绩模拟计算为 <span class="big">' + secs.toFixed(2) + '</span> 秒' +
+    '<div class="muted-line">即 ' + readable + '</div>';
+  resultEl.style.display = 'block';
+}
+
+// 页面初始化
+window.addEventListener('DOMContentLoaded', () => {
+  restoreFormData();
+  bindAutoSave();
+})
+</script>
+</body>
+</html>
