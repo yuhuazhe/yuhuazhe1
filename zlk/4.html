@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>原神千星奇遇模拟速查</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", sans-serif;
+        }
+        body {
+            /* ========== 底图区域，在这里替换背景图 ========== */
+            background: url("3.png") center / cover no-repeat fixed;
+            min-height: 100vh;
+            padding: 20px 10px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        /* 标题区域固定不动 */
+        .header-block {
+            margin-bottom: 16px;
+        }
+        h1 {
+            text-align: center;
+            color: #fff;
+            text-shadow: 0 0 8px #0008;
+            font-size: clamp(1.5rem, 4vw, 2.4rem);
+        }
+        /* 表头：搜索序号｜怪物名称｜奇域名称｜说明(奇域UID) */
+        .header-row {
+            display: grid;
+            grid-template-columns: 80px 1fr 1fr 180px;
+            gap: 10px;
+            padding: 10px 14px;
+            backdrop-filter: blur(12px);
+            background-color: rgba(0,0,0,0.25);
+            border-radius: 10px;
+            color: #fff;
+            margin-top: 8px;
+        }
+        .header-row > div {
+            text-align: center;
+            font-weight: bold;
+        }
+        /* 条目滚动容器 */
+        .scroll-wrap {
+            max-height: 65vh;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        /* 滚动条美化 */
+        .scroll-wrap::-webkit-scrollbar {
+            width: 6px;
+        }
+        .scroll-wrap::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 3px;
+        }
+        /* 每一条条形框，和表头网格对齐 */
+        .item-bar {
+            display: grid;
+            grid-template-columns: 80px 1fr 1fr 180px;
+            gap: 10px;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+            backdrop-filter: blur(12px);
+            background-color: rgba(255,255,255,0.15);
+            border-radius: 10px;
+            color: #fff;
+            transition: background 0.2s;
+        }
+        .item-bar:hover {
+            background-color: rgba(255,255,255,0.22);
+        }
+        .item-bar > div {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        /* ========== 手机端适配 ========== */
+        @media (max-width:768px){
+            body {
+                padding:10px 5px;
+            }
+            .header-row, .item-bar {
+                grid-template-columns: 60px 0.9fr 0.9fr 140px;
+                gap:6px;
+                padding: 9px 8px;
+                font-size:0.9rem;
+            }
+            .scroll-wrap {
+                max-height: 60vh;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- 标题区域固定，不会跟着滚动 -->
+    <div class="header-block">
+        <h1>原神千星奇遇模拟速查</h1>
+        <div class="header-row">
+            <div>搜索序号</div>
+            <div>怪物名称</div>
+            <div>奇域名称</div>
+            <div>奇域UID</div>
+        </div>
+    </div>
+
+    <!-- 条目区域，可上下滑动 -->
+    <div class="scroll-wrap">
+        <div class="item-bar">
+            <div>1</div>
+            <div>感电鸭</div>
+            <div></div>
+            <div></div>
+        </div>
+        <div class="item-bar">
+            <div>2</div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <div class="item-bar">
+            <div>3</div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <div class="item-bar">
+            <div>4</div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <div class="item-bar">
+            <div>5</div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <div class="item-bar">
+            <div>6</div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <div class="item-bar">
+            <div>7</div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <div class="item-bar">
+            <div>8</div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <div class="item-bar">
+            <div>9</div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+
+
+        
+    </div>
+</div>
+</body>
+</html>
