@@ -1,0 +1,2070 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>原神 BUFF 排轴工具</title>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;font-family:"Microsoft YaHei",system-ui,sans-serif}
+  :root{
+    --bg:#121419; --panel:#181b22; --panel2:#1e232c; --panel3:#232a34;
+    --line:#2c3038; --line2:#3a424e;
+    --text:#e6e8ec; --muted:#8b93a1;
+    --accent:#4e6ca3; --accent2:#6b8cc9; --danger:#7c3c3c;
+    --side:130px; --row:54px; --head:38px;
+  }
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--text);overflow:hidden;font-size:13px}
+
+  .app{height:100vh;display:flex;flex-direction:column;padding:10px;gap:10px}
+
+  /* ============ 工具栏 ============ */
+  .toolbar{
+    display:flex;flex-wrap:wrap;align-items:center;gap:6px;
+    background:var(--panel);border:1px solid var(--line);
+    border-radius:8px;padding:8px 10px;flex:0 0 auto;
+  }
+  .grp{display:flex;align-items:center;gap:6px}
+  .sep{width:1px;height:22px;background:var(--line2);margin:0 3px}
+  .toolbar label{font-size:12px;color:var(--muted);white-space:nowrap}
+
+  button{
+    background:var(--accent);color:#fff;border:none;padding:6px 10px;
+    border-radius:5px;cursor:pointer;font-size:13px;transition:.15s;
+    white-space:nowrap;line-height:1.2;
+  }
+  button:hover{background:var(--accent2)}
+  button:disabled{opacity:.4;cursor:default}
+  button:disabled:hover{background:var(--accent)}
+  button.ghost{background:#252b35;color:#cfd5df}
+  button.ghost:hover{background:#313a47}
+  button.danger{background:var(--danger)}
+  button.danger:hover{background:#964848}
+  button.icon{width:30px;padding:6px 0;text-align:center;font-size:14px}
+
+  input,select{
+    background:var(--panel2);border:1px solid var(--line2);color:var(--text);
+    padding:5px 8px;border-radius:5px;font-size:13px;outline:none;
+  }
+  input:focus,select:focus{border-color:var(--accent2)}
+  input[type=color]{padding:2px;width:36px;height:29px;cursor:pointer;background:var(--panel2)}
+  input[type=checkbox]{width:14px;height:14px;accent-color:var(--accent)}
+  .w60{width:62px}.w80{width:80px}.w110{width:112px}
+  .readout{
+    font-size:12px;color:#ffd166;background:#262b33;border-radius:5px;
+    padding:5px 9px;min-width:62px;text-align:center;font-variant-numeric:tabular-nums;
+  }
+
+  /* ============ 工作区 ============ */
+  .workspace{flex:1;display:flex;gap:10px;min-height:0}
+
+  .board{
+    flex:1;min-width:0;overflow:auto;position:relative;
+    background:var(--panel);border:1px solid var(--line);border-radius:8px;
+  }
+  .board::-webkit-scrollbar{width:10px;height:10px}
+  .board::-webkit-scrollbar-thumb{background:#333a45;border-radius:5px}
+  .board::-webkit-scrollbar-thumb:hover{background:#414a58}
+  .board::-webkit-scrollbar-track{background:#15181e}
+  .board::-webkit-scrollbar-corner{background:#15181e}
+
+  .board-inner{position:relative}
+
+  .row{display:flex}
+  .cell{position:relative;flex:0 0 auto}
+
+  .row.header{position:sticky;top:0;z-index:20;background:var(--panel)}
+  .corner{
+    position:sticky;left:0;z-index:30;background:var(--panel);
+    border-right:1px solid var(--line);border-bottom:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;
+    font-size:11px;color:var(--muted);letter-spacing:1px;
+  }
+  .axis-cell{border-bottom:1px solid var(--line);height:100%}
+
+  .role-cell{
+    position:sticky;left:0;z-index:10;background:var(--panel);
+    border-right:1px solid var(--line);border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:4px;padding:0 8px;
+  }
+  .role-name{
+    flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    cursor:text;border-bottom:1px dashed transparent;
+  }
+  .role-name:hover{border-bottom-color:#4a5364}
+  .role-del{
+    flex:0 0 auto;width:18px;height:18px;line-height:16px;padding:0;font-size:14px;
+    border-radius:3px;background:transparent;color:var(--muted);
+    opacity:0;transition:.15s;
+  }
+  .role-cell:hover .role-del{opacity:1}
+  .role-del:hover{background:var(--danger);color:#fff}
+  .rename-input{width:100%;font-size:13px;padding:3px 5px}
+
+  .track{
+    border-bottom:1px solid var(--line);
+    background-image:
+      repeating-linear-gradient(to right, rgba(255,255,255,.05) 0 1px, transparent 1px var(--minor)),
+      repeating-linear-gradient(to right, rgba(255,255,255,.13) 0 1px, transparent 1px var(--major));
+  }
+
+  /* ============ 刻度 ============ */
+  .tick{position:absolute;bottom:0;width:1px;background:#4a505a;pointer-events:none}
+  .tick.major{height:11px;background:#8a919c}
+  .tick.minor{height:5px}
+  .tick-label{
+    position:absolute;bottom:13px;transform:translateX(-50%);
+    font-size:11px;color:#98a0ad;white-space:nowrap;pointer-events:none;
+    font-variant-numeric:tabular-nums;
+  }
+
+  /* ============ 游标 ============ */
+  .cursor-line{
+    position:absolute;top:0;bottom:0;width:2px;background:rgba(255,107,107,.85);
+    pointer-events:none;z-index:6;display:none;
+  }
+  .cursor-tag{
+    position:absolute;top:calc(var(--head) + 3px);left:0;transform:translateX(-50%);
+    background:#ff6b6b;color:#1a1a1a;font-size:10px;font-weight:700;
+    padding:1px 5px;border-radius:3px;white-space:nowrap;
+    font-variant-numeric:tabular-nums;
+  }
+
+  /* ============ 框选 ============ */
+  .marquee{
+    position:absolute;border:1px solid #ffd166;background:rgba(255,209,102,.10);
+    pointer-events:none;z-index:9;display:none;
+  }
+
+  /* ============ BUFF 块 ============ */
+  .buff-block{
+    position:absolute;height:44px;border-radius:5px;
+    display:flex;align-items:center;gap:6px;padding:0 9px;
+    font-size:12px;color:#fff;white-space:nowrap;overflow:hidden;
+    box-shadow:0 2px 6px rgba(0,0,0,.45);
+    border:1px solid rgba(255,255,255,.18);
+    cursor:grab;user-select:none;touch-action:none;z-index:5;
+    text-shadow:0 1px 2px rgba(0,0,0,.55);
+  }
+  .buff-block:active{cursor:grabbing}
+  .buff-block.selected{outline:2px solid #ffd166;z-index:8}
+  .buff-block.locked{cursor:not-allowed;opacity:.85}
+  .buff-block.locked::after{
+    content:'';position:absolute;inset:0;border-radius:5px;
+    background:repeating-linear-gradient(45deg,transparent 0 6px,rgba(0,0,0,.14) 6px 12px);
+    pointer-events:none;
+  }
+  .buff-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
+  .buff-meta{display:none;opacity:.75;font-size:10px;pointer-events:none;font-variant-numeric:tabular-nums}
+  .buff-block.wide .buff-meta{display:inline}
+  .buff-ico{font-size:10px;opacity:.85;pointer-events:none}
+
+  .handle{position:absolute;top:0;height:100%;width:7px;cursor:ew-resize;z-index:2}
+  .handle.hl{left:0}
+  .handle.hr{right:0}
+  .handle:hover{background:rgba(255,255,255,.3)}
+
+  .del-btn{
+    position:absolute;top:2px;right:2px;width:16px;height:16px;padding:0;
+    font-size:12px;line-height:14px;border-radius:3px;
+    background:rgba(0,0,0,.5);color:#ffb3b3;opacity:0;transition:.15s;z-index:3;
+  }
+  .buff-block:hover .del-btn{opacity:1}
+  .del-btn:hover{background:#a33;color:#fff}
+
+  /* ============ 属性面板 ============ */
+  .inspector{
+    width:232px;flex:0 0 232px;display:flex;flex-direction:column;gap:10px;
+    background:var(--panel);border:1px solid var(--line);border-radius:8px;
+    padding:12px;overflow:auto;
+  }
+  .inspector::-webkit-scrollbar{width:8px}
+  .inspector::-webkit-scrollbar-thumb{background:#333a45;border-radius:4px}
+  .inspector h3{
+    font-size:11px;color:var(--muted);font-weight:500;
+    letter-spacing:2px;flex:0 0 auto;
+  }
+  .insp-body{flex:1;display:flex;flex-direction:column;gap:9px;min-height:0}
+  .field{display:flex;flex-direction:column;gap:3px}
+  .field>label{font-size:12px;color:var(--muted)}
+  .field input,.field select{width:100%}
+  .row2{display:flex;gap:6px}
+  .row2 .field{flex:1}
+  .check{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);cursor:pointer;user-select:none}
+  .insp-empty{color:#666d7a;font-size:12px;line-height:1.9;text-align:center;margin-top:18px}
+  .insp-empty b{color:#8b93a1}
+  .btn-row{display:flex;gap:6px}
+  .btn-row button{flex:1;padding:6px 4px;font-size:12px}
+  .hint{font-size:11px;color:#5f6673;line-height:1.7;margin-top:auto;padding-top:8px;border-top:1px solid var(--line)}
+  .hint kbd{
+    background:#252b35;border:1px solid #3a424e;border-radius:3px;
+    padding:0 4px;font-size:10px;font-family:inherit;color:#aab2bf;
+  }
+
+  /* ============ 悬浮提示 / 右键菜单 / Toast ============ */
+  #dragTip{
+    position:fixed;z-index:9999;display:none;pointer-events:none;
+    transform:translateX(-50%);white-space:nowrap;
+    background:#ffd166;color:#1a1a1a;font-size:11px;font-weight:700;
+    padding:3px 8px;border-radius:4px;box-shadow:0 2px 8px #0008;
+    font-variant-numeric:tabular-nums;
+  }
+  .ctx-menu{
+    position:fixed;z-index:9998;background:var(--panel3);
+    border:1px solid var(--line2);border-radius:6px;padding:4px;
+    min-width:158px;box-shadow:0 8px 24px #000b;display:none;
+  }
+  .ctx-menu button{
+    display:block;width:100%;text-align:left;background:transparent;
+    padding:6px 10px;border-radius:4px;color:#dfe3ea;font-size:12.5px;
+  }
+  .ctx-menu button:hover{background:#334052}
+  .ctx-menu button.danger{color:#ff9b9b}
+  .ctx-menu button.danger:hover{background:#4a2a2a}
+  .ctx-sep{height:1px;background:var(--line2);margin:4px 6px}
+  .ctx-title{
+    font-size:11px;color:var(--muted);padding:5px 10px 4px;
+    border-bottom:1px solid var(--line2);margin-bottom:4px;
+  }
+  #toast{
+    position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(10px);
+    background:#2b3440;border:1px solid #3d4857;color:#e6e8ec;
+    padding:7px 16px;border-radius:6px;font-size:12.5px;
+    opacity:0;pointer-events:none;transition:.22s;z-index:9999;
+    box-shadow:0 6px 18px #0008;
+  }
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  /* ============ 导出模式 ============ */
+  .board.exporting{overflow:visible}
+  .board.exporting .row.header{position:static}
+  .board.exporting .corner,
+  .board.exporting .role-cell{position:static}
+  .board.exporting .cursor-line,
+  .board.exporting .marquee{display:none !important}
+
+  @media (max-width:920px){ .inspector{display:none} }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- ================= 工具栏 ================= -->
+  <div class="toolbar">
+    <div class="grp">
+      <button id="addRole">＋角色</button>
+      <select id="roleSelect" title="新 BUFF 归属角色"></select>
+    </div>
+
+    <div class="sep"></div>
+
+    <div class="grp">
+      <input id="buffName" type="text" placeholder="BUFF名称" class="w110">
+      <input id="startTime" type="number" step="0.1" value="0" class="w60" title="起始时间(s)">
+      <input id="duration" type="number" step="0.1" value="8" class="w60" title="持续时长(s)">
+      <input id="buffColor" type="color" value="#864343" title="颜色">
+      <button id="addBuff">＋BUFF</button>
+    </div>
+
+    <div class="sep"></div>
+
+    <div class="grp">
+      <button id="undoBtn" class="ghost icon" title="撤销 (Ctrl+Z)">↶</button>
+      <button id="redoBtn" class="ghost icon" title="重做 (Ctrl+Y)">↷</button>
+      <button id="copyBtn"  class="ghost" title="复制选中 (Ctrl+C)">复制</button>
+      <button id="pasteBtn" class="ghost" title="粘贴到游标 (Ctrl+V)">粘贴</button>
+    </div>
+
+    <div class="sep"></div>
+
+    <div class="grp">
+      <button id="playBtn" class="ghost icon" title="播放 / 暂停 (空格)">▶</button>
+      <select id="speedSel" title="播放速度">
+        <option value="0.25">0.25×</option>
+        <option value="0.5">0.5×</option>
+        <option value="1" selected>1×</option>
+        <option value="2">2×</option>
+        <option value="4">4×</option>
+      </select>
+      <span class="readout" id="cursorReadout">0.0s</span>
+    </div>
+
+    <div class="sep"></div>
+
+    <div class="grp">
+      <label>吸附</label>
+      <select id="snapSel" title="拖拽吸附精度">
+        <option value="0.1">0.1s</option>
+        <option value="0.5" selected>0.5s</option>
+        <option value="1">1s</option>
+        <option value="0">关闭</option>
+      </select>
+      <label>总长</label>
+      <input id="maxTime" type="number" min="5" max="120" step="1" value="30" class="w60" title="时间轴总时长(s)">
+      <button id="zoomOut" class="ghost icon">－</button>
+      <span class="readout" id="zoomLabel">40px/s</span>
+      <button id="zoomIn" class="ghost icon">＋</button>
+    </div>
+
+    <div class="sep"></div>
+
+    <div class="grp">
+      <button id="exportImg">PNG</button>
+      <button id="exportExcel">Excel</button>
+      <button id="exportJson" class="ghost">导出JSON</button>
+      <button id="importJson" class="ghost">导入</button>
+      <button id="clearAll" class="danger">清空</button>
+    </div>
+  </div>
+
+  <!-- ================= 工作区 ================= -->
+  <div class="workspace">
+    <div class="board" id="board">
+      <div class="board-inner" id="boardInner"></div>
+    </div>
+    <aside class="inspector">
+      <h3>属性 / 批量编辑</h3>
+      <div class="insp-body" id="inspBody"></div>
+    </aside>
+  </div>
+</div>
+
+<div id="dragTip"></div>
+<div id="toast"></div>
+<div class="ctx-menu" id="ctxMenu"></div>
+<input type="file" id="fileInput" accept=".json,application/json" hidden>
+
+<script>
+(function () {
+  'use strict';
+
+  /* =====================================================
+   *  常量
+   * ===================================================*/
+  const STORAGE_KEY  = 'genshin-buff-timeline-v2';
+  const SIDEBAR_W    = 130;
+  const HEADER_H     = 38;
+  const ROW_H        = 54;
+  const BLOCK_H      = 44;
+  const BLOCK_TOP    = 5;
+  const MIN_SCALE    = 12;
+  const MAX_SCALE    = 120;
+  const HISTORY_MAX  = 60;
+  const PALETTE      = ['#864343','#3f6b8a','#4a7a5c','#8a6d3b','#6b4a8a','#8a3f6b','#3b7a8a','#7a8a3b'];
+
+  /* =====================================================
+   *  DOM
+   * ===================================================*/
+  const board       = document.getElementById('board');
+  const boardInner  = document.getElementById('boardInner');
+  const inspBody    = document.getElementById('inspBody');
+  const roleSelect  = document.getElementById('roleSelect');
+  const dragTip     = document.getElementById('dragTip');
+  const ctxMenu     = document.getElementById('ctxMenu');
+  const toastEl     = document.getElementById('toast');
+  const fileInput   = document.getElementById('fileInput');
+  const playBtn     = document.getElementById('playBtn');
+  const undoBtn     = document.getElementById('undoBtn');
+  const redoBtn     = document.getElementById('redoBtn');
+
+  /* =====================================================
+   *  状态
+   * ===================================================*/
+  let roleList    = [];
+  let buffList    = [];
+  let selectedIds = new Set();
+  let PX_PER_SEC  = 40;
+  let MAX_TIME    = 30;
+  let snapStep    = 0.5;
+  let cursorT     = 0;
+
+  let playing   = false;
+  let playSpeed = 1;
+  let lastTs    = 0;
+
+  let history      = [];
+  let historyIndex = -1;
+  let histTimer    = null;
+  let clipboard    = [];
+
+  let idCounter = 0;
+  const nextId = () => 'b' + (++idCounter) + '_' + Date.now().toString(36);
+
+  /* =====================================================
+   *  工具函数
+   * ===================================================*/
+  const round01 = n => Math.round((n + Number.EPSILON) * 10) / 10;
+  const clamp   = (v, a, b) => Math.min(Math.max(v, a), b);
+  const fmt     = t => String(round01(t));
+  const $ = id => document.getElementById(id);
+
+  function snapVal(v) {
+    return snapStep ? round01(Math.round(v / snapStep) * snapStep) : round01(v);
+  }
+
+  function isEditing() {
+    const el = document.activeElement;
+    if (!el) return false;
+    const tag = el.tagName.toUpperCase();
+    return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' ||
+           el.isContentEditable;
+  }
+
+  let toastTimer = null;
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove('show'), 1500);
+  }
+
+  function gridIntervals(px) {
+    const list = [0.1, 0.2, 0.5, 1, 2, 5, 10, 15, 30, 60];
+    let major = 60;
+    for (const c of list) { if (c * px >= 44) { major = c; break; } }
+    let minor = major / 5;
+    if (minor * px < 13) minor = major / 2;
+    if (minor * px < 13) minor = major;
+    return { major, minor };
+  }
+
+  /* =====================================================
+   *  数据：序列化 / 存取
+   * ===================================================*/
+  function normalizeBuff(b) {
+    return {
+      id: b.id && String(b.id) || nextId(),
+      name: String(b.name == null ? 'BUFF' : b.name),
+      start: round01(Number(b.start) || 0),
+      duration: Math.max(0.1, round01(Number(b.duration) || 1)),
+      color: /^#[0-9a-fA-F]{6}$/.test(b.color) ? b.color : '#864343',
+      roleIndex: Number(b.roleIndex) || 0,
+      locked: !!b.locked
+    };
+  }
+
+  function defaultData() {
+    roleList = [{ name: '角色1' }, { name: '角色2' }, { name: '角色3' }];
+    buffList = [];
+    selectedIds.clear();
+    cursorT = 0;
+  }
+
+  function snapshot() {
+    return JSON.stringify({ roleList, buffList, MAX_TIME });
+  }
+
+  function saveLocal() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        roleList, buffList, MAX_TIME, PX_PER_SEC, snapStep
+      }));
+    } catch (e) { /* 忽略 */ }
+  }
+
+  function loadLocal() {
+    let ok = false;
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const d = JSON.parse(raw);
+        if (Array.isArray(d.roleList) && d.roleList.length) {
+          roleList = d.roleList.map(r => ({ name: String((r && r.name) || '角色') }));
+          buffList = (d.buffList || []).map(normalizeBuff);
+          if (d.MAX_TIME)   MAX_TIME   = clamp(Math.round(d.MAX_TIME), 5, 120);
+          if (d.PX_PER_SEC) PX_PER_SEC = clamp(Math.round(d.PX_PER_SEC), MIN_SCALE, MAX_SCALE);
+          if (d.snapStep !== undefined) snapStep = Number(d.snapStep) || 0;
+          ok = true;
+        }
+      }
+    } catch (e) { ok = false; }
+    if (!ok) defaultData();
+    sanitizeAll();
+  }
+
+  function sanitizeAll() {
+    if (!roleList.length) roleList = [{ name: '角色1' }];
+    buffList.forEach(b => {
+      b.roleIndex = clamp(b.roleIndex, 0, roleList.length - 1);
+      b.start     = clamp(b.start, 0, Math.max(0, MAX_TIME - 0.1));
+      b.duration  = clamp(b.duration, 0.1, MAX_TIME - b.start);
+    });
+  }
+
+  /* =====================================================
+   *  历史记录
+   * ===================================================*/
+  function pushHistory() {
+    const snap = snapshot();
+    if (historyIndex >= 0 && history[historyIndex] === snap) return;
+    history = history.slice(0, historyIndex + 1);
+    history.push(snap);
+    if (history.length > HISTORY_MAX) history.shift();
+    historyIndex = history.length - 1;
+    updateHistoryButtons();
+  }
+
+  function pushHistoryDebounced() {
+    clearTimeout(histTimer);
+    histTimer = setTimeout(pushHistory, 400);
+  }
+
+  function applyHistory(snap) {
+    try {
+      const d = JSON.parse(snap);
+      roleList = (d.roleList || []).map(r => ({ name: String((r && r.name) || '角色') }));
+      buffList = (d.buffList || []).map(normalizeBuff);
+      MAX_TIME = d.MAX_TIME || MAX_TIME;
+      selectedIds.clear();
+      $('maxTime').value = MAX_TIME;
+      cursorT = clamp(cursorT, 0, MAX_TIME);
+      saveLocal();
+      buildBoard();
+      renderInspector();
+    } catch (e) { /* 忽略 */ }
+  }
+
+  function undo() {
+    if (historyIndex <= 0) { toast('没有可撤销的操作'); return; }
+    historyIndex--;
+    applyHistory(history[historyIndex]);
+    updateHistoryButtons();
+  }
+
+  function redo() {
+    if (historyIndex >= history.length - 1) { toast('没有可重做的操作'); return; }
+    historyIndex++;
+    applyHistory(history[historyIndex]);
+    updateHistoryButtons();
+  }
+
+  function updateHistoryButtons() {
+    undoBtn.disabled = historyIndex <= 0;
+    redoBtn.disabled = historyIndex >= history.length - 1;
+  }
+
+  /* 统一提交：保存 + 全量刷新 + 记录历史 */
+  function commit() {
+    saveLocal();
+    buildBoard();
+    renderInspector();
+    pushHistory();
+  }
+
+  /* 轻量提交：不重建 DOM（拖拽结束等场景） */
+  function commitLight() {
+    saveLocal();
+    renderInspector();
+    pushHistory();
+  }
+
+  /* =====================================================
+   *  时间轴渲染
+   * ===================================================*/
+  function buildBoard() {
+    const tlW = MAX_TIME * PX_PER_SEC;
+    boardInner.style.width = (SIDEBAR_W + tlW) + 'px';
+    boardInner.innerHTML = '';
+
+    /* ---- 表头 ---- */
+    const header = document.createElement('div');
+    header.className = 'row header';
+    header.style.height = HEADER_H + 'px';
+
+    const corner = document.createElement('div');
+    corner.className = 'cell corner';
+    corner.style.width = SIDEBAR_W + 'px';
+    corner.textContent = '角色 / 时间';
+
+    const axisCell = document.createElement('div');
+    axisCell.className = 'cell axis-cell';
+    axisCell.style.width = tlW + 'px';
+
+    header.append(corner, axisCell);
+    boardInner.appendChild(header);
+    buildAxis(axisCell);
+
+    /* ---- 角色轨道 ---- */
+    roleList.forEach((role, idx) => {
+      const row = document.createElement('div');
+      row.className = 'row';
+      row.style.height = ROW_H + 'px';
+
+      const nameCell = document.createElement('div');
+      nameCell.className = 'cell role-cell';
+      nameCell.style.width = SIDEBAR_W + 'px';
+
+      const nameSpan = document.createElement('span');
+      nameSpan.className = 'role-name';
+      nameSpan.textContent = role.name;
+      nameSpan.title = '双击重命名';
+      nameSpan.addEventListener('dblclick', () => startRename(nameCell, idx));
+
+      const delBtn = document.createElement('button');
+      delBtn.className = 'role-del';
+      delBtn.textContent = '×';
+      delBtn.title = '删除角色';
+      delBtn.addEventListener('click', e => { e.stopPropagation(); deleteRole(idx); });
+
+      nameCell.append(nameSpan, delBtn);
+
+      const track = document.createElement('div');
+      track.className = 'cell track';
+      track.style.width = tlW + 'px';
+      track.dataset.role = idx;
+      applyGrid(track);
+
+      row.append(nameCell, track);
+      boardInner.appendChild(row);
+    });
+
+    /* ---- 覆盖层 ---- */
+    const marquee = document.createElement('div');
+    marquee.className = 'marquee';
+    marquee.id = 'marquee';
+    boardInner.appendChild(marquee);
+
+    const cursor = document.createElement('div');
+    cursor.className = 'cursor-line';
+    cursor.id = 'cursorLine';
+    const tag = document.createElement('span');
+    tag.className = 'cursor-tag';
+    cursor.appendChild(tag);
+    boardInner.appendChild(cursor);
+
+    renderBuffs();
+    updateCursorLine();
+    renderRoleSelect();
+  }
+
+  function applyGrid(el) {
+    const { major, minor } = gridIntervals(PX_PER_SEC);
+    el.style.setProperty('--minor', (minor * PX_PER_SEC) + 'px');
+    el.style.setProperty('--major', (major * PX_PER_SEC) + 'px');
+  }
+
+  function buildAxis(container) {
+    container.innerHTML = '';
+    const { major, minor } = gridIntervals(PX_PER_SEC);
+    const count = Math.round(MAX_TIME / minor);
+
+    for (let i = 0; i <= count; i++) {
+      const t = i * minor;
+      if (t > MAX_TIME + 1e-6) break;
+      const x = t * PX_PER_SEC;
+      const isMajor = Math.abs(t / major - Math.round(t / major)) < 1e-6;
+
+      const tick = document.createElement('i');
+      tick.className = 'tick ' + (isMajor ? 'major' : 'minor');
+      tick.style.left = x + 'px';
+      container.appendChild(tick);
+
+      if (isMajor) {
+        const lab = document.createElement('span');
+        lab.className = 'tick-label';
+        lab.style.left = x + 'px';
+        lab.textContent = fmt(t) + 's';
+        container.appendChild(lab);
+      }
+    }
+  }
+
+  /* =====================================================
+   *  BUFF 渲染
+   * ===================================================*/
+  function renderBuffs() {
+    boardInner.querySelectorAll('.buff-block').forEach(el => el.remove());
+    buffList.forEach(b => {
+      const track = boardInner.querySelector('.track[data-role="' + b.roleIndex + '"]');
+      if (track) track.appendChild(makeBlock(b));
+    });
+  }
+
+  function makeBlock(b) {
+    const el = document.createElement('div');
+    el.className = 'buff-block';
+    el.dataset.id = b.id;
+
+    const name = document.createElement('span');
+    name.className = 'buff-name';
+    name.textContent = b.name;
+
+    const meta = document.createElement('span');
+    meta.className = 'buff-meta';
+    meta.textContent = fmt(b.duration) + 's';
+
+    const ico = document.createElement('span');
+    ico.className = 'buff-ico';
+
+    const hl = document.createElement('i');
+    hl.className = 'handle hl';
+    const hr = document.createElement('i');
+    hr.className = 'handle hr';
+
+    const del = document.createElement('button');
+    del.className = 'del-btn';
+    del.textContent = '×';
+    del.title = '删除';
+    del.addEventListener('click', e => { e.stopPropagation(); removeBuff(b.id); });
+
+    el.append(name, meta, ico, hl, hr, del);
+
+    syncBlock(el, b);
+    return el;
+  }
+
+  function syncBlock(el, b) {
+    const w = Math.max(8, b.duration * PX_PER_SEC);
+    el.style.left   = (b.start * PX_PER_SEC) + 'px';
+    el.style.width  = w + 'px';
+    el.style.height = BLOCK_H + 'px';
+    el.style.top    = BLOCK_TOP + 'px';
+    el.style.background = b.color;
+    el.classList.toggle('selected', selectedIds.has(b.id));
+    el.classList.toggle('locked', !!b.locked);
+    el.classList.toggle('wide', w > 82);
+
+    const nm = el.querySelector('.buff-name');
+    if (nm && nm.textContent !== b.name) nm.textContent = b.name;
+
+    const meta = el.querySelector('.buff-meta');
+    if (meta && meta.textContent !== fmt(b.duration) + 's') {
+      meta.textContent = fmt(b.duration) + 's';
+    }
+
+    const ico = el.querySelector('.buff-ico');
+    if (ico) ico.textContent = b.locked ? '🔒' : '';
+  }
+
+  function updateBlockDom(b) {
+    const el = boardInner.querySelector('.buff-block[data-id="' + b.id + '"]');
+    if (el) syncBlock(el, b);
+  }
+
+  function updateAllBlocks() {
+    buffList.forEach(b => updateBlockDom(b));
+  }
+
+  /* =====================================================
+   *  游标
+   * ===================================================*/
+  function updateCursorLine() {
+    const line = $('cursorLine');
+    if (!line) return;
+    line.style.display = 'block';
+    line.style.left = (SIDEBAR_W + cursorT * PX_PER_SEC) + 'px';
+    const tag = line.querySelector('.cursor-tag');
+    if (tag) tag.textContent = fmt(cursorT) + 's';
+    const ro = $('cursorReadout');
+    if (ro) ro.textContent = fmt(cursorT) + 's';
+  }
+
+  function setCursor(t, silent) {
+    cursorT = clamp(round01(t), 0, MAX_TIME);
+    updateCursorLine();
+    if (!silent) renderInspector();
+  }
+
+  /* =====================================================
+   *  播放
+   * ===================================================*/
+  function togglePlay() {
+    playing = !playing;
+    playBtn.textContent = playing ? '⏸' : '▶';
+    if (playing) {
+      if (cursorT >= MAX_TIME - 1e-6) cursorT = 0;
+      lastTs = performance.now();
+      requestAnimationFrame(playTick);
+    }
+  }
+
+  function playTick(ts) {
+    if (!playing) return;
+    const dt = Math.min(0.1, (ts - lastTs) / 1000);
+    lastTs = ts;
+    cursorT = Math.min(MAX_TIME, cursorT + dt * playSpeed);
+    updateCursorLine();
+
+    if (cursorT >= MAX_TIME - 1e-6) {
+      playing = false;
+      playBtn.textContent = '▶';
+      return;
+    }
+    requestAnimationFrame(playTick);
+  }
+
+  /* =====================================================
+   *  选择
+   * ===================================================*/
+  function setSelection(ids) {
+    selectedIds = new Set(ids);
+    updateAllBlocks();
+    renderInspector();
+  }
+
+  function toggleSelection(id) {
+    if (selectedIds.has(id)) selectedIds.delete(id);
+    else selectedIds.add(id);
+    updateAllBlocks();
+    renderInspector();
+  }
+
+  function clearSelection() {
+    if (!selectedIds.size) return;
+    selectedIds.clear();
+    updateAllBlocks();
+    renderInspector();
+  }
+
+  function selectedBuffs() {
+    return buffList.filter(b => selectedIds.has(b.id));
+  }
+
+  /* =====================================================
+   *  拖拽 / 缩放 / 吸附
+   * ===================================================*/
+  function collectSnapTargets(excludeIds) {
+    const targets = [0, MAX_TIME, cursorT];
+    buffList.forEach(b => {
+      if (excludeIds.has(b.id)) return;
+      targets.push(b.start, b.start + b.duration);
+    });
+    return targets;
+  }
+
+  function computeSnap(rawStart, dur, mainId) {
+    const exclude = new Set(selectedIds);
+    if (mainId) exclude.add(mainId);
+    const targets = collectSnapTargets(exclude);
+    const th = 8 / PX_PER_SEC;
+
+    let best = null;
+    for (const t of targets) {
+      // 左边缘吸附
+      let d = t - rawStart;
+      if (Math.abs(d) < th && (!best || Math.abs(d) < Math.abs(best))) best = d;
+      // 右边缘吸附
+      d = t - (rawStart + dur);
+      if (Math.abs(d) < th && (!best || Math.abs(d) < Math.abs(best))) best = d;
+    }
+    if (best !== null) return round01(rawStart + best);
+
+    return snapVal(rawStart);
+  }
+
+  function startBlockDrag(e, el, b, mode) {
+    if (b.locked) { toast('该 BUFF 已锁定'); return; }
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    /* 选择逻辑 */
+    if (e.shiftKey) {
+      toggleSelection(b.id);
+    } else if (!selectedIds.has(b.id)) {
+      setSelection([b.id]);
+    }
+    /* 若已在选区中且未按 Shift，保持多选，拖动时整体移动 */
+
+    const moving = selectedBuffs();
+    if (!moving.length) return;
+
+    const startX = e.clientX;
+    const origin = moving.map(x => ({ ref: x, start: x.start, dur: x.duration }));
+    const mainOrigin = { start: b.start, dur: b.duration };
+
+    /* 整体移动的边界 */
+    let minDelta = -Infinity, maxDelta = Infinity;
+    if (mode === 'move') {
+      origin.forEach(o => {
+        minDelta = Math.max(minDelta, -o.start);
+        maxDelta = Math.min(maxDelta, MAX_TIME - o.start - o.dur);
+      });
+    }
+
+    let moved = false;
+    dragTip.style.display = 'block';
+
+    function onMove(ev) {
+      if (Math.abs(ev.clientX - startX) > 2) moved = true;
+      const dt = (ev.clientX - startX) / PX_PER_SEC;
+
+      if (mode === 'move') {
+        let rawMain = mainOrigin.start + dt;
+        // 吸附（基于主块）
+        let snapped = computeSnap(rawMain, mainOrigin.dur, b.id);
+        let delta = snapped - mainOrigin.start;
+        delta = clamp(delta, minDelta, maxDelta);
+
+        origin.forEach(o => {
+          o.ref.start = round01(o.start + delta);
+          updateBlockDom(o.ref);
+        });
+      } else if (mode === 'right') {
+        let rawDur = mainOrigin.dur + dt;
+        let newStart = mainOrigin.start;
+        let newDur = rawDur;
+        // 右边缘吸附
+        const exclude = new Set(selectedIds);
+        const targets = collectSnapTargets(exclude);
+        const th = 8 / PX_PER_SEC;
+        let best = null;
+        for (const t of targets) {
+          const d = t - (mainOrigin.start + rawDur);
+          if (Math.abs(d) < th && (!best || Math.abs(d) < Math.abs(best))) best = d;
+        }
+        if (best !== null) newDur = rawDur + best;
+        else newDur = snapVal(rawDur);
+
+        newDur = clamp(round01(newDur), 0.1, MAX_TIME - newStart);
+        b.duration = newDur;
+        updateBlockDom(b);
+        origin.forEach(o => { if (o.ref !== b) o.ref.duration = o.dur; });
+      } else { // left
+        let rawStart = mainOrigin.start + dt;
+        const end = mainOrigin.start + mainOrigin.dur;
+
+        const exclude = new Set(selectedIds);
+        const targets = collectSnapTargets(exclude);
+        const th = 8 / PX_PER_SEC;
+        let best = null;
+        for (const t of targets) {
+          const d = t - rawStart;
+          if (Math.abs(d) < th && (!best || Math.abs(d) < Math.abs(best))) best = d;
+        }
+        if (best !== null) rawStart = rawStart + best;
+        else rawStart = snapVal(rawStart);
+
+        rawStart = clamp(round01(rawStart), 0, end - 0.1);
+        b.start = rawStart;
+        b.duration = round01(end - rawStart);
+        updateBlockDom(b);
+      }
+
+      updateTip(el, b);
+    }
+
+    function onUp() {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      dragTip.style.display = 'none';
+      if (moved) {
+        origin.forEach(o => {
+          o.ref.start = round01(o.ref.start);
+          o.ref.duration = round01(o.ref.duration);
+        });
+        commitLight();
+      }
+    }
+
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+    updateTip(el, b);
+  }
+
+  function updateTip(el, b) {
+    const r = el.getBoundingClientRect();
+    dragTip.style.left = (r.left + r.width / 2) + 'px';
+    dragTip.style.top = Math.max(4, r.top - 26) + 'px';
+    dragTip.textContent =
+      fmt(b.start) + 's → ' + fmt(b.start + b.duration) + 's  (' + fmt(b.duration) + 's)';
+  }
+
+  /* =====================================================
+   *  框选 / 单击设置游标
+   * ===================================================*/
+  function startMarquee(e) {
+    e.preventDefault();
+    const innerRect = boardInner.getBoundingClientRect();
+    const sx = e.clientX, sy = e.clientY;
+    const ox = sx - innerRect.left, oy = sy - innerRect.top;
+
+    const marquee = $('marquee');
+    let dragging = false;
+    const baseSel = e.shiftKey ? new Set(selectedIds) : new Set();
+
+    function onMove(ev) {
+      const dx = ev.clientX - sx;
+      const dy = ev.clientY - sy;
+      if (!dragging && Math.abs(dx) < 4 && Math.abs(dy) < 4) return;
+      dragging = true;
+
+      const cx = ev.clientX - innerRect.left;
+      const cy = ev.clientY - innerRect.top;
+      const left = Math.min(ox, cx);
+      const top = Math.min(oy, cy);
+      const w = Math.abs(cx - ox);
+      const h = Math.abs(cy - oy);
+
+      marquee.style.display = 'block';
+      marquee.style.left = left + 'px';
+      marquee.style.top = top + 'px';
+      marquee.style.width = w + 'px';
+      marquee.style.height = h + 'px';
+
+      /* 命中检测 */
+      const hits = new Set(baseSel);
+      buffList.forEach(b => {
+        const bx = SIDEBAR_W + b.start * PX_PER_SEC;
+        const by = HEADER_H + b.roleIndex * ROW_H + BLOCK_TOP;
+        const bw = Math.max(8, b.duration * PX_PER_SEC);
+        const bh = BLOCK_H;
+        if (bx < left + w && bx + bw > left && by < top + h && by + bh > top) {
+          hits.add(b.id);
+        }
+      });
+      selectedIds = hits;
+      updateAllBlocks();
+    }
+
+    function onUp(ev) {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      marquee.style.display = 'none';
+
+      if (dragging) {
+        renderInspector();
+      } else {
+        /* 单击：设置游标 */
+        const t = snapVal(clamp((ev.clientX - innerRect.left - SIDEBAR_W) / PX_PER_SEC, 0, MAX_TIME));
+        setCursor(t);
+        if (!ev.shiftKey) clearSelection();
+      }
+    }
+
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+  }
+
+  /* =====================================================
+   *  事件委托：boardInner
+   * ===================================================*/
+  boardInner.addEventListener('pointerdown', e => {
+    if (e.button !== 0) return;
+
+    const block = e.target.closest && e.target.closest('.buff-block');
+    if (block) {
+      if (e.target.closest('.del-btn')) return;
+      const b = buffList.find(x => x.id === block.dataset.id);
+      if (!b) return;
+
+      let mode = 'move';
+      if (e.target.classList.contains('hl')) mode = 'left';
+      else if (e.target.classList.contains('hr')) mode = 'right';
+
+      startBlockDrag(e, block, b, mode);
+      return;
+    }
+
+    if (e.target.closest('.role-cell') || e.target.closest('.corner')) return;
+
+    const track = e.target.closest && e.target.closest('.track');
+    const axis  = e.target.closest && e.target.closest('.axis-cell');
+    if (!track && !axis) return;
+
+    startMarquee(e);
+  });
+
+  /* 右键菜单 */
+  boardInner.addEventListener('contextmenu', e => {
+    const block = e.target.closest && e.target.closest('.buff-block');
+    const track = e.target.closest && e.target.closest('.track');
+
+    if (block) {
+      const b = buffList.find(x => x.id === block.dataset.id);
+      if (!b) return;
+      e.preventDefault();
+      if (!selectedIds.has(b.id)) setSelection([b.id]);
+      showCtxMenu(e.clientX, e.clientY, { type: 'buff', buff: b });
+    } else if (track) {
+      e.preventDefault();
+      const idx = Number(track.dataset.role);
+      const rect = track.getBoundingClientRect();
+      const t = snapVal(clamp((e.clientX - rect.left) / PX_PER_SEC, 0, MAX_TIME));
+      setCursor(t);
+      showCtxMenu(e.clientX, e.clientY, { type: 'track', roleIndex: idx, time: t });
+    }
+  });
+
+  /* =====================================================
+   *  右键菜单
+   * ===================================================*/
+  function showCtxMenu(x, y, ctx) {
+    ctxMenu.innerHTML = '';
+
+    function item(label, fn, cls) {
+      const b = document.createElement('button');
+      b.textContent = label;
+      if (cls) b.className = cls;
+      b.addEventListener('click', () => { hideCtxMenu(); fn(); });
+      ctxMenu.appendChild(b);
+    }
+    function title(t) {
+      const d = document.createElement('div');
+      d.className = 'ctx-title';
+      d.textContent = t;
+      ctxMenu.appendChild(d);
+    }
+    function sep() {
+      const d = document.createElement('div');
+      d.className = 'ctx-sep';
+      ctxMenu.appendChild(d);
+    }
+
+    if (ctx.type === 'buff') {
+      const b = ctx.buff;
+      const sel = selectedBuffs();
+      const count = sel.length > 1 ? sel.length : 1;
+
+      title(count > 1 ? ('已选 ' + count + ' 个 BUFF') : b.name);
+
+      if (count > 1) {
+        item('删除选中的 ' + count + ' 个', () => {
+          buffList = buffList.filter(x => !selectedIds.has(x.id));
+          selectedIds.clear();
+          commit();
+        }, 'danger');
+        sep();
+      } else {
+        item('复制 (Ctrl+C)', copySelection);
+        item('在此后插入副本', () => duplicateBuff(b.id));
+        sep();
+        item('对齐到游标', () => {
+          b.start = clamp(snapVal(cursorT), 0, MAX_TIME - b.duration);
+          updateBlockDom(b);
+          commitLight();
+        });
+        item('对齐到时间轴开头', () => {
+          b.start = 0;
+          updateBlockDom(b);
+          commitLight();
+        });
+        sep();
+        item(b.locked ? '解锁' : '锁定', () => {
+          b.locked = !b.locked;
+          updateBlockDom(b);
+          commitLight();
+        });
+        item('删除', () => removeBuff(b.id), 'danger');
+      }
+    } else {
+      title('时间 ' + fmt(ctx.time) + 's');
+      item('在此处添加 BUFF', () => {
+        addBuffAt(ctx.roleIndex, ctx.time);
+      });
+      item('粘贴到此处', () => pasteAt(ctx.time));
+      sep();
+      item('游标移到此处', () => setCursor(ctx.time));
+      item('在该角色添加 2s BUFF', () => addBuffAt(ctx.roleIndex, ctx.time, 2));
+    }
+
+    ctxMenu.style.display = 'block';
+    const mw = ctxMenu.offsetWidth;
+    const mh = ctxMenu.offsetHeight;
+    ctxMenu.style.left = Math.min(x, window.innerWidth - mw - 8) + 'px';
+    ctxMenu.style.top  = Math.min(y, window.innerHeight - mh - 8) + 'px';
+  }
+
+  function hideCtxMenu() { ctxMenu.style.display = 'none'; }
+
+  window.addEventListener('pointerdown', e => {
+    if (!ctxMenu.contains(e.target)) hideCtxMenu();
+  }, true);
+  window.addEventListener('blur', hideCtxMenu);
+
+  /* =====================================================
+   *  BUFF 增删改
+   * ===================================================*/
+  function addBuffAt(roleIndex, time, dur) {
+    const nameEl = $('buffName');
+    const name = (nameEl.value.trim() || 'BUFF');
+    const d = dur || (Number($('duration').value) || 8);
+    const color = $('buffColor').value;
+
+    const start = clamp(snapVal(time), 0, Math.max(0, MAX_TIME - 0.1));
+    const duration = clamp(round01(d), 0.1, MAX_TIME - start);
+
+    const nb = {
+      id: nextId(),
+      name,
+      start: round01(start),
+      duration: round01(duration),
+      color,
+      roleIndex: clamp(roleIndex, 0, roleList.length - 1),
+      locked: false
+    };
+    buffList.push(nb);
+    saveLocal();
+    renderBuffs();
+    setSelection([nb.id]);
+    pushHistory();
+  }
+
+  function duplicateBuff(id) {
+    const b = buffList.find(x => x.id === id);
+    if (!b) return;
+    const nb = {
+      ...b,
+      id: nextId(),
+      start: clamp(round01(b.start + b.duration), 0, Math.max(0, MAX_TIME - b.duration))
+    };
+    buffList.push(nb);
+    saveLocal();
+    renderBuffs();
+    setSelection([nb.id]);
+    pushHistory();
+  }
+
+  function removeBuff(id) {
+    const i = buffList.findIndex(x => x.id === id);
+    if (i < 0) return;
+    buffList.splice(i, 1);
+    selectedIds.delete(id);
+    saveLocal();
+    renderBuffs();
+    renderInspector();
+    pushHistory();
+  }
+
+  function deleteRole(idx) {
+    if (roleList.length <= 1) { toast('至少保留一个角色'); return; }
+    if (!confirm('删除角色「' + roleList[idx].name + '」及其全部 BUFF？')) return;
+    roleList.splice(idx, 1);
+    buffList = buffList.filter(b => b.roleIndex !== idx);
+    buffList.forEach(b => { if (b.roleIndex > idx) b.roleIndex--; });
+    selectedIds.clear();
+    commit();
+  }
+
+  function startRename(cell, idx) {
+    const role = roleList[idx];
+    const input = document.createElement('input');
+    input.className = 'rename-input';
+    input.value = role.name;
+    cell.replaceChildren(input);
+    input.focus();
+    input.select();
+
+    let done = false;
+    const commitRename = () => {
+      if (done) return;
+      done = true;
+      const v = input.value.trim();
+      if (v) role.name = v;
+      saveLocal();
+      buildBoard();
+      renderInspector();
+      pushHistory();
+    };
+    input.addEventListener('blur', commitRename);
+    input.addEventListener('keydown', ev => {
+      if (ev.key === 'Enter') input.blur();
+      if (ev.key === 'Escape') { input.value = role.name; input.blur(); }
+    });
+  }
+
+  /* =====================================================
+   *  复制 / 粘贴
+   * ===================================================*/
+  function copySelection() {
+    const sel = selectedBuffs();
+    if (!sel.length) { toast('请先选中 BUFF'); return; }
+    clipboard = sel.map(b => ({ ...b }));
+    toast('已复制 ' + sel.length + ' 个 BUFF');
+  }
+
+  function pasteAt(baseTime) {
+    if (!clipboard.length) { toast('剪贴板为空'); return; }
+
+    const minStart = Math.min(...clipboard.map(b => b.start));
+    const maxEnd   = Math.max(...clipboard.map(b => b.start + b.duration));
+    const span     = maxEnd - minStart;
+
+    const target = (baseTime === undefined) ? cursorT : baseTime;
+    const newMin = clamp(target, 0, Math.max(0, MAX_TIME - span));
+    const delta  = newMin - minStart;
+
+    const newIds = [];
+    clipboard.forEach(src => {
+      const nb = {
+        ...src,
+        id: nextId(),
+        start: clamp(round01(src.start + delta), 0, Math.max(0, MAX_TIME - src.duration)),
+        roleIndex: clamp(src.roleIndex, 0, roleList.length - 1)
+      };
+      buffList.push(nb);
+      newIds.push(nb.id);
+    });
+
+    saveLocal();
+    renderBuffs();
+    setSelection(newIds);
+    pushHistory();
+    toast('已粘贴 ' + newIds.length + ' 个 BUFF');
+  }
+
+  /* =====================================================
+   *  属性面板
+   * ===================================================*/
+  function field(label, node) {
+    const w = document.createElement('div');
+    w.className = 'field';
+    const l = document.createElement('label');
+    l.textContent = label;
+    w.append(l, node);
+    return w;
+  }
+
+  function textInput(value, onInput, onDone) {
+    const i = document.createElement('input');
+    i.type = 'text';
+    i.value = value;
+    i.addEventListener('input', () => onInput(i.value));
+    if (onDone) i.addEventListener('blur', onDone);
+    return i;
+  }
+
+  function numInput(value, onInput, onDone) {
+    const i = document.createElement('input');
+    i.type = 'number';
+    i.step = '0.1';
+    i.value = value;
+    i.addEventListener('input', () => {
+      const v = parseFloat(i.value);
+      if (!isNaN(v)) onInput(v);
+    });
+    if (onDone) i.addEventListener('blur', onDone);
+    return i;
+  }
+
+  function renderInspector() {
+    inspBody.innerHTML = '';
+    const sel = selectedBuffs();
+
+    /* ---------- 空状态 ---------- */
+    if (!sel.length) {
+      const d = document.createElement('div');
+      d.className = 'insp-empty';
+      d.innerHTML =
+        '未选中 BUFF<br>' +
+        '<b>单击色块</b>选中 · <b>拖拽空白</b>框选<br>' +
+        '<b>双击轨道</b>快速创建<br>' +
+        '<b>右键</b>打开更多操作<br><br>' +
+        '共 <b>' + buffList.length + '</b> 个 BUFF · ' +
+        '<b>' + roleList.length + '</b> 个角色';
+      inspBody.appendChild(d);
+
+      const hint = document.createElement('div');
+      hint.className = 'hint';
+      hint.innerHTML =
+        '<kbd>空格</kbd> 播放/暂停　<kbd>←→</kbd> 移动<br>' +
+        '<kbd>↑↓</kbd> 调时长　<kbd>Del</kbd> 删除<br>' +
+        '<kbd>Ctrl</kbd>+<kbd>Z</kbd> 撤销　<kbd>Ctrl</kbd>+<kbd>C/V</kbd> 复制粘贴<br>' +
+        '<kbd>Ctrl</kbd>+<kbd>A</kbd> 全选　<kbd>Esc</kbd> 取消选择';
+      inspBody.appendChild(hint);
+      return;
+    }
+
+    /* ---------- 多选批量 ---------- */
+    if (sel.length > 1) {
+      const info = document.createElement('div');
+      info.className = 'insp-empty';
+      info.style.marginTop = '0';
+      info.innerHTML = '已选中 <b>' + sel.length + '</b> 个 BUFF';
+      inspBody.appendChild(info);
+
+      /* 批量颜色 */
+      const colorInput = document.createElement('input');
+      colorInput.type = 'color';
+      colorInput.value = sel[0].color;
+      colorInput.addEventListener('input', () => {
+        sel.forEach(b => { b.color = colorInput.value; updateBlockDom(b); });
+        saveLocal();
+        pushHistoryDebounced();
+      });
+      inspBody.appendChild(field('统一颜色', colorInput));
+
+      /* 整体平移 */
+      const shiftWrap = document.createElement('div');
+      shiftWrap.className = 'btn-row';
+      const bL = document.createElement('button');
+      bL.className = 'ghost';
+      bL.textContent = '← 整体左移';
+      const bR = document.createElement('button');
+      bR.className = 'ghost';
+      bR.textContent = '整体右移 →';
+      const step = snapStep || 0.5;
+      bL.addEventListener('click', () => shiftSelection(-step));
+      bR.addEventListener('click', () => shiftSelection(step));
+      shiftWrap.append(bL, bR);
+      inspBody.appendChild(field('整体移动 (' + step + 's)', shiftWrap));
+
+      /* 对齐 */
+      const alignWrap = document.createElement('div');
+      alignWrap.className = 'btn-row';
+      const a1 = document.createElement('button');
+      a1.className = 'ghost';
+      a1.textContent = '起点对齐';
+      a1.title = '将所有选中 BUFF 的起点对齐到最早起点';
+      const a2 = document.createElement('button');
+      a2.className = 'ghost';
+      a2.textContent = '对齐游标';
+      a1.addEventListener('click', () => {
+        const minS = Math.min(...sel.map(b => b.start));
+        sel.forEach(b => { b.start = clamp(minS, 0, MAX_TIME - b.duration); });
+        updateAllBlocks();
+        commitLight();
+      });
+      a2.addEventListener('click', () => {
+        sel.forEach(b => { b.start = clamp(snapVal(cursorT), 0, MAX_TIME - b.duration); });
+        updateAllBlocks();
+        commitLight();
+      });
+      alignWrap.append(a1, a2);
+      inspBody.appendChild(field('对齐', alignWrap));
+
+      /* 锁定 / 解锁 */
+      const lockWrap = document.createElement('div');
+      lockWrap.className = 'btn-row';
+      const lk1 = document.createElement('button');
+      lk1.className = 'ghost';
+      lk1.textContent = '全部锁定';
+      const lk2 = document.createElement('button');
+      lk2.className = 'ghost';
+      lk2.textContent = '全部解锁';
+      lk1.addEventListener('click', () => {
+        sel.forEach(b => { b.locked = true; updateBlockDom(b); });
+        commitLight();
+      });
+      lk2.addEventListener('click', () => {
+        sel.forEach(b => { b.locked = false; updateBlockDom(b); });
+        commitLight();
+      });
+      lockWrap.append(lk1, lk2);
+      inspBody.appendChild(field('锁定', lockWrap));
+
+      /* 删除 */
+      const delAll = document.createElement('button');
+      delAll.className = 'danger';
+      delAll.textContent = '删除选中的 ' + sel.length + ' 个 BUFF';
+      delAll.style.width = '100%';
+      delAll.addEventListener('click', () => {
+        buffList = buffList.filter(b => !selectedIds.has(b.id));
+        selectedIds.clear();
+        commit();
+      });
+      inspBody.appendChild(delAll);
+      return;
+    }
+
+    /* ---------- 单选 ---------- */
+    const b = sel[0];
+
+    inspBody.appendChild(field('名称', textInput(b.name, v => {
+      b.name = v;
+      updateBlockDom(b);
+      saveLocal();
+      pushHistoryDebounced();
+    })));
+
+    /* 角色 */
+    const roleSel = document.createElement('select');
+    roleList.forEach((r, i) => {
+      const o = document.createElement('option');
+      o.value = i;
+      o.textContent = r.name;
+      roleSel.appendChild(o);
+    });
+    roleSel.value = b.roleIndex;
+    roleSel.addEventListener('change', () => {
+      b.roleIndex = Number(roleSel.value);
+      saveLocal();
+      renderBuffs();
+      pushHistory();
+    });
+    inspBody.appendChild(field('所在角色', roleSel));
+
+    /* 时间 */
+    const timeRow = document.createElement('div');
+    timeRow.className = 'row2';
+
+    const sInput = numInput(b.start, v => {
+      b.start = clamp(round01(v), 0, MAX_TIME - b.duration);
+      updateBlockDom(b);
+      saveLocal();
+      pushHistoryDebounced();
+    }, () => {
+      sInput.value = b.start;
+      renderInspector();
+    });
+
+    const dInput = numInput(b.duration, v => {
+      b.duration = clamp(round01(v), 0.1, MAX_TIME - b.start);
+      updateBlockDom(b);
+      saveLocal();
+      pushHistoryDebounced();
+    }, () => {
+      dInput.value = b.duration;
+      renderInspector();
+    });
+
+    timeRow.append(field('起始 (s)', sInput), field('时长 (s)', dInput));
+    inspBody.appendChild(timeRow);
+
+    /* 结束时间（只读显示） */
+    const endInfo = document.createElement('div');
+    endInfo.className = 'check';
+    endInfo.style.color = '#8b93a1';
+    endInfo.textContent = '结束于 ' + fmt(b.start + b.duration) + 's';
+    inspBody.appendChild(endInfo);
+
+    /* 颜色 + 快捷调色 */
+    const colorInput = document.createElement('input');
+    colorInput.type = 'color';
+    colorInput.value = b.color;
+    colorInput.addEventListener('input', () => {
+      b.color = colorInput.value;
+      updateBlockDom(b);
+      saveLocal();
+      pushHistoryDebounced();
+    });
+    inspBody.appendChild(field('颜色', colorInput));
+
+    const quick = document.createElement('div');
+    quick.style.display = 'flex';
+    quick.style.gap = '4px';
+    quick.style.flexWrap = 'wrap';
+    PALETTE.forEach(c => {
+      const sw = document.createElement('button');
+      sw.style.cssText =
+        'width:22px;height:22px;padding:0;border-radius:4px;background:' + c +
+        ';border:1px solid rgba(255,255,255,.2);';
+      sw.title = c;
+      sw.addEventListener('click', () => {
+        b.color = c;
+        colorInput.value = c;
+        updateBlockDom(b);
+        saveLocal();
+        pushHistoryDebounced();
+      });
+      quick.appendChild(sw);
+    });
+    inspBody.appendChild(field('快捷色板', quick));
+
+    /* 锁定 */
+    const lockLabel = document.createElement('label');
+    lockLabel.className = 'check';
+    const lockCb = document.createElement('input');
+    lockCb.type = 'checkbox';
+    lockCb.checked = !!b.locked;
+    lockCb.addEventListener('change', () => {
+      b.locked = lockCb.checked;
+      updateBlockDom(b);
+      saveLocal();
+      pushHistory();
+    });
+    lockLabel.append(lockCb, document.createTextNode('锁定位置（防止误拖）'));
+    inspBody.appendChild(lockLabel);
+
+    /* 操作按钮 */
+    const ops = document.createElement('div');
+    ops.className = 'btn-row';
+    const dupBtn = document.createElement('button');
+    dupBtn.className = 'ghost';
+    dupBtn.textContent = '复制一份';
+    dupBtn.addEventListener('click', () => duplicateBuff(b.id));
+    const delBtn = document.createElement('button');
+    delBtn.className = 'danger';
+    delBtn.textContent = '删除';
+    delBtn.addEventListener('click', () => removeBuff(b.id));
+    ops.append(dupBtn, delBtn);
+    inspBody.appendChild(ops);
+  }
+
+  function shiftSelection(delta) {
+    const sel = selectedBuffs();
+    if (!sel.length) return;
+    let minStart = Infinity, maxEnd = -Infinity;
+    sel.forEach(b => {
+      minStart = Math.min(minStart, b.start);
+      maxEnd   = Math.max(maxEnd, b.start + b.duration);
+    });
+    const d = clamp(delta, -minStart, MAX_TIME - maxEnd);
+    if (Math.abs(d) < 1e-6) return;
+    sel.forEach(b => { b.start = round01(b.start + d); });
+    updateAllBlocks();
+    commitLight();
+  }
+
+  /* =====================================================
+   *  缩放
+   * ===================================================*/
+  function updateZoomLabel() {
+    $('zoomLabel').textContent = Math.round(PX_PER_SEC) + 'px/s';
+  }
+
+  function setZoom(px) {
+    PX_PER_SEC = clamp(Math.round(px), MIN_SCALE, MAX_SCALE);
+    updateZoomLabel();
+    buildBoard();
+    saveLocal();
+  }
+
+  /* =====================================================
+   *  工具栏事件
+   * ===================================================*/
+  function renderRoleSelect() {
+    const cur = roleSelect.value;
+    roleSelect.innerHTML = '';
+    roleList.forEach((r, i) => {
+      const o = document.createElement('option');
+      o.value = i;
+      o.textContent = r.name;
+      roleSelect.appendChild(o);
+    });
+    if (cur !== '' && Number(cur) < roleList.length) roleSelect.value = cur;
+  }
+
+  $('addRole').addEventListener('click', () => {
+    roleList.push({ name: '角色' + (roleList.length + 1) });
+    selectedIds.clear();
+    commit();
+    roleSelect.value = roleList.length - 1;
+  });
+
+  $('addBuff').addEventListener('click', () => {
+    if (!roleList.length) { toast('请先添加角色'); return; }
+    const nameEl = $('buffName');
+    const name = nameEl.value.trim() || 'BUFF';
+
+    let start = round01(Number($('startTime').value) || 0);
+    let dur   = round01(Number($('duration').value) || 1);
+    start = clamp(start, 0, Math.max(0, MAX_TIME - 0.1));
+    dur   = clamp(dur, 0.1, MAX_TIME - start);
+
+    const nb = {
+      id: nextId(),
+      name,
+      start,
+      duration: dur,
+      color: $('buffColor').value,
+      roleIndex: clamp(Number(roleSelect.value) || 0, 0, roleList.length - 1),
+      locked: false
+    };
+    buffList.push(nb);
+    saveLocal();
+    renderBuffs();
+    setSelection([nb.id]);
+    pushHistory();
+
+    /* 连续添加时自动前移起始时间 */
+    $('startTime').value = fmt(start + dur);
+    nameEl.value = '';
+    nameEl.focus();
+  });
+
+  $('snapSel').addEventListener('change', e => {
+    snapStep = Number(e.target.value) || 0;
+    saveLocal();
+    renderInspector();
+  });
+
+  $('maxTime').addEventListener('change', e => {
+    let v = Number(e.target.value);
+    if (isNaN(v)) v = MAX_TIME;
+    MAX_TIME = clamp(Math.round(v), 5, 120);
+    e.target.value = MAX_TIME;
+
+    buffList.forEach(b => {
+      b.start    = clamp(b.start, 0, Math.max(0, MAX_TIME - 0.1));
+      b.duration = clamp(b.duration, 0.1, MAX_TIME - b.start);
+    });
+    cursorT = clamp(cursorT, 0, MAX_TIME);
+    commit();
+  });
+
+  $('zoomIn').addEventListener('click', () => setZoom(PX_PER_SEC + 6));
+  $('zoomOut').addEventListener('click', () => setZoom(PX_PER_SEC - 6));
+
+  board.addEventListener('wheel', e => {
+    if (!(e.ctrlKey || e.metaKey)) return;
+    e.preventDefault();
+    setZoom(PX_PER_SEC + (e.deltaY > 0 ? -5 : 5));
+  }, { passive: false });
+
+  $('undoBtn').addEventListener('click', undo);
+  $('redoBtn').addEventListener('click', redo);
+  $('copyBtn').addEventListener('click', copySelection);
+  $('pasteBtn').addEventListener('click', () => pasteAt());
+
+  playBtn.addEventListener('click', togglePlay);
+  $('speedSel').addEventListener('change', e => {
+    playSpeed = Number(e.target.value) || 1;
+  });
+
+  $('clearAll').addEventListener('click', () => {
+    if (!confirm('确定清空所有角色与 BUFF 数据？此操作不可恢复。')) return;
+    defaultData();
+    saveLocal();
+    buildBoard();
+    renderInspector();
+    pushHistory();
+  });
+
+  /* =====================================================
+   *  键盘快捷键
+   * ===================================================*/
+  window.addEventListener('keydown', e => {
+    /* 全局：撤销 / 重做 / 播放 */
+    if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'z') {
+      if (isEditing()) return;
+      e.preventDefault(); undo(); return;
+    }
+    if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'y' ||
+        (e.shiftKey && e.key.toLowerCase() === 'z'))) {
+      if (isEditing()) return;
+      e.preventDefault(); redo(); return;
+    }
+
+    if (isEditing()) return;
+
+    /* 空格播放 */
+    if (e.code === 'Space') {
+      e.preventDefault(); togglePlay(); return;
+    }
+
+    /* Ctrl + A / C / V / D */
+    if (e.ctrlKey || e.metaKey) {
+      const k = e.key.toLowerCase();
+      if (k === 'a') {
+        e.preventDefault();
+        setSelection(buffList.map(b => b.id));
+        return;
+      }
+      if (k === 'c') { e.preventDefault(); copySelection(); return; }
+      if (k === 'v') { e.preventDefault(); pasteAt(); return; }
+      if (k === 'd') {
+        e.preventDefault();
+        const sel = selectedBuffs();
+        if (sel.length) { copySelection(); pasteAt(Math.min(...sel.map(b => b.start)) + 1); }
+        return;
+      }
+    }
+
+    /* Esc */
+    if (e.key === 'Escape') {
+      hideCtxMenu();
+      clearSelection();
+      return;
+    }
+
+    /* 单块操作 */
+    const sel = selectedBuffs();
+    if (!sel.length) return;
+    const step = snapStep || 0.1;
+
+    switch (e.key) {
+      case 'Delete':
+      case 'Backspace':
+        e.preventDefault();
+        buffList = buffList.filter(b => !selectedIds.has(b.id));
+        selectedIds.clear();
+        commit();
+        break;
+      case 'ArrowLeft':
+        e.preventDefault();
+        moveSelection(-step, e.shiftKey ? step : 0);
+        break;
+      case 'ArrowRight':
+        e.preventDefault();
+        moveSelection(step, e.shiftKey ? step : 0);
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        resizeSelection(step);
+        break;
+      case 'ArrowDown':
+        e.preventDefault();
+        resizeSelection(-step);
+        break;
+      default:
+        break;
+    }
+  });
+
+  function moveSelection(delta, _s) {
+    const sel = selectedBuffs().filter(b => !b.locked);
+    if (!sel.length) return;
+    let minStart = Infinity, maxEnd = -Infinity;
+    sel.forEach(b => {
+      minStart = Math.min(minStart, b.start);
+      maxEnd   = Math.max(maxEnd, b.start + b.duration);
+    });
+    const d = clamp(delta, -minStart, MAX_TIME - maxEnd);
+    if (Math.abs(d) < 1e-9) return;
+    sel.forEach(b => { b.start = round01(b.start + d); });
+    updateAllBlocks();
+    commitLight();
+  }
+
+  function resizeSelection(delta) {
+    const sel = selectedBuffs().filter(b => !b.locked);
+    if (!sel.length) return;
+    sel.forEach(b => {
+      b.duration = clamp(round01(b.duration + delta), 0.1, MAX_TIME - b.start);
+    });
+    updateAllBlocks();
+    commitLight();
+  }
+
+  /* =====================================================
+   *  导出 PNG
+   * ===================================================*/
+  $('exportImg').addEventListener('click', async function () {
+    const btn = this;
+    const old = btn.textContent;
+    btn.textContent = '生成中…';
+    btn.disabled = true;
+
+    const prevCursor = cursorT;
+    board.classList.add('exporting');
+
+    try {
+      await new Promise(r => setTimeout(r, 60));
+      const canvas = await html2canvas(boardInner, {
+        backgroundColor: '#121419',
+        scale: 2,
+        useCORS: true,
+        width: boardInner.scrollWidth,
+        height: boardInner.scrollHeight,
+        windowWidth: boardInner.scrollWidth,
+        windowHeight: boardInner.scrollHeight
+      });
+      const link = document.createElement('a');
+      link.download = '原神BUFF排轴.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      toast('图片已导出');
+    } catch (err) {
+      console.error(err);
+      alert('导出失败，请重试');
+    } finally {
+      board.classList.remove('exporting');
+      btn.textContent = old;
+      btn.disabled = false;
+      cursorT = prevCursor;
+      updateCursorLine();
+    }
+  });
+
+  /* =====================================================
+   *  导出 Excel
+   * ===================================================*/
+  const STYLE_HEADER = {
+    fill: { fgColor: { rgb: 'FF2C3038' } },
+    font: { color: { rgb: 'FFFFFFFF' }, bold: true, sz: 11 },
+    alignment: { horizontal: 'center', vertical: 'center' },
+    border: {
+      top:    { style: 'thin', color: { rgb: 'FF555555' } },
+      bottom: { style: 'thin', color: { rgb: 'FF555555' } },
+      left:   { style: 'thin', color: { rgb: 'FF555555' } },
+      right:  { style: 'thin', color: { rgb: 'FF555555' } }
+    }
+  };
+  const STYLE_ROLE = {
+    fill: { fgColor: { rgb: 'FF1E232C' } },
+    font: { color: { rgb: 'FFFFFFFF' }, sz: 11 },
+    alignment: { horizontal: 'center', vertical: 'center' },
+    border: {
+      top:    { style: 'thin', color: { rgb: 'FF333333' } },
+      bottom: { style: 'thin', color: { rgb: 'FF333333' } },
+      left:   { style: 'thin', color: { rgb: 'FF333333' } },
+      right:  { style: 'thin', color: { rgb: 'FF333333' } }
+    }
+  };
+  const STYLE_GRID = {
+    fill: { fgColor: { rgb: 'FF121419' } },
+    border: {
+      top:    { style: 'hair', color: { rgb: 'FF2C3038' } },
+      bottom: { style: 'hair', color: { rgb: 'FF2C3038' } },
+      left:   { style: 'hair', color: { rgb: 'FF2C3038' } },
+      right:  { style: 'hair', color: { rgb: 'FF2C3038' } }
+    }
+  };
+
+  $('exportExcel').addEventListener('click', () => {
+    if (!buffList.length) { toast('暂无数据可导出'); return; }
+
+    const wb = XLSX.utils.book_new();
+
+    /* ---------- Sheet1：明细 ---------- */
+    const detail = [['角色名称', 'BUFF名称', '起始(s)', '时长(s)', '结束(s)', '颜色']];
+    buffList
+      .slice()
+      .sort((a, b) => a.roleIndex - b.roleIndex || a.start - b.start)
+      .forEach(b => {
+        detail.push([
+          (roleList[b.roleIndex] || {}).name || '',
+          b.name,
+          b.start,
+          b.duration,
+          round01(b.start + b.duration),
+          b.color
+        ]);
+      });
+    const ws1 = XLSX.utils.aoa_to_sheet(detail);
+    ws1['!cols'] = [{ wch: 12 }, { wch: 20 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }];
+    XLSX.utils.book_append_sheet(wb, ws1, 'BUFF明细');
+
+    /* ---------- Sheet2：甘特图 ---------- */
+    const STEP = 0.5;
+    const colCount = Math.round(MAX_TIME / STEP);
+
+    const aoa = [];
+    const header = ['角色\\时间'];
+    for (let i = 0; i <= colCount; i++) header.push(fmt(i * STEP) + 's');
+    aoa.push(header);
+    roleList.forEach(r => {
+      const row = [r.name];
+      for (let i = 0; i <= colCount; i++) row.push('');
+      aoa.push(row);
+    });
+
+    const ws2 = XLSX.utils.aoa_to_sheet(aoa);
+    ws2['!cols'] = [{ wch: 14 }].concat(
+      Array.from({ length: colCount + 1 }, () => ({ wch: 4 }))
+    );
+    ws2['!rows'] = [{ hpt: 22 }].concat(roleList.map(() => ({ hpt: 26 })));
+
+    for (let c = 0; c <= colCount + 1; c++) {
+      const addr = XLSX.utils.encode_cell({ r: 0, c });
+      if (ws2[addr]) ws2[addr].s = STYLE_HEADER;
+    }
+    for (let r = 1; r <= roleList.length; r++) {
+      const na = XLSX.utils.encode_cell({ r, c: 0 });
+      if (ws2[na]) ws2[na].s = STYLE_ROLE;
+      for (let c = 1; c <= colCount + 1; c++) {
+        const addr = XLSX.utils.encode_cell({ r, c });
+        if (ws2[addr]) ws2[addr].s = STYLE_GRID;
+      }
+    }
+
+    const merges = [];
+    buffList.forEach(b => {
+      const r = b.roleIndex + 1;
+      if (r > roleList.length) return;
+
+      const c1 = Math.max(1, Math.min(colCount, Math.round(b.start / STEP) + 1));
+      const c2 = Math.max(c1 + 1, Math.min(colCount + 1, Math.round((b.start + b.duration) / STEP) + 1));
+      if (c2 <= c1) return;
+
+      merges.push({ s: { r, c: c1 }, e: { r, c: c2 - 1 } });
+
+      const rgb = 'FF' + String(b.color).replace('#', '').toUpperCase().padEnd(6, '0');
+      const style = {
+        fill: { fgColor: { rgb } },
+        font: { color: { rgb: 'FFFFFFFF' }, bold: true, sz: 10 },
+        alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+        border: {
+          top:    { style: 'thin', color: { rgb: 'FF444444' } },
+          bottom: { style: 'thin', color: { rgb: 'FF444444' } },
+          left:   { style: 'thin', color: { rgb: 'FF444444' } },
+          right:  { style: 'thin', color: { rgb: 'FF444444' } }
+        }
+      };
+
+      const sa = XLSX.utils.encode_cell({ r, c: c1 });
+      if (ws2[sa]) { ws2[sa].v = b.name; ws2[sa].s = style; }
+      for (let c = c1 + 1; c < c2; c++) {
+        const addr = XLSX.utils.encode_cell({ r, c });
+        if (ws2[addr]) ws2[addr].s = style;
+      }
+    });
+    ws2['!merges'] = merges;
+
+    XLSX.utils.book_append_sheet(wb, ws2, 'BUFF时间轴');
+    XLSX.writeFile(wb, '原神BUFF排轴.xlsx');
+    toast('Excel 已导出');
+  });
+
+  /* =====================================================
+   *  导出 / 导入 JSON
+   * ===================================================*/
+  $('exportJson').addEventListener('click', () => {
+    const data = {
+      version: 2,
+      exportedAt: new Date().toISOString(),
+      roleList,
+      buffList,
+      maxTime: MAX_TIME
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = '原神BUFF排轴.json';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    toast('JSON 已导出');
+  });
+
+  $('importJson').addEventListener('click', () => fileInput.click());
+
+  fileInput.addEventListener('change', e => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const d = JSON.parse(String(reader.result));
+        if (!Array.isArray(d.roleList) || !d.roleList.length) throw new Error('缺少 roleList');
+        if (!Array.isArray(d.buffList)) throw new Error('缺少 buffList');
+
+        roleList = d.roleList.map(r => ({ name: String((r && r.name) || '角色') }));
+        if (d.maxTime) MAX_TIME = clamp(Math.round(d.maxTime), 5, 120);
+        buffList = d.buffList.map(normalizeBuff);
+        sanitizeAll();
+        selectedIds.clear();
+        cursorT = 0;
+        $('maxTime').value = MAX_TIME;
+
+        saveLocal();
+        buildBoard();
+        renderInspector();
+        pushHistory();
+        toast('导入成功（' + buffList.length + ' 个 BUFF）');
+      } catch (err) {
+        alert('导入失败：' + err.message);
+      }
+    };
+    reader.readAsText(f);
+    e.target.value = '';
+  });
+
+  /* =====================================================
+   *  启动
+   * ===================================================*/
+  loadLocal();
+  $('maxTime').value = MAX_TIME;
+  $('snapSel').value = String(snapStep);
+  updateZoomLabel();
+  buildBoard();
+  renderInspector();
+  updateCursorLine();
+  pushHistory();
+
+  window.addEventListener('resize', () => {
+    hideCtxMenu();
+    updateCursorLine();
+  });
+
+  board.addEventListener('scroll', () => {
+    hideCtxMenu();
+  });
+
+})();
+</script>
+</body>
+</html>
