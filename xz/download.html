@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>软件下载中心</title>
+<style>
+  :root{
+    --bg:#0f1116;
+    --panel:#171a21;
+    --line:#262b36;
+    --txt:#e6e9ef;
+    --dim:#8f97a8;
+    --brand:#4f7cff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:"Segoe UI","Microsoft YaHei",system-ui,sans-serif;
+    background:var(--bg);color:var(--txt);
+    padding:44px 20px;
+    font-size:14px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:900px;margin:0 auto}
+
+  h1{font-size:19px;font-weight:600;margin-bottom:6px}
+  .sub{font-size:13px;color:var(--dim);margin-bottom:22px}
+
+  table{width:100%;border-collapse:collapse;background:var(--panel);
+        border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  th{
+    text-align:left;font-size:12px;font-weight:600;color:var(--dim);
+    padding:11px 16px;border-bottom:1px solid var(--line);white-space:nowrap;
+  }
+  td{padding:15px 16px;border-bottom:1px solid var(--line);vertical-align:middle}
+  tr:last-child td{border-bottom:0}
+
+  .name{font-weight:600}
+  .desc{font-size:12.5px;color:var(--dim);margin-top:3px;line-height:1.5}
+  .meta{font-size:12.5px;color:var(--dim);white-space:nowrap}
+  .col-act{text-align:right;width:150px}
+
+  .dl{
+    font-family:inherit;font-size:13px;font-weight:600;color:#fff;
+    background:var(--brand);border:0;border-radius:7px;
+    padding:9px 16px;cursor:pointer;white-space:nowrap;
+  }
+  .dl:hover{background:#3f6bff}
+  .dl:disabled{background:#39415a;color:#9aa3b8;cursor:default}
+
+  .tip{margin-top:16px;font-size:12.5px;color:var(--dim)}
+
+  /* 窄屏：表格转成卡片式堆叠 */
+  @media (max-width:640px){
+    body{padding:28px 14px}
+    thead{display:none}
+    tr{display:block;border-bottom:1px solid var(--line)}
+    tr:last-child{border-bottom:0}
+    td{display:block;border:0;padding:4px 16px}
+    td:first-child{padding-top:15px}
+    td:last-child{padding-bottom:15px}
+    .col-act{text-align:left;width:auto;padding-top:12px}
+    .dl{width:100%}
+    .col-hide{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>软件下载中心</h1>
+  <p class="sub">点击右侧「下载」获取 .exe 安装包</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>程序</th>
+        <th>版本 / 平台</th>
+        <th>大小</th>
+        <th class="col-act">下载</th>
+      </tr>
+    </thead>
+    <tbody id="list">
+
+      <!--
+        ===== 加程序：复制下面整段 <tr> 追加到 </tr> 后面，改内容即可 =====
+        data-file 写 .exe 文件名（与 html 同目录）或完整下载 URL
+        data-name 是下载后保存的文件名，一般与 data-file 一致
+      -->
+      <tr>
+        <td>
+          <div class="name">原神BUFf排轴工具</div>
+          <div class="desc">用于模拟排轴流程实用工具</div>
+        </td>
+        <td class="meta">v2.1<br>Windows 10/11 · 64 位</td>
+        <td class="meta">157kb</td>
+        <td class="col-act">
+          <button class="dl" type="button"
+                  data-file="原神BUFf排轴工具.exe"
+                  data-name="program-setup.exe">下载</button>
+        </td>
+      </tr>
+
+    </tbody>
+  </table>
+
+  <p class="tip">安装包已代码签名，下载后建议核对文件大小与数字签名。</p>
+</div>
+
+<script>
+/* data-file 支持相对路径（exe 与 html 同目录时直接写文件名）或完整 URL。
+   用事件委托，新增的 <tr> 无需再改这段脚本。 */
+document.getElementById("list").addEventListener("click", function (e) {
+  var btn = e.target.closest(".dl");
+  if (!btn || btn.disabled) return;
+
+  var url  = btn.dataset.file;
+  var name = btn.dataset.name || url.split(/[\\/]/).pop();
+
+  var a = document.createElement("a");
+  a.href = url;
+  a.download = name;          // 同源时强制下载并保留文件名
+  a.rel = "noopener";
+  a.style.display = "none";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  btn.disabled = true;
+  btn.textContent = "下载中…";
+  setTimeout(function () {
+    btn.disabled = false;
+    btn.textContent = "下载";
+  }, 2000);
+});
+</script>
+</body>
+</html>
