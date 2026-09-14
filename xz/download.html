@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>羽化哲</title>
+<title>软件下载中心</title>
 <style>
   :root{
     --bg:#0f1116;
@@ -48,6 +48,10 @@
   .dl:hover{background:#3f6bff}
   .dl:disabled{background:#39415a;color:#9aa3b8;cursor:default}
 
+  /* 下载失败提示：平时占位 0 高度，只有出错才显形 */
+  .err{margin-top:10px;font-size:12.5px;color:#f87171;line-height:1.6;min-height:0}
+  .err:empty{display:none}
+
   .tip{margin-top:16px;font-size:12.5px;color:var(--dim)}
 
   /* 窄屏：表格转成卡片式堆叠 */
@@ -61,7 +65,6 @@
     td:last-child{padding-bottom:15px}
     .col-act{text-align:left;width:auto;padding-top:12px}
     .dl{width:100%}
-    .col-hide{display:none}
   }
 </style>
 </head>
@@ -84,8 +87,20 @@
 
       <!--
         ===== 加程序：复制下面整段 <tr> 追加到 </tr> 后面，改内容即可 =====
-        data-file 写 .exe 文件名（与 html 同目录）或完整下载 URL
-        data-name 是下载后保存的文件名，一般与 data-file 一致
+
+        data-file  真正去下载的地址，三种写法任选：
+                    ① 只写文件名   data-file="setup.exe"
+                       → exe 与 download.html 在同一个目录
+                    ② 绝对路径     data-file="/xz/setup.exe"
+                       → 以网站根目录为起点，子目录部署时最稳
+                    ③ 完整网址     data-file="https://yuhuazhe.cn/xz/setup.exe"
+
+        ⚠ 文件名建议只用 ASCII（字母、数字、连字符）。
+          中文或空格文件名在部分静态托管的 URL 编码环节会取不到文件，
+          浏览器提示「无法下载 - 没有文件」，但服务器上明明有。
+
+        data-name  下载后保存到本地的文件名，可以和 data-file 不同，
+                   所以 exe 换成 ASCII 名后，用户保存下来仍是中文名。
       -->
       <tr>
         <td>
@@ -93,11 +108,12 @@
           <div class="desc">用于模拟排轴流程实用工具</div>
         </td>
         <td class="meta">v2.1<br>Windows 10/11 · 64 位</td>
-        <td class="meta">157kb</td>
+        <td class="meta">157 KB</td>
         <td class="col-act">
           <button class="dl" type="button"
-                  data-file="原神BUFf排轴工具.exe"
-                  data-name="原神BUFF排轴工具.exe">下载</button>
+                  data-file="yuanshen-buff-tool.exe"
+                  data-name="原神BUFf排轴工具.exe">下载</button>
+          <div class="err"></div>
         </td>
       </tr>
 
@@ -108,30 +124,63 @@
 </div>
 
 <script>
-/* data-file 支持相对路径（exe 与 html 同目录时直接写文件名）或完整 URL。
-   用事件委托，新增的 <tr> 无需再改这段脚本。 */
-document.getElementById("list").addEventListener("click", function (e) {
-  var btn = e.target.closest(".dl");
-  if (!btn || btn.disabled) return;
+/* 用事件委托，所以以后自己加多少行 <tr> 都不用改这段脚本。 */
 
-  var url  = btn.dataset.file;
-  var name = btn.dataset.name || url.split(/[\\/]/).pop();
+// 把 data-file 里的中文、空格转成 %XX，避免托管平台在编码环节丢文件
+function toURL(s){
+  if (/^https?:\/\//i.test(s) || s.charAt(0) === "/") return encodeURI(s);
+  return s.split("/").map(encodeURIComponent).join("/");
+}
 
+// 触发浏览器下载
+function fire(url, name){
   var a = document.createElement("a");
   a.href = url;
-  a.download = name;          // 同源时强制下载并保留文件名
+  a.download = name || "";
   a.rel = "noopener";
   a.style.display = "none";
   document.body.appendChild(a);
   a.click();
   a.remove();
+}
+
+// 先问服务器这个文件在不在，再决定要不要真的下
+function exists(url){
+  return fetch(url, { method: "HEAD", cache: "no-store" })
+    .then(function (r) {
+      // r.ok=false 且拿到了 HTTP 状态码，说明文件确实不在
+      return { missing: !r.ok, status: r.status };
+    })
+    .catch(function () {
+      // 跨域或网络异常，无法判断，就交给浏览器正常下载，不误报
+      return { missing: false, status: 0 };
+    });
+}
+
+document.getElementById("list").addEventListener("click", function (e) {
+  var btn = e.target.closest(".dl");
+  if (!btn || btn.disabled) return;
+
+  var raw   = btn.dataset.file;
+  var url   = toURL(raw);
+  var name  = btn.dataset.name || decodeURIComponent(url.split(/[\\/]/).pop());
+  var errEl = btn.parentNode.querySelector(".err");
 
   btn.disabled = true;
   btn.textContent = "下载中…";
-  setTimeout(function () {
+  errEl.textContent = "";
+
+  exists(url).then(function (res) {
+    if (res.missing) {
+      errEl.textContent = "下载失败（HTTP " + res.status + "）：服务器上找不到 " + name +
+                          "，请确认文件已提交到 " + (location.pathname.replace(/[^/]*$/, "") || "/") +
+                          " 目录，且大小写与名称完全一致。";
+    } else {
+      fire(url, name);
+    }
     btn.disabled = false;
     btn.textContent = "下载";
-  }, 2000);
+  });
 });
 </script>
 </body>
