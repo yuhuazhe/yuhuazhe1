@@ -1,262 +1,983 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>抗性/防御系数计算</title>
-    <style>
-        :root {
-            --bg-main: #121212;
-            --bg-card: #1e1e1e;
-            --border-color: #333;
-            --text-primary: #e0e0e0;
-            --text-secondary: #aaa;
-            --accent-color: #bb86fc;
-            --accent-blue: #64b5f6;
-            --success-color: #81c784;
-            --danger-color: #e57373;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#16161c">
+<title>抗性 / 防御乘区计算器</title>
+<style>
+    :root {
+        --bg-body: #16161c;
+        --bg-card: #1e1e26;
+        --bg-sunken: #14141a;
+        --border-color: #33333f;
+        --border-soft: #2a2a34;
+        --text-primary: #e6e6ee;
+        --text-secondary: #a0a0b0;
+        --text-muted: #6f6f80;
+        --accent-color: #bb86fc;
+        --accent-blue: #64b5f6;
+        --accent-amber: #ffb74d;
+        --success-color: #7fdc9a;
+        --danger-color: #ff8a80;
+        --shadow: 0 4px 16px rgba(0, 0, 0, .34);
+        --radius: 11px;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Roboto, "Helvetica Neue", "Microsoft YaHei", Arial, sans-serif;
+    }
+
+    [hidden] { display: none !important; }
+
+    html { -webkit-text-size-adjust: 100%; }
+
+    body {
+        background:
+            radial-gradient(1000px 460px at 12% -12%, rgba(187, 134, 252, .12), transparent 60%),
+            radial-gradient(820px 420px at 100% 0%, rgba(100, 181, 246, .09), transparent 55%),
+            var(--bg-body);
+        color: var(--text-primary);
+        line-height: 1.5;
+        padding: 12px 16px 18px;
+        min-height: 100vh;
+    }
+
+    /* ---------------- 全局水印（不拦截任何鼠标事件） ---------------- */
+    .watermark {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        user-select: none;
+        -webkit-user-select: none;
+        z-index: 9999;
+        opacity: .06;
+    }
+    .wm-text {
+        fill: #ffffff;
+        font-size: 27px;
+        font-weight: 700;
+        letter-spacing: 3px;
+        font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+
+    .container {
+        position: relative;
+        max-width: 1160px;
+        margin: 0 auto;
+    }
+
+    /* ---------------- 顶部标题 ---------------- */
+    .page-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: center;
+        gap: 4px 12px;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+    .page-head h1 {
+        font-size: clamp(1.15rem, 2.3vw, 1.5rem);
+        letter-spacing: .03em;
+        background: linear-gradient(96deg, var(--accent-color), var(--accent-blue));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+    .mem-hint {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: .73rem;
+        color: var(--text-muted);
+    }
+    .mem-hint::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--success-color);
+        box-shadow: 0 0 6px rgba(127, 220, 154, .8);
+    }
+    .mem-hint.off::before { background: var(--danger-color); box-shadow: none; }
+
+    /* ---------------- 标签页 ---------------- */
+    .tabs {
+        display: flex;
+        gap: 6px;
+        padding: 5px;
+        margin: 0 auto 12px;
+        max-width: 460px;
+        background: var(--bg-card);
+        border: 1px solid var(--border-soft);
+        border-radius: 999px;
+        box-shadow: var(--shadow);
+    }
+    .tab {
+        flex: 1 1 0;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 999px;
+        background: transparent;
+        color: var(--text-secondary);
+        font-size: .9rem;
+        font-weight: 600;
+        letter-spacing: .03em;
+        cursor: pointer;
+        transition: background-color .2s, color .2s, box-shadow .2s;
+    }
+    .tab:hover { color: var(--text-primary); background: rgba(255, 255, 255, .045); }
+    .tab.active {
+        color: #14121a;
+        background: linear-gradient(96deg, var(--accent-color), #8ea8ff);
+        box-shadow: 0 3px 12px rgba(187, 134, 252, .3);
+    }
+    .tab:focus-visible { outline: 2px solid var(--accent-blue); outline-offset: 2px; }
+
+    /* ---------------- 两栏布局（电脑端一屏展示） ---------------- */
+    .layout {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        align-items: stretch;
+    }
+    .col { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+    /* 左右两栏等宽，且末张卡片拉伸填满，保证边框上下对齐、两栏同高 */
+    .col > .card:last-child { flex: 1 1 auto; }
+    /* 队伍统计卡内容纵向居中，多余高度均匀分布，避免底部大片留白 */
+    .card-team { display: flex; flex-direction: column; }
+    .card-team .team-grid { flex: 1 1 auto; align-content: center; }
+
+    /* ---------------- 卡片 ---------------- */
+    .card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-soft);
+        border-radius: var(--radius);
+        padding: 13px 15px;
+        box-shadow: var(--shadow);
+    }
+    .card h2 {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--accent-blue);
+        font-size: .96rem;
+        font-weight: 650;
+        padding-bottom: 7px;
+        margin-bottom: 11px;
+        border-bottom: 1px solid var(--border-soft);
+    }
+    .card h2::before {
+        content: "";
+        width: 3px;
+        height: 14px;
+        border-radius: 3px;
+        background: linear-gradient(var(--accent-color), var(--accent-blue));
+    }
+
+    /* ---------------- 表单 ---------------- */
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+        gap: 11px;
+    }
+    .form-grid.narrow { grid-template-columns: minmax(0, 320px); }
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+    .form-group > label {
+        color: var(--text-secondary);
+        font-size: .78rem;
+        font-weight: 500;
+    }
+    .input-wrap {
+        display: flex;
+        align-items: center;
+        background: var(--bg-sunken);
+        border: 1px solid var(--border-color);
+        border-radius: 7px;
+        transition: border-color .18s, box-shadow .18s;
+    }
+    .input-wrap:focus-within {
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 3px rgba(187, 134, 252, .15);
+    }
+    .input-wrap input {
+        flex: 1 1 auto;
+        width: 100%;
+        min-width: 0;
+        background: transparent;
+        border: none;
+        padding: 7px 4px 7px 10px;
+        color: var(--text-primary);
+        font-size: .94rem;
+        font-variant-numeric: tabular-nums;
+    }
+    .input-wrap input:focus { outline: none; }
+    .input-wrap .unit {
+        padding: 0 10px 0 4px;
+        color: var(--text-muted);
+        font-size: .8rem;
+    }
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button { opacity: .3; }
+
+    /* ---------------- 队伍统计区 ---------------- */
+    .team-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 9px;
+    }
+    /* 四名角色固定 2×2，避免出现 3+1 的参差排布 */
+    .team-grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .member {
+        background: var(--bg-sunken);
+        border: 1px solid var(--border-soft);
+        border-radius: 9px;
+        padding: 9px 11px;
+        transition: border-color .2s;
+    }
+    .member:hover { border-color: #43435a; }
+    .member.is-active { border-color: rgba(187, 134, 252, .5); }
+    .member-head {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        margin-bottom: 7px;
+        font-size: .82rem;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+    .member-head .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #5b5b6d;
+        transition: background-color .2s, box-shadow .2s;
+    }
+    .member.is-active .member-head .dot {
+        background: var(--accent-color);
+        box-shadow: 0 0 7px rgba(187, 134, 252, .65);
+    }
+    .member > .form-group + .form-group { margin-top: 7px; }
+    .member-body {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px;
+    }
+    .member .form-group > label { font-size: .75rem; }
+    .member .input-wrap input { padding: 6px 4px 6px 9px; font-size: .9rem; }
+
+    /* ---------------- 合计条 ---------------- */
+    .sum-bar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px 18px;
+        margin-top: 11px;
+        padding: 10px 13px;
+        background: linear-gradient(96deg, rgba(187, 134, 252, .10), rgba(100, 181, 246, .07));
+        border: 1px dashed rgba(187, 134, 252, .4);
+        border-radius: 9px;
+    }
+    .sum-item { display: flex; flex-direction: column; gap: 1px; }
+    .sum-item .label { color: var(--text-secondary); font-size: .74rem; }
+    .sum-item .value {
+        color: var(--accent-amber);
+        font-size: 1.1rem;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+    }
+    .expr {
+        flex: 1 1 240px;
+        min-width: 0;
+        font-size: .74rem;
+        color: var(--text-muted);
+        font-variant-numeric: tabular-nums;
+        word-break: break-all;
+    }
+
+    /* ---------------- 结果区 ---------------- */
+    .result-card {
+        border-color: rgba(127, 220, 154, .3);
+        display: flex;
+        flex-direction: column;
+    }
+    .result-card h2 { color: var(--success-color); }
+    .result-card h2::before { background: linear-gradient(var(--success-color), var(--accent-blue)); }
+    /* 内容在卡片内纵向居中，避免拉伸后底部留白突兀 */
+    .result-main {
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 0;
+    }
+    .result-box {
+        padding: 10px 13px;
+        background: var(--bg-sunken);
+        border-radius: 8px;
+        border-left: 3px solid var(--success-color);
+    }
+    .result-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 3px 14px;
+        padding: 4px 0;
+    }
+    .result-row + .result-row { border-top: 1px dashed var(--border-soft); }
+    .result-row .label { color: var(--text-secondary); font-size: .82rem; }
+    .result-row .value {
+        color: var(--success-color);
+        font-size: 1.02rem;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+    }
+    .result-row.primary .value { font-size: 1.32rem; color: #9dffb8; }
+    .result-row .value.warn { color: var(--danger-color); }
+
+    /* ---------------- 公式参考 ---------------- */
+    .formula-list {
+        margin-top: 10px;
+        border: 1px solid var(--border-soft);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .fl-row {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr;
+        gap: 8px;
+        padding: 6px 12px;
+        font-size: .8rem;
+        color: var(--text-muted);
+        border-top: 1px solid var(--border-soft);
+        transition: background-color .2s, color .2s;
+        font-variant-numeric: tabular-nums;
+    }
+    .fl-row:first-child { border-top: none; }
+    .fl-row .cond { text-align: right; }
+    .fl-row.on {
+        background: rgba(187, 134, 252, .13);
+        color: var(--text-primary);
+        font-weight: 600;
+        box-shadow: inset 3px 0 0 var(--accent-color);
+    }
+    .fl-row.stacked { grid-template-columns: 1fr; gap: 3px; }
+    .fl-row.stacked .fx { color: var(--text-primary); }
+    .fl-row.stacked .cond { text-align: left; color: var(--text-muted); font-weight: 500; }
+
+    .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+    }
+    .btn {
+        padding: 8px 15px;
+        border: 1px solid transparent;
+        border-radius: 7px;
+        font-size: .84rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color .2s, border-color .2s, transform .1s;
+    }
+    .btn:active { transform: translateY(1px); }
+    .btn-ghost {
+        background: transparent;
+        color: var(--text-secondary);
+        border-color: var(--border-color);
+    }
+    .btn-ghost:hover { color: var(--text-primary); border-color: var(--accent-color); }
+
+    /* 矮屏电脑：进一步压缩，仍保持一屏 */
+    @media (min-width: 861px) and (max-height: 760px) {
+        body { padding: 8px 16px 12px; }
+        .page-head { margin-bottom: 6px; }
+        .tabs { margin-bottom: 8px; padding: 4px; }
+        .tab { padding: 6px 14px; font-size: .86rem; }
+        .card { padding: 11px 13px; }
+        .card h2 { margin-bottom: 9px; }
+        .member { padding: 8px 10px; }
+        .layout, .col { gap: 10px; }
+    }
+
+    /* ---------------- 平板 / 手机 ---------------- */
+    @media (max-width: 860px) {
+        .layout { grid-template-columns: 1fr; }
+        /* 展开两栏，让卡片直接参与排序：参数 → 队伍统计 → 结果 */
+        .col { display: contents; }
+        .card-param { order: 1; }
+        .card-team { order: 2; }
+        .result-card { order: 3; }
+    }
+
+    @media (max-width: 620px) {
+        body { padding: 10px 11px 30px; }
+        .page-head { margin-bottom: 8px; }
+        .page-head .mem-hint { flex: 1 0 100%; justify-content: center; }
+        .tabs {
+            position: sticky;
+            top: 8px;
+            z-index: 50;
+            margin-bottom: 10px;
+            max-width: none;
+            backdrop-filter: blur(9px);
+            background: rgba(30, 30, 38, .93);
         }
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        }
-        body {
-            background-color: var(--bg-main);
-            color: var(--text-primary);
-            line-height: 1.6;
-            padding: 16px;
-            min-height: 100vh;
-        }
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-        h1 {
-            color: var(--accent-color);
-            text-align: center;
-            margin: 16px 0 24px;
-            font-size: clamp(1.5rem, 3vw, 2rem);
-        }
-        .card {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        .card h2 {
-            color: var(--accent-blue);
-            margin-bottom: 16px;
-            font-size: clamp(1.2rem, 2.5vw, 1.5rem);
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 8px;
-        }
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-        .form-group label {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-        .form-group input {
-            background-color: var(--bg-main);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 10px 12px;
-            color: var(--text-primary);
-            font-size: 1rem;
-            transition: border-color 0.2s;
-        }
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--accent-color);
-        }
-        .btn {
-            background-color: var(--accent-color);
-            color: #000;
-            border: none;
-            border-radius: 6px;
-            padding: 10px 16px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            width: 100%;
-            margin-top: 8px;
-        }
-        .btn:hover {
-            background-color: #9c27b0;
-        }
-        .result-box {
-            margin-top: 16px;
-            padding: 12px;
-            background-color: var(--bg-main);
-            border-radius: 6px;
-            border-left: 4px solid var(--success-color);
-        }
-        .result-item {
-            margin: 6px 0;
-        }
-        .label {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-        .value {
-            color: var(--success-color);
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
-        .note {
-            margin-top: 12px;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-        }
-        .note span {
-            color: var(--danger-color);
-        }
-        @media (max-width: 600px) {
-            .card {
-                padding: 16px;
-            }
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+        .tab { padding: 10px 14px; font-size: .92rem; }
+        .card { padding: 13px; border-radius: 10px; }
+        .card h2 { font-size: 1rem; }
+        .layout, .col { gap: 10px; }
+
+        /* 手机上改为「标签 + 输入框」同行，省高度、好点按 */
+        .form-grid, .team-grid { grid-template-columns: 1fr; gap: 10px; }
+        .form-grid.narrow { grid-template-columns: minmax(0, 1fr); }
+        .form-group { flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; }
+        .form-group > label { flex: 1 1 auto; font-size: .84rem; }
+        .input-wrap { flex: 0 0 144px; }
+        .input-wrap input { font-size: 16px; padding: 9px 4px 9px 11px; }
+        .input-wrap .unit { font-size: .82rem; }
+
+        .member { padding: 10px 12px; }
+        .member-head { font-size: .86rem; margin-bottom: 8px; }
+        .member-body { grid-template-columns: 1fr; gap: 8px; }
+        .member > .form-group + .form-group { margin-top: 8px; }
+        .team-grid.two { grid-template-columns: 1fr; }
+        .member .form-group > label { font-size: .8rem; }
+        .member .input-wrap { flex: 0 0 132px; }
+        .member .input-wrap input { font-size: 16px; padding: 8px 4px 8px 10px; }
+
+        .sum-bar { gap: 8px 16px; padding: 11px 12px; }
+        .sum-item .value { font-size: 1.16rem; }
+        .expr { flex: 1 1 100%; }
+
+        .result-row .label { font-size: .84rem; }
+        .result-row .value { font-size: 1.06rem; }
+        .result-row.primary .value { font-size: 1.34rem; }
+        .fl-row { grid-template-columns: 1fr; gap: 2px; padding: 7px 12px; }
+        .fl-row .cond { text-align: left; color: var(--text-muted); }
+        .fl-row.stacked .cond { color: var(--text-muted); }
+        .btn { flex: 1 1 auto; min-height: 44px; font-size: .9rem; }
+    }
+
+    @media (max-width: 380px) {
+        .input-wrap, .member .input-wrap { flex: 0 0 116px; }
+    }
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>抗性/防御系数计算</h1>
 
-        <!-- 抗性系数计算 -->
-        <div class="card">
-            <h2>抗性系数计算</h2>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="baseResist">敌人初始抗性 (%)</label>
-                    <input type="number" id="baseResist" placeholder="例：10" step="0.1" value="10">
-                </div>
-                <div class="form-group">
-                    <label for="resistDown">减抗数值 (%)</label>
-                    <input type="number" id="resistDown" placeholder="例：40" step="0.1" value="0">
+<!-- 全局水印：pointer-events:none，不拦截点击 / 输入 -->
+<svg class="watermark" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+    <defs>
+        <pattern id="wmPattern" width="300" height="180" patternUnits="userSpaceOnUse" patternTransform="rotate(-26)">
+            <text x="150" y="95" text-anchor="middle" class="wm-text">羽化哲</text>
+        </pattern>
+    </defs>
+    <rect x="0" y="0" width="100%" height="100%" fill="url(#wmPattern)"></rect>
+</svg>
+
+<div class="container">
+    <header class="page-head">
+        <h1>抗性 / 防御乘区计算器</h1>
+        <span class="mem-hint" id="memHint">输入已记忆</span>
+    </header>
+
+    <nav class="tabs" role="tablist" aria-label="计算板块切换">
+        <button class="tab active" id="tab-resist" role="tab" aria-selected="true" aria-controls="panel-resist" data-target="panel-resist">抗性乘区</button>
+        <button class="tab" id="tab-defense" role="tab" aria-selected="false" aria-controls="panel-defense" data-target="panel-defense">防御乘区</button>
+    </nav>
+
+    <!-- ==================== 抗性乘区 ==================== -->
+    <section class="panel" id="panel-resist" role="tabpanel" aria-labelledby="tab-resist">
+        <div class="layout">
+
+            <div class="col">
+                <div class="card card-team">
+                    <h2>队伍减抗统计</h2>
+                    <div class="team-grid two">
+                        <div class="member" data-member="1">
+                            <div class="member-head"><span class="dot"></span>角色 1</div>
+                            <div class="form-group">
+                                <label for="rd1">减抗数值</label>
+                                <div class="input-wrap">
+                                    <input type="number" id="rd1" class="rd-input" step="0.1" min="0" value="0" autocomplete="off">
+                                    <span class="unit">%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="member" data-member="2">
+                            <div class="member-head"><span class="dot"></span>角色 2</div>
+                            <div class="form-group">
+                                <label for="rd2">减抗数值</label>
+                                <div class="input-wrap">
+                                    <input type="number" id="rd2" class="rd-input" step="0.1" min="0" value="0" autocomplete="off">
+                                    <span class="unit">%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="member" data-member="3">
+                            <div class="member-head"><span class="dot"></span>角色 3</div>
+                            <div class="form-group">
+                                <label for="rd3">减抗数值</label>
+                                <div class="input-wrap">
+                                    <input type="number" id="rd3" class="rd-input" step="0.1" min="0" value="0" autocomplete="off">
+                                    <span class="unit">%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="member" data-member="4">
+                            <div class="member-head"><span class="dot"></span>角色 4</div>
+                            <div class="form-group">
+                                <label for="rd4">减抗数值</label>
+                                <div class="input-wrap">
+                                    <input type="number" id="rd4" class="rd-input" step="0.1" min="0" value="0" autocomplete="off">
+                                    <span class="unit">%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sum-bar">
+                        <div class="sum-item">
+                            <span class="label">总减抗</span>
+                            <span class="value" id="totalResistDown">0.00 %</span>
+                        </div>
+                        <div class="expr" id="resistExpr">总减抗 = 0.00 + 0.00 + 0.00 + 0.00 = 0.00 %</div>
+                    </div>
                 </div>
             </div>
-            <button class="btn" onclick="calcResist()">计算抗性系数</button>
-            <div class="result-box" id="resistResult" style="display: none;">
-                <div class="result-item">
-                    <span class="label">最终抗性：</span>
-                    <span class="value" id="finalResist"></span>
+
+            <div class="col">
+                <div class="card card-param">
+                    <h2>敌人抗性</h2>
+                    <div class="form-grid narrow">
+                        <div class="form-group">
+                            <label for="baseResist">敌人初始抗性</label>
+                            <div class="input-wrap">
+                                <input type="number" id="baseResist" step="0.1" value="10" autocomplete="off">
+                                <span class="unit">%</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="result-item">
-                    <span class="label">抗性系数：</span>
-                    <span class="value" id="resistCoeff"></span>
+
+                <div class="card result-card">
+                    <h2>抗性乘区结果</h2>
+                    <div class="result-main">
+                        <div class="result-box">
+                            <div class="result-row">
+                                <span class="label">敌人实际抗性</span>
+                                <span class="value" id="actualResist">10.00 %</span>
+                            </div>
+                            <div class="result-row primary">
+                                <span class="label">抗性乘区</span>
+                                <span class="value" id="resistCoeff">0.9000</span>
+                            </div>
+                        </div>
+
+                        <div class="formula-list" id="resistFormulaList">
+                            <div class="fl-row" data-branch="lt0">
+                                <span class="fx">抗性乘区 = 1 − 实际抗性 ÷ 2</span>
+                                <span class="cond">实际抗性 &lt; 0</span>
+                            </div>
+                            <div class="fl-row" data-branch="mid">
+                                <span class="fx">抗性乘区 = 1 − 实际抗性</span>
+                                <span class="cond">0 ≤ 实际抗性 ≤ 75%</span>
+                            </div>
+                            <div class="fl-row" data-branch="gt75">
+                                <span class="fx">抗性乘区 = 1 ÷ (1 + 4 × 实际抗性)</span>
+                                <span class="cond">实际抗性 &gt; 75%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        <button class="btn btn-ghost" type="button" id="resetResist">重置抗性板块</button>
+                    </div>
                 </div>
-                <div class="result-item label" id="resistFormula"></div>
             </div>
+
         </div>
+    </section>
 
-        <!-- 防御系数计算 -->
-        <div class="card">
-            <h2>防御系数计算</h2>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="charLv">角色等级</label>
-                    <input type="number" id="charLv" placeholder="角色等级" value="90">
-                </div>
-                <div class="form-group">
-                    <label for="enemyLv">敌人等级</label>
-                    <input type="number" id="enemyLv" placeholder="敌人等级" value="90">
-                </div>
-                <div class="form-group">
-                    <label for="defReduction">减防百分比 (%)</label>
-                    <input type="number" id="defReduction" placeholder="上限90%" step="0.1" value="0">
-                </div>
-                <div class="form-group">
-                    <label for="ignoreDef">无视防御百分比 (%)</label>
-                    <input type="number" id="ignoreDef" placeholder="上限100%" step="0.1" value="0">
+    <!-- ==================== 防御乘区 ==================== -->
+    <section class="panel" id="panel-defense" role="tabpanel" aria-labelledby="tab-defense" hidden>
+        <div class="layout">
+
+            <div class="col">
+                <div class="card card-team">
+                    <h2>队伍减防 / 无视防御统计</h2>
+                    <div class="team-grid two">
+                        <div class="member" data-member="1">
+                            <div class="member-head"><span class="dot"></span>角色 1</div>
+                            <div class="member-body">
+                            <div class="form-group">
+                                <label for="dr1">减防百分比</label>
+                                <div class="input-wrap">
+                                    <input type="number" id="dr1" class="dr-input" step="0.1" min="0" value="0" autocomplete="off">
+                                    <span class="unit">%</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="ig1">无视防御百分比</label>
+                                <div class="input-wrap">
+                                    <input type="number" id="ig1" class="ig-input" step="0.1" min="0" value="0" autocomplete="off">
+                                    <span class="unit">%</span>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="member" data-member="2">
+                            <div class="member-head"><span class="dot"></span>角色 2</div>
+                            <div class="member-body">
+                            <div class="form-group">
+                                <label for="dr2">减防百分比</label>
+                                <div class="input-wrap">
+                                    <input type="number" id="dr2" class="dr-input" step="0.1" min="0" value="0" autocomplete="off">
+                                    <span class="unit">%</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="ig2">无视防御百分比</label>
+                                <div class="input-wrap">
+                                    <input type="number" id="ig2" class="ig-input" step="0.1" min="0" value="0" autocomplete="off">
+                                    <span class="unit">%</span>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="member" data-member="3">
+                            <div class="member-head"><span class="dot"></span>角色 3</div>
+                            <div class="member-body">
+                            <div class="form-group">
+                                <label for="dr3">减防百分比</label>
+                                <div class="input-wrap">
+                                    <input type="number" id="dr3" class="dr-input" step="0.1" min="0" value="0" autocomplete="off">
+                                    <span class="unit">%</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="ig3">无视防御百分比</label>
+                                <div class="input-wrap">
+                                    <input type="number" id="ig3" class="ig-input" step="0.1" min="0" value="0" autocomplete="off">
+                                    <span class="unit">%</span>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="member" data-member="4">
+                            <div class="member-head"><span class="dot"></span>角色 4</div>
+                            <div class="member-body">
+                            <div class="form-group">
+                                <label for="dr4">减防百分比</label>
+                                <div class="input-wrap">
+                                    <input type="number" id="dr4" class="dr-input" step="0.1" min="0" value="0" autocomplete="off">
+                                    <span class="unit">%</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="ig4">无视防御百分比</label>
+                                <div class="input-wrap">
+                                    <input type="number" id="ig4" class="ig-input" step="0.1" min="0" value="0" autocomplete="off">
+                                    <span class="unit">%</span>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sum-bar">
+                        <div class="sum-item">
+                            <span class="label">总减防（上限 90%）</span>
+                            <span class="value" id="totalDefRed">0.00 %</span>
+                        </div>
+                        <div class="sum-item">
+                            <span class="label">总无视防御（上限 100%）</span>
+                            <span class="value" id="totalIgnoreDef">0.00 %</span>
+                        </div>
+                        <div class="expr" id="defenseExpr">总减防 = 0.00 + 0.00 + 0.00 + 0.00 = 0.00 %｜总无视防御 = 0.00 + 0.00 + 0.00 + 0.00 = 0.00 %</div>
+                    </div>
                 </div>
             </div>
-            <button class="btn" onclick="calcDefense()">计算防御系数</button>
-            <div class="result-box" id="defenseResult" style="display: none;">
-                <div class="result-item">
-                    <span class="label">防御系数：</span>
-                    <span class="value" id="defenseCoeff"></span>
+
+            <div class="col">
+                <div class="card card-param">
+                    <h2>等级参数</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="charLv">角色等级</label>
+                            <div class="input-wrap">
+                                <input type="number" id="charLv" step="1" min="1" value="90" autocomplete="off">
+                                <span class="unit">Lv</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="enemyLv">敌人等级</label>
+                            <div class="input-wrap">
+                                <input type="number" id="enemyLv" step="1" min="1" value="90" autocomplete="off">
+                                <span class="unit">Lv</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card result-card">
+                    <h2>防御乘区结果</h2>
+                    <div class="result-main">
+                        <div class="result-box">
+                            <div class="result-row">
+                                <span class="label">角色防御基准值</span>
+                                <span class="value" id="charBase">190</span>
+                            </div>
+                            <div class="result-row">
+                                <span class="label">敌人有效防御</span>
+                                <span class="value" id="enemyDef">190.00</span>
+                            </div>
+                            <div class="result-row primary">
+                                <span class="label">防御乘区</span>
+                                <span class="value" id="defenseCoeff">0.5000</span>
+                            </div>
+                        </div>
+
+                        <div class="formula-list">
+                            <div class="fl-row stacked on">
+                                <span class="fx">防御乘区 = (角色等级 + 100) ÷ [(角色等级 + 100) + 敌人有效防御]</span>
+                                <span class="cond">敌人有效防御 = (敌人等级 + 100) × (1 − 总减防%) × (1 − 总无视防御%)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        <button class="btn btn-ghost" type="button" id="resetDefense">重置防御板块</button>
+                    </div>
                 </div>
             </div>
-            <div class="note">
-                <span>注意：</span> 减防上限90%，无视防御上限100%，数值将自动截断。
-            </div>
+
         </div>
-    </div>
+    </section>
+</div>
 
-    <script>
-        // 抗性计算：初始抗性 - 减抗 = 最终抗性，再计算系数
-        function calcResist() {
-            const base = parseFloat(document.getElementById('baseResist').value);
-            const down = parseFloat(document.getElementById('resistDown').value);
+<script>
+(function () {
+    "use strict";
 
-            if (isNaN(base) || isNaN(down)) {
-                alert("请输入有效数字");
-                return;
-            }
+    var $ = function (id) { return document.getElementById(id); };
 
-            // 计算最终抗性
-            const finalResistPercent = base - down;
-            const finalResist = finalResistPercent / 100;
-            let resistCoeff, formula;
+    /* ================= 本地记忆（刷新 / 二次进入不丢失） ================= */
+    var STORE_KEY = "kx-calc-v1";
+    var DEFAULTS = {
+        baseResist: "10",
+        rd1: "0", rd2: "0", rd3: "0", rd4: "0",
+        charLv: "90", enemyLv: "90",
+        dr1: "0", dr2: "0", dr3: "0", dr4: "0",
+        ig1: "0", ig2: "0", ig3: "0", ig4: "0"
+    };
+    var PERSIST_IDS = Object.keys(DEFAULTS);
+    var activeTab = "panel-resist";
 
-            // 原神标准抗性公式
-            if (finalResist <= 0) {
-                resistCoeff = 1 - finalResist / 2;
-                formula = "套用公式：1 - 最终抗性 ÷ 2（最终抗性 ≤ 0%）";
-            } else if (finalResist > 0 && finalResist <= 0.75) {
-                resistCoeff = 1 - finalResist;
-                formula = "套用公式：1 - 最终抗性（0% ＜ 最终抗性 ≤ 75%）";
-            } else {
-                resistCoeff = 1 / (finalResist + 5);
-                formula = "套用公式：1 ÷ (最终抗性 + 5)（最终抗性 ＞ 75%）";
-            }
+    var storageOK = (function () {
+        try {
+            var k = "__kx_probe__";
+            window.localStorage.setItem(k, "1");
+            window.localStorage.removeItem(k);
+            return true;
+        } catch (e) { return false; }
+    })();
 
-            // 展示结果
-            document.getElementById('resistResult').style.display = 'block';
-            document.getElementById('finalResist').textContent = finalResistPercent.toFixed(2) + " %";
-            document.getElementById('resistCoeff').textContent = resistCoeff.toFixed(4);
-            document.getElementById('resistFormula').textContent = formula;
+    function loadState() {
+        if (!storageOK) return {};
+        try {
+            return JSON.parse(window.localStorage.getItem(STORE_KEY)) || {};
+        } catch (e) { return {}; }
+    }
+    function saveState() {
+        if (!storageOK) return;
+        var data = { tab: activeTab };
+        PERSIST_IDS.forEach(function (id) {
+            var el = $(id);
+            if (el) data[id] = el.value;
+        });
+        try { window.localStorage.setItem(STORE_KEY, JSON.stringify(data)); } catch (e) {}
+    }
+
+    /* ================= 通用工具 ================= */
+    function raw(el) {
+        var v = parseFloat(el.value);
+        return isNaN(v) ? 0 : v;
+    }
+    function atLeastZero(el) { return Math.max(0, raw(el)); }
+    function fixed(v, d) { return v.toFixed(d === undefined ? 2 : d); }
+    function inputsOf(selector, scope) {
+        return Array.prototype.slice.call((scope || document).querySelectorAll(selector));
+    }
+
+    /* ================= 标签页切换 ================= */
+    var tabs = inputsOf(".tab");
+    var panels = inputsOf(".panel");
+
+    function activateTab(panelId) {
+        var matched = false;
+        tabs.forEach(function (t) {
+            var on = t.getAttribute("data-target") === panelId;
+            if (on) matched = true;
+            t.classList.toggle("active", on);
+            t.setAttribute("aria-selected", on ? "true" : "false");
+        });
+        if (!matched) return;
+        panels.forEach(function (p) {
+            var on = p.id === panelId;
+            p.classList.toggle("active", on);
+            p.hidden = !on;
+        });
+        activeTab = panelId;
+    }
+
+    tabs.forEach(function (tab) {
+        tab.addEventListener("click", function () {
+            activateTab(tab.getAttribute("data-target"));
+            saveState();
+        });
+    });
+
+    /* ================= 抗性乘区 ================= */
+    var baseResistEl = $("baseResist");
+    var rdInputs = inputsOf(".rd-input");
+
+    function calcResist() {
+        var base = raw(baseResistEl);
+        var parts = rdInputs.map(atLeastZero);
+        var total = parts.reduce(function (a, b) { return a + b; }, 0);
+        var actualPct = base - total;
+        var r = actualPct / 100;      // 小数形式
+
+        var coeff, branch;
+        if (r < 0) {
+            coeff = 1 - r / 2;                       // 实际抗性 < 0
+            branch = "lt0";
+        } else if (r <= 0.75) {
+            coeff = 1 - r;                           // 0 ≤ 实际抗性 ≤ 75%
+            branch = "mid";
+        } else {
+            coeff = 1 / (1 + 4 * r);                 // 实际抗性 > 75%
+            branch = "gt75";
         }
 
-        // 防御系数计算
-        function calcDefense() {
-            const charLv = parseInt(document.getElementById('charLv').value);
-            const enemyLv = parseInt(document.getElementById('enemyLv').value);
-            let defRed = parseFloat(document.getElementById('defReduction').value);
-            let ignoreDef = parseFloat(document.getElementById('ignoreDef').value);
+        inputsOf("#panel-resist .member").forEach(function (m, i) {
+            m.classList.toggle("is-active", (parts[i] || 0) > 0);
+        });
 
-            if (isNaN(charLv) || isNaN(enemyLv) || isNaN(defRed) || isNaN(ignoreDef)) {
-                alert("请输入有效数字");
-                return;
-            }
+        $("totalResistDown").textContent = fixed(total) + " %";
+        $("resistExpr").textContent =
+            "总减抗 = " + parts.map(function (v) { return fixed(v); }).join(" + ") +
+            " = " + fixed(total) + " %";
 
-            // 数值限制
-            defRed = Math.min(defRed, 90);
-            ignoreDef = Math.min(ignoreDef, 100);
+        var actualEl = $("actualResist");
+        actualEl.textContent = fixed(actualPct) + " %";
+        actualEl.classList.toggle("warn", actualPct > 75);
+        $("resistCoeff").textContent = coeff.toFixed(4);
 
-            const charVal = charLv + 100;
-            const enemyDef = (enemyLv + 100) * (1 - defRed / 100) * (1 - ignoreDef / 100);
-            const defCoeff = charVal / (charVal + enemyDef);
+        inputsOf("#resistFormulaList .fl-row").forEach(function (row) {
+            row.classList.toggle("on", row.getAttribute("data-branch") === branch);
+        });
+    }
 
-            document.getElementById('defenseResult').style.display = 'block';
-            document.getElementById('defenseCoeff').textContent = defCoeff.toFixed(4);
-        }
-    </script>
+    /* ================= 防御乘区 ================= */
+    var charLvEl = $("charLv");
+    var enemyLvEl = $("enemyLv");
+    var drInputs = inputsOf(".dr-input");
+    var igInputs = inputsOf(".ig-input");
+
+    function calcDefense() {
+        var charLv = Math.max(1, raw(charLvEl));
+        var enemyLv = Math.max(1, raw(enemyLvEl));
+
+        var drParts = drInputs.map(atLeastZero);
+        var igParts = igInputs.map(atLeastZero);
+        var drRaw = drParts.reduce(function (a, b) { return a + b; }, 0);
+        var igRaw = igParts.reduce(function (a, b) { return a + b; }, 0);
+
+        // 原有上限逻辑保持不变
+        var defRed = Math.min(drRaw, 90);
+        var ignoreDef = Math.min(igRaw, 100);
+
+        var charVal = charLv + 100;
+        var enemyDef = (enemyLv + 100) * (1 - defRed / 100) * (1 - ignoreDef / 100);
+        var defCoeff = charVal / (charVal + enemyDef);
+
+        inputsOf("#panel-defense .member").forEach(function (m, i) {
+            m.classList.toggle("is-active", (drParts[i] || 0) > 0 || (igParts[i] || 0) > 0);
+        });
+
+        $("totalDefRed").textContent = fixed(drRaw) + " %";
+        $("totalIgnoreDef").textContent = fixed(igRaw) + " %";
+        $("defenseExpr").textContent =
+            "总减防 = " + drParts.map(function (v) { return fixed(v); }).join(" + ") + " = " + fixed(drRaw) + " %" +
+            "｜总无视防御 = " + igParts.map(function (v) { return fixed(v); }).join(" + ") + " = " + fixed(igRaw) + " %" +
+            (drRaw > 90 || igRaw > 100 ? "（已按上限截断）" : "");
+
+        $("charBase").textContent = charVal;
+        $("enemyDef").textContent = fixed(enemyDef);
+        $("defenseCoeff").textContent = defCoeff.toFixed(4);
+    }
+
+    /* ================= 事件绑定 ================= */
+    function onEdit(fn) {
+        return function () { fn(); saveState(); };
+    }
+    inputsOf("#panel-resist input").forEach(function (el) {
+        el.addEventListener("input", onEdit(calcResist));
+        el.addEventListener("change", onEdit(calcResist));
+    });
+    inputsOf("#panel-defense input").forEach(function (el) {
+        el.addEventListener("input", onEdit(calcDefense));
+        el.addEventListener("change", onEdit(calcDefense));
+    });
+
+    function resetPanel(ids) {
+        ids.forEach(function (id) {
+            var el = $(id);
+            if (el) el.value = DEFAULTS[id];
+        });
+    }
+    $("resetResist").addEventListener("click", function () {
+        resetPanel(["baseResist", "rd1", "rd2", "rd3", "rd4"]);
+        calcResist();
+        saveState();
+    });
+    $("resetDefense").addEventListener("click", function () {
+        resetPanel(["charLv", "enemyLv", "dr1", "dr2", "dr3", "dr4", "ig1", "ig2", "ig3", "ig4"]);
+        calcDefense();
+        saveState();
+    });
+
+    /* ================= 初始化：先恢复记忆，再计算 ================= */
+    var saved = loadState();
+    PERSIST_IDS.forEach(function (id) {
+        var el = $(id);
+        if (!el) return;
+        var v = saved[id];
+        if (v !== undefined && v !== null && v !== "" && !isNaN(parseFloat(v))) el.value = v;
+    });
+    if (saved.tab === "panel-defense" || saved.tab === "panel-resist") activateTab(saved.tab);
+
+    var memHint = $("memHint");
+    if (memHint && !storageOK) {
+        memHint.textContent = "当前环境无法本地记忆，刷新后需重新填写";
+        memHint.classList.add("off");
+    }
+
+    calcResist();
+    calcDefense();
+    saveState();
+})();
+</script>
 </body>
 </html>
