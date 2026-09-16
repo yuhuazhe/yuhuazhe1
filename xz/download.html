@@ -40,17 +40,15 @@
   .meta{font-size:12.5px;color:var(--dim);white-space:nowrap}
   .col-act{text-align:right;width:150px}
 
+  /* 按钮已改为跳转链接，外观保持不变 */
   .dl{
+    display:inline-block;
     font-family:inherit;font-size:13px;font-weight:600;color:#fff;
     background:var(--brand);border:0;border-radius:7px;
     padding:9px 16px;cursor:pointer;white-space:nowrap;
+    text-decoration:none;text-align:center;
   }
   .dl:hover{background:#3f6bff}
-  .dl:disabled{background:#39415a;color:#9aa3b8;cursor:default}
-
-  /* 下载失败提示：平时占位 0 高度，只有出错才显形 */
-  .err{margin-top:10px;font-size:12.5px;color:#f87171;line-height:1.6;min-height:0}
-  .err:empty{display:none}
 
   .tip{margin-top:16px;font-size:12.5px;color:var(--dim)}
 
@@ -72,7 +70,7 @@
 <div class="wrap">
 
   <h1>软件下载中心</h1>
-  <p class="sub">点击右侧「下载」获取 .exe 安装包</p>
+  <p class="sub">点击右侧「下载」跳转到网盘获取 .exe 安装包</p>
 
   <table>
     <thead>
@@ -88,62 +86,61 @@
       <!--
         ===== 加程序：复制下面整段 <tr> 追加到 </tr> 后面，改内容即可 =====
 
-        data-file  真正去下载的地址，三种写法任选：
-                    ① 只写文件名   data-file="setup.exe"
-                       → exe 与 download.html 在同一个目录
-                    ② 绝对路径     data-file="/xz/setup.exe"
-                       → 以网站根目录为起点，子目录部署时最稳
-                    ③ 完整网址     data-file="https://yuhuazhe.cn/xz/setup.exe"
-
-        ⚠ 文件名建议只用 ASCII（字母、数字、连字符）。
-          中文或空格文件名在部分静态托管的 URL 编码环节会取不到文件，
-          浏览器提示「无法下载 - 没有文件」，但服务器上明明有。
-
-        data-name  下载后保存到本地的文件名，可以和 data-file 不同，
-                   所以 exe 换成 ASCII 名后，用户保存下来仍是中文名。
+        href  点击后跳转的网盘分享地址，直接填微云分享链接即可。
+              链接带 target="_blank"，点击后在新标签页打开，
+              由网盘页面完成取件/下载，本页面不再直接触发文件下载。
       -->
       <tr>
         <td>
-          <div class="name">原神BUFf排轴工具</div>
+          <div class="name">原神BUFF排轴工具-v2.1.exe</div>
           <div class="desc">用于模拟排轴流程实用工具</div>
         </td>
         <td class="meta">v2.1<br>Windows 10/11 · 64 位</td>
-        <td class="meta">157 KB</td>
+        <td class="meta">14,424 KB</td>
         <td class="col-act">
-          <button class="dl" type="button"
-                  data-file="原神BUFF排轴工具.exe"
-                  data-name="原神BUFF排轴工具.exe">下载</button>
-          <div class="err"></div>
+          <!-- 分享码区分大小写：ClXBFXyj 第 2 位是小写字母 l（不是大写 I），抄错就跳「文件不存在」 -->
+          <a class="dl" href="https://share.weiyun.com/ClXBFXyj"
+             target="_blank" rel="noopener noreferrer">下载</a>
         </td>
       </tr>
 
       <tr>
         <td>
-          <div class="name">充能计算器</div>
+          <div class="name">充能计算器-v2.5.exe</div>
           <div class="desc">计算角色所需的充能需求</div>
         </td>
         <td class="meta">v2.5<br>Windows 10/11 · 64 位</td>
-        <td class="meta">413KB</td>
+        <td class="meta">14,210 KB</td>
         <td class="col-act">
-          <button class="dl" type="button"
-                  data-file="充能计算器.exe"
-                  data-name="充能计算器.exe">下载</button>
-          <div class="err"></div>
+          <!-- 分享码末位是小写 c：ZX6yJamc -->
+          <a class="dl" href="https://share.weiyun.com/ZX6yJamc"
+             target="_blank" rel="noopener noreferrer">下载</a>
         </td>
       </tr>
 
       <tr>
         <td>
-          <div class="name">抗性减防计算器</div>
+          <div class="name">抗性减防计算器-v2.1.exe</div>
           <div class="desc">快速计算系数程序</div>
         </td>
         <td class="meta">v2.1<br>Windows 10/11 · 64 位</td>
-        <td class="meta">170 KB</td>
+        <td class="meta">14,119 KB</td>
         <td class="col-act">
-          <button class="dl" type="button"
-                  data-file="抗性减防计算器.exe"
-                  data-name="抗性减防计算器.exe">下载</button>
-          <div class="err"></div>
+          <a class="dl" href="https://share.weiyun.com/382K7vM4"
+             target="_blank" rel="noopener noreferrer">下载</a>
+        </td>
+      </tr>
+
+      <tr>
+        <td>
+          <div class="name">面板计算器-v2.1.exe</div>
+          <div class="desc">快速计算角色面板</div>
+        </td>
+        <td class="meta">v2.1<br>Windows 10/11 · 64 位</td>
+        <td class="meta">14,122 KB</td>
+        <td class="col-act">
+          <a class="dl" href="https://share.weiyun.com/X9W2iE5v"
+             target="_blank" rel="noopener noreferrer">下载</a>
         </td>
       </tr>
 
@@ -152,66 +149,5 @@
 
   <p class="tip">若提示有风险，则需要无视风险下载即可！版权所有侵必究！</p>
 </div>
-
-<script>
-/* 用事件委托，所以以后自己加多少行 <tr> 都不用改这段脚本。 */
-
-// 把 data-file 里的中文、空格转成 %XX，避免托管平台在编码环节丢文件
-function toURL(s){
-  if (/^https?:\/\//i.test(s) || s.charAt(0) === "/") return encodeURI(s);
-  return s.split("/").map(encodeURIComponent).join("/");
-}
-
-// 触发浏览器下载
-function fire(url, name){
-  var a = document.createElement("a");
-  a.href = url;
-  a.download = name || "";
-  a.rel = "noopener";
-  a.style.display = "none";
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-}
-
-// 先问服务器这个文件在不在，再决定要不要真的下
-function exists(url){
-  return fetch(url, { method: "HEAD", cache: "no-store" })
-    .then(function (r) {
-      // r.ok=false 且拿到了 HTTP 状态码，说明文件确实不在
-      return { missing: !r.ok, status: r.status };
-    })
-    .catch(function () {
-      // 跨域或网络异常，无法判断，就交给浏览器正常下载，不误报
-      return { missing: false, status: 0 };
-    });
-}
-
-document.getElementById("list").addEventListener("click", function (e) {
-  var btn = e.target.closest(".dl");
-  if (!btn || btn.disabled) return;
-
-  var raw   = btn.dataset.file;
-  var url   = toURL(raw);
-  var name  = btn.dataset.name || decodeURIComponent(url.split(/[\\/]/).pop());
-  var errEl = btn.parentNode.querySelector(".err");
-
-  btn.disabled = true;
-  btn.textContent = "下载中…";
-  errEl.textContent = "";
-
-  exists(url).then(function (res) {
-    if (res.missing) {
-      errEl.textContent = "下载失败（HTTP " + res.status + "）：服务器上找不到 " + name +
-                          "，请确认文件已提交到 " + (location.pathname.replace(/[^/]*$/, "") || "/") +
-                          " 目录，且大小写与名称完全一致。";
-    } else {
-      fire(url, name);
-    }
-    btn.disabled = false;
-    btn.textContent = "下载";
-  });
-});
-</script>
 </body>
 </html>
