@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>7.2版本 幽境危战</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Microsoft Yahei",sans-serif;}
+body{
+  color:#fff;
+  min-height:100vh;
+  padding:24px 16px;
+  position:relative;
+}
+/* 背景底图预留位置 */
+.bg-layer{
+  position:fixed;
+  inset:0;
+  z-index:-2;
+  background:#0b0b1a;
+}
+.bg-layer img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  opacity:0.6;   /* 背景底图稍微提高不透明度，使其更清晰 */
+}
+.bg-overlay{
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  background:linear-gradient(180deg, rgba(10,12,30,0.25), rgba(5,6,20,0.45));
+}
+.wrapper{
+  max-width:1440px;
+  margin:0 auto;
+}
+.header{
+  text-align:center;
+  margin-bottom:28px;
+}
+.main-title{
+  font-size:34px;
+  font-weight:700;
+  letter-spacing:2px;
+  color:#f4f1ff;
+  text-shadow:0 0 18px rgba(126,91,255,0.45);
+  margin-bottom:14px;
+}
+.download-btn{
+  padding:10px 22px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.18);
+  background:rgba(255,255,255,0.06);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color:#fff;
+  font-size:14px;
+  cursor:pointer;
+  transition:.2s ease;
+}
+.download-btn:hover{
+  background:rgba(255,255,255,0.14);
+  transform:translateY(-1px);
+}
+/* 三栏布局 */
+.card-container{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+}
+@media (max-width:1100px){
+  .card-container{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+@media (max-width:720px){
+  .card-container{
+    grid-template-columns:1fr;
+  }
+  .main-title{
+    font-size:26px;
+  }
+}
+/* 液态玻璃卡片：直接全透明 */
+.glass-card{
+  background: rgba(255,255,255,0);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius:18px;
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.18),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+  padding:18px;
+}
+/* Boss图片添加位置 */
+.boss-img-box{
+  width:100%;
+  height:180px;
+  border-radius:14px;
+  margin-bottom:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#cfd6ff;
+  font-size:13px;
+  background: transparent;   /* 完全透出底图 */
+  border:1px dashed rgba(255,255,255,0.18);
+  overflow:hidden;
+  position:relative;
+}
+.boss-img-box img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  border-radius:12px;
+  /* 透明度调整：既能看清怪物，又能透出底图 */
+  opacity:0.62;
+}
+.placeholder-text{
+  text-align:center;
+}
+.boss-name{
+  font-size:18px;
+  font-weight:700;
+  margin-bottom:4px;
+  color:#ffffff;
+}
+.boss-sub{
+  font-size:13px;
+  color:#d9ddf7;
+  margin-bottom:14px;
+}
+/* 血量独立框架 */
+.hp-block{
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:14px;
+  background: rgba(255,255,255,0);
+  border:1px solid rgba(255,255,255,0.12);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);
+}
+.hp-title{
+  font-size:13px;
+  font-weight:600;
+  color:#b9c0ff;
+  margin-bottom:8px;
+}
+.hp-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:24px;
+  align-items:center;
+  font-size:14px;
+  line-height:1.7;
+  color:#f3f4ff;
+  margin-bottom:6px;
+}
+.fit-row{
+  font-size:13px;
+  color:#c5c9e8;
+}
+/*重点高亮文字改为红色*/
+.text-highlight{
+  color:#ff5c6c;
+  font-weight:bold;
+}
+/* 机制独立框架 */
+.mechanic-block{
+  border-radius:14px;
+  padding:14px;
+  background: rgba(255,255,255,0);
+  border:1px solid rgba(255,255,255,0.12);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);
+}
+.mechanic-title{
+  font-size:14px;
+  font-weight:700;
+  color:#e4dcff;
+  margin-bottom:12px;
+}
+.mechanic-content{
+  font-size:12.5px;
+  line-height:1.8;
+  color:#ececff;
+  text-align:justify;
+}
+.mechanic-content p{
+  margin-bottom:8px;
+}
+.mechanic-content p:last-child{
+  margin-bottom:0;
+}
+/* 底部留白 */
+.footer-tip{
+  text-align:center;
+  margin-top:24px;
+  font-size:12px;
+  color:#9aa0d6;
+}
+</style>
+</head>
+<body>
+<!-- 全局背景底图添加位置 -->
+<div class="bg-layer">
+  <img id="globalBg" src="bj.webp" alt="背景底图">
+</div>
+<div class="bg-overlay"></div>
+<div class="wrapper" id="capture-area">
+  <div class="header">
+    <h1 class="main-title">7.2版本 幽境危战</h1>
+    <button class="download-btn" onclick="downloadImage()">下载图片</button>
+  </div>
+  <div class="card-container">
+    <!-- 波涛锚定者·狂飙突窿 -->
+    <div class="glass-card">
+      <div class="boss-img-box" id="bossImg1">
+        <span class="placeholder-text">Boss图片添加位置</span>
+        <img id="bossImg1Tag" src="1.1.3.png" alt="波涛锚定者·狂飙突窿" onload="imgLoadHandler(1)">
+      </div>
+      <div class="boss-name">波涛锚定者·狂飙突窿</div>
+      <div class="boss-sub">版本：v1.1</div>
+      <div class="hp-block">
+        <div class="hp-title">血量</div>
+        <div class="hp-row">
+          <span>N5：15063255</span>
+          <span>N6：33517377</span>
+        </div>
+        <div class="fit-row">
+          星烁反应角色 ✔ | 雷元素角色 ✔
+        </div>
+      </div>
+      <div class="mechanic-block">
+        <div class="mechanic-title">机制</div>
+        <div class="mechanic-content">
+          <p>• 强抗寒态 <span class="text-highlight">-10% 雷抗，70% 水抗，10% 其他抗</span></p>
+          <p>• 开局 <span class="text-highlight">9s</span>，以及后续每 <span class="text-highlight">16s</span>，会进行「豪饮」，该过程持续 <span class="text-highlight">2s</span>，期间受到伤害降低 <span class="text-highlight">50%</span>，且不被冰冻影响，会积累 <span class="text-highlight">95%「豪饮值」</span>，否则豪饮100%。不处于「豪饮」状态时，对其造成<span class="text-highlight">雷元素反应伤害</span>可以降低其「豪饮值」。</p>
+          <p>•【豪饮值】积累满时，会进入<span class="text-highlight">「奋勇状态」</span>：此时强毁不会消耗【豪饮值】，并获得一个护盾，期间水元素抗性 <span class="text-highlight">130%</span>，其余抗性 <span class="text-highlight">10%</span>。在此状态期间，对其造成雷或元素反应可以更迅速地降低【豪饮值】，若完全靠自然消耗，则该状态会持续 <span class="text-highlight">40s</span>。</p>
+          <p>• 退出「奋勇状态」时，强毁会受到所承受的 <span class="text-highlight">150%星辉反应伤害+60%其他伤害</span>的反噬伤害，该伤害的15%，会拉回强毁最大生命值，之后会继续开始「豪饮」。</p>
+        </div>
+      </div>
+    </div>
+    <!-- 铁甲熔火帝皇·敕命远征 -->
+    <div class="glass-card">
+      <div class="boss-img-box" id="bossImg2">
+        <span class="placeholder-text">Boss图片添加位置</span>
+        <img id="bossImg2Tag" src="1.1.1.png" alt="铁甲熔火帝皇·敕命远征" onload="imgLoadHandler(2)">
+      </div>
+      <div class="boss-name">铁甲熔火帝皇·敕命远征</div>
+      <div class="boss-sub">版本：v1.1</div>
+      <div class="hp-block">
+        <div class="hp-title">血量</div>
+        <div class="hp-row">
+          <span>N5：8552749</span>
+          <span>N6：14042886</span>
+        </div>
+        <div class="fit-row">
+          水元素角色 ✔ | 火元素角色 ✖
+        </div>
+      </div>
+      <div class="mechanic-block">
+        <div class="mechanic-title">机制</div>
+        <div class="mechanic-content">
+          <p>• 具有 <span class="text-highlight">64U 火元素蓄能【熔火双角】</span>，免疫由扩散类反应造成的伤害衰减，存在期间全抗性提升 <span class="text-highlight">15%</span>，破角后损失 <span class="text-highlight">10% 生命值</span>。</p>
+          <p>• 被任意技能时摧毁 <span class="text-highlight">3 个【坚硬重甲】</span>，若场上仍有存活的重甲傀儡则只会补足数量为 3 只。其具有 <span class="text-highlight">12U 火元素</span>，火元素蓄积时将把头锤向敌，使其损失 12U 火元素。</p>
+          <p>• 首领被破甲时还基于【坚重重甲】受到的伤害损失生命值，等同于其受到的 <span class="text-highlight">60% 火元素伤害 + 10% 非火元素伤害</span>，不超过首领 <span class="text-highlight">15% 生命值</span>。</p>
+        </div>
+      </div>
+    </div>
+    <!-- 蕴光月守宫·银牙锁鞘 -->
+    <div class="glass-card">
+      <div class="boss-img-box" id="bossImg3">
+        <span class="placeholder-text">Boss图片添加位置</span>
+        <img id="bossImg3Tag" src="1.1.2.png" alt="蕴光月守宫·银牙锁鞘" onload="imgLoadHandler(3)">
+      </div>
+      <div class="boss-name">蕴光月守宫·银牙锁鞘</div>
+      <div class="boss-sub">版本：v1.1</div>
+      <div class="hp-block">
+        <div class="hp-title">血量</div>
+        <div class="hp-row">
+          <span>N5：10253207</span>
+          <span>N6：20950087</span>
+        </div>
+        <div class="fit-row">
+          岩元素角色 ✔ | 治疗角色 ✔
+        </div>
+      </div>
+      <div class="mechanic-block">
+        <div class="mechanic-title">机制</div>
+        <div class="mechanic-content">
+          <p>• 入战后，会展开 <span class="text-highlight">9 层岩元素护盾</span>，在护盾上一层岩元素护盾前，无法对元素护盾的层数造成减损。全部护盾被击破后，强毁会基于被击破的岩元素护盾的 <span class="text-highlight">70%</span> 和其他伤害的 <span class="text-highlight">10%</span>，受到一次高额伤害，不超过强毁最大生命的 <span class="text-highlight">40%</span>，并晕眩 <span class="text-highlight">15s</span>。</p>
+          <p>• 护盾结束后的 <span class="text-highlight">4s</span>，强毁会为队伍中附近的所有角色施加<span class="text-highlight">【蕴光之茧】</span>：使全部角色基于自身最大生命值的 <span class="text-highlight">15% 损失生命值</span>，造成的伤害 <span class="text-highlight">-50%</span>，受到的治疗 <span class="text-highlight">-40%</span>，暴击率 <span class="text-highlight">-100%</span>，持续<span class="text-highlight">40s</span>，期间首领获得额外的 <span class="text-highlight">60% 岩元素抗性</span>。</p>
+          <p>• 为任意我方角色恢复生命值至上限可解除【蕴光之茧】，使其造成的伤害提升 <span class="text-highlight">50%</span>，暴击率提升 <span class="text-highlight">15%</span>，持续 <span class="text-highlight">15s</span>，并使强毁失去额外获得的岩元素抗性。</p>
+          <p>• 在破除全部岩元素护盾的 <span class="text-highlight">55s</span> 后，强毁会重新展开护盾。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-tip">怪物内容最终版权归米哈游所有！网站仅作引用！感谢92佬提供帮助！</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script>
+//图片加载完成，隐藏占位文字
+function imgLoadHandler(num){
+  const box = document.getElementById('bossImg'+num);
+  const text = box.querySelector('.placeholder-text');
+  if(text) text.style.display = 'none';
+}
+
+// 下载功能：直接截取整个页面，效果与预览一致
+async function downloadImage(){
+  const bgImg = document.getElementById('globalBg');
+  const bossImgs = document.querySelectorAll('#capture-area img');
+
+  // 等待所有图片加载完成
+  await Promise.all([bgImg, ...bossImgs].map(img => {
+    if (img.complete) return Promise.resolve();
+    return new Promise(resolve => {
+      img.addEventListener('load', resolve, { once: true });
+      img.addEventListener('error', resolve, { once: true });
+    });
+  }));
+
+  try {
+    const fullWidth = document.documentElement.scrollWidth;
+    const fullHeight = document.documentElement.scrollHeight;
+
+    const canvas = await html2canvas(document.body, {
+      backgroundColor: '#0b0b1a',
+      useCORS: true,
+      allowTaint: true,
+      scale: window.devicePixelRatio >= 2 ? 2 : 1.5,
+      logging: false,
+      width: fullWidth,
+      height: fullHeight,
+      scrollX: 0,
+      scrollY: -window.scrollY,
+      windowWidth: fullWidth,
+      windowHeight: fullHeight
+    });
+
+    const link = document.createElement('a');
+    link.download = '7.2幽境危战.png';
+    link.href = canvas.toDataURL('image/png');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } catch (err) {
+    console.error('截图失败:', err);
+    alert('下载截图失败');
+  }
+}
+
+// 图片填充辅助函数：填入全局背景
+function setGlobalBg(src){
+  document.getElementById('globalBg').src = src;
+}
+// 图片填充辅助函数：填入Boss图片
+function setBossImg(index, src){
+  const tag = document.getElementById('bossImg' + index + 'Tag');
+  tag.src = src;
+}
+</script>
+</body>
+</html>
