@@ -106,8 +106,6 @@
                 align-self:end;
             }
         }
-
-        /* 外层：垂直滚动 */
         .outer-scroll{
             flex: 1;
             overflow-y: auto;
@@ -119,8 +117,6 @@
         .outer-scroll::-webkit-scrollbar{
             display:none;
         }
-
-        /* 内层：横向滚动，所有表格行全部放在这里！ */
         .x-scroll{
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
@@ -133,11 +129,8 @@
             background:rgba(255,255,255,0.25);
             border-radius:4px;
         }
-
-        /* ========= PC表格：CSS Grid 写死每一列像素，彻底杜绝对不齐 ========= */
         .grid-row{
             display: grid;
-            /* 【重点】所有行，表头+数据行，完全一模一样的列宽度定义 */
             grid-template-columns: 220px 140px 160px 80px 130px 100px 110px 180px;
             gap:8px;
             align-items:center;
@@ -207,8 +200,6 @@
             text-decoration:none;
             font-size:12px;
         }
-
-        /* ========= 手机端卡片模式 ========= */
         @media (max-width:679px){
             .grid-row{
                 display:none !important;
@@ -315,7 +306,6 @@
     </div>
     <div class="outer-scroll">
         <div class="x-scroll">
-            <!-- 表头Grid行 -->
             <div class="grid-row grid-header">
                 <div class="col-avatar-wrap"></div>
                 <div class="cell cell-header">队伍名称</div>
@@ -323,13 +313,11 @@
                 <div class="cell cell-header">金数</div>
                 <div class="cell cell-header">DPS</div>
                 <div class="cell cell-header">满能量</div>
-                <div class="cell cell-header">日期</div>
+                <div class="cell cell-header">版本</div>
                 <div class="cell cell-header">视频链接</div>
             </div>
-            <!-- PC表格数据容器 -->
             <div id="listPc"></div>
         </div>
-        <!-- 手机卡片容器 -->
         <div id="listMobile"></div>
     </div>
 </div>
@@ -338,9 +326,15 @@ const teamMeta = {
     "星扩散队": {
         avatars: ["tx/wsn.webp","tx/wyns.webp","tx/adt.webp","tx/fls.webp"],
         video: "https://b23.tv/cwUbVTm"
+    },
+    "星超导队": {
+        avatars: ["tx/sdn.png","tx/adt.webp","tx/mty.png","tx/alx.png"],
+        video: ""
     }
 };
+
 let dataList = [
+    // ====================== 星扩散【完全原始，一行未改动】 ======================
     {team:"星扩散队",config:"01薇00沃00奥6珐",gold:4,dps:215085.15,fullEnergy:"是",configInfo:"v6.1"},
     {team:"星扩散队",config:"01薇01沃00奥6珐",gold:5,dps:240619.5592,fullEnergy:"是",configInfo:"v6.1"},
     {team:"星扩散队",config:"00薇00沃00奥6珐",gold:3,dps:177457.18,fullEnergy:"是",configInfo:"v6.1"},
@@ -398,6 +392,20 @@ let dataList = [
     {team:"星扩散队",config:"61薇20沃20奥6珐",gold:14,dps:764139.3,fullEnergy:"是",configInfo:"v6.1"},
     {team:"星扩散队",config:"61薇21沃20奥6珐",gold:15,dps:840411.3,fullEnergy:"是",configInfo:"v6.1"},
     {team:"星扩散队",config:"61薇61沃20奥6珐",gold:19,dps:1051740.75,fullEnergy:"是",configInfo:"v6.1"},
+
+    // ====================== 星超导队 12条 ======================
+    {team:"星超导队",config:"01桑00奥00米c6阿",gold:4,dps:286269.0668,fullEnergy:"是",configInfo:"v1.1"},
+    {team:"星超导队",config:"01桑00奥10米c6阿",gold:5,dps:329309.6361,fullEnergy:"是",configInfo:"v1.1"},
+    {team:"星超导队",config:"01桑00奥20米c6阿",gold:6,dps:408841.3732,fullEnergy:"是",configInfo:"v1.1"},
+    {team:"星超导队",config:"01桑00奥61米c6阿",gold:11,dps:519484.9807,fullEnergy:"是",configInfo:"v1.1"},
+    {team:"星超导队",config:"21桑00奥00米c6阿",gold:6,dps:333363.0593,fullEnergy:"是",configInfo:"v1.1"},
+    {team:"星超导队",config:"21桑00奥10米c6阿",gold:7,dps:379511.6247,fullEnergy:"是",configInfo:"v1.1"},
+    {team:"星超导队",config:"21桑00奥20米c6阿",gold:8,dps:470176.7052,fullEnergy:"是",configInfo:"v1.1"},
+    {team:"星超导队",config:"21桑00奥61米c6阿",gold:13,dps:591895.3949,fullEnergy:"是",configInfo:"v1.1"},
+    {team:"星超导队",config:"61桑00奥00米c6阿",gold:10,dps:556915.702,fullEnergy:"是",configInfo:"v1.1"},
+    {team:"星超导队",config:"61桑00奥10米c6阿",gold:11,dps:633368.5709,fullEnergy:"是",configInfo:"v1.1"},
+    {team:"星超导队",config:"61桑00奥20米c6阿",gold:12,dps:785523.1688,fullEnergy:"是",configInfo:"v1.1"},
+    {team:"星超导队",config:"61桑00奥61米c6阿",gold:17,dps:947264.04118,fullEnergy:"是",configInfo:"v1.1"},
 ];
 
 const inpTeam = document.getElementById("inpTeam");
@@ -407,7 +415,6 @@ const btnTopGold = document.getElementById("btnTopGold");
 const listPc = document.getElementById("listPc");
 const listMobile = document.getElementById("listMobile");
 
-/* “同金数最高”开关：开启后只保留同金数中 DPS 最高的队伍 */
 let onlyTopPerGold = false;
 
 function getAvatarHtml(avatars){
@@ -419,7 +426,6 @@ function getAvatarHtml(avatars){
     }
     return html;
 }
-
 function buildPcRow(item){
     const meta = teamMeta[item.team] || {avatars:[],video:""};
     const avatars = item.avatars??meta.avatars;
@@ -438,7 +444,6 @@ function buildPcRow(item){
     <div class="cell">${vlink}</div>
 </div>`;
 }
-
 function buildMobileCard(item){
     const meta = teamMeta[item.team] || {avatars:[],video:""};
     const avatars = item.avatars??meta.avatars;
@@ -457,7 +462,6 @@ function buildMobileCard(item){
     <div class="mobile-card__row"><span class="mobile-card__label">视频：</span><span class="mobile-card__value">${vlink}</span></div>
 </div>`;
 }
-
 function render(){
     let arr = JSON.parse(JSON.stringify(dataList));
     const kw = inpTeam.value.trim().toLowerCase();
@@ -465,9 +469,6 @@ function render(){
     const g = selGold.value;
     if(g !== "all") arr = arr.filter(x=>x.gold===Number(g));
 
-    /* 同金数最高：
-       - 已选定具体金数：只保留该金数下 DPS 最高的队伍（并列最高全部保留）
-       - 金数为“全部”：每个金数各保留其 DPS 最高的队伍 */
     if(onlyTopPerGold && arr.length){
         if(g !== "all"){
             const top = Math.max(...arr.map(x=>x.dps));
@@ -480,7 +481,6 @@ function render(){
             arr = arr.filter(x=>x.dps===topOfGold[x.gold]);
         }
     }
-
     if(selSort.value==="desc") arr.sort((a,b)=>b.dps - a.dps);
     else arr.sort((a,b)=>a.dps - b.dps);
 
@@ -491,7 +491,6 @@ function render(){
         listMobile.innerHTML += buildMobileCard(d);
     })
 }
-
 inpTeam.addEventListener("input",render);
 selGold.addEventListener("change",render);
 selSort.addEventListener("change",render);
