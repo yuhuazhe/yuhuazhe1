@@ -1,526 +1,1145 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="paper">
 <head>
-    <meta charset="UTF-8">
-    <!-- 移动端核心优化：禁止缩放、适配安全区、宽度锁定设备宽度 -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>羽化哲</title>
-    <!-- MathJax 公式渲染库 -->
-    <script id="MathJax-script" async
-        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
-    </script>
-    <script>
-        window.MathJax = {
-            tex: {
-                inlineMath: [['$', '$'], ['(', ')']],
-                displayMath: [['$$', '$$'], ['[', ']']],
-                processEscapes: true
-            },
-            chtml: {
-                scale: 1.0
-            }
-        };
-    </script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: "Microsoft Yahei", system-ui, -apple-system, sans-serif;
-            background-color: #0f0f0f;
-            /* 背景底图 + 渐变光晕叠加 */
-            background-image:
-                url("zhanshi/1.0.jpg"),
-                radial-gradient(circle at 10% 10%, rgba(88, 166, 255, 0.08), transparent 25%),
-                radial-gradient(circle at 90% 90%, rgba(199, 146, 234, 0.08), transparent 25%);
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            color: #cccccc;
-            line-height: 1.8;
-            /* 上下左右增加安全内边距，适配刘海屏/底部手势条 */
-            padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
-            max-width: 1280px;
-            margin: 0 auto;
-            position: relative;
-            min-height: 100vh;
-        }
-        /* 全局暗遮罩，防止底图过亮看不清文字 */
-        body::before {
-            content: "";
-            position: fixed;
-            inset: 0;
-            background-color: rgba(0, 0, 0, 0.28);
-            z-index: -1;
-        }
-        /* 主标题 */
-        h1 {
-            color: #58a6ff;
-            text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid rgba(35, 134, 255, 0.6);
-            font-size: clamp(22px, 5vw, 32px);
-        }
-        /* 大板块标题 */
-        h2 {
-            color: #c792ea;
-            margin: 30px 0 16px;
-            padding-left: 10px;
-            border-left: 4px solid rgba(199, 146, 234, 0.6);
-            font-size: clamp(17px, 4vw, 20px);
-        }
-        /* 小标题 */
-        h3 {
-            color: #89ddff;
-            margin: 16px 0 8px;
-            font-size: clamp(15px, 3.5vw, 17px);
-        }
-        /* 板块容器：低透明度磨砂，底图可穿透，不会完全透明丢失可读性 */
-        .section {
-            background-color: rgba(10, 10, 10, 0.52);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 12px;
-            padding: clamp(14px, 3vw, 25px);
-            margin-bottom: 20px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
-            backdrop-filter: blur(16px) saturate(140%);
-            -webkit-backdrop-filter: blur(16px) saturate(140%);
-        }
-        /* 普通描述文本 */
-        .text-desc {
-            color: #d1d1d1;
-            font-size: clamp(14px, 3vw, 15px);
-            margin: 8px 0;
-            line-height: 1.7;
-        }
-        /* 公式框：半透明底色，区分正文，不遮挡底图 */
-        .formula {
-            background-color: rgba(20, 20, 20, 0.62);
-            color: #ffcb6b;
-            font-family: "Consolas", "Courier New", monospace;
-            font-size: clamp(12px, 2.8vw, 14px);
-            padding: clamp(12px, 3vw, 16px);
-            border-radius: 8px;
-            margin: 10px 0;
-            /* 横向滚动优化，隐藏丑陋默认滚动条 */
-            overflow-x: auto;
-            scrollbar-width: thin;
-            scrollbar-color: #ffcb6b33 transparent;
-            border-left: 3px solid rgba(255, 203, 107, 0.65);
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
-            backdrop-filter: blur(10px) saturate(130%);
-            -webkit-backdrop-filter: blur(10px) saturate(130%);
-        }
-        /* 美化移动端横向滚动条 */
-        .formula::-webkit-scrollbar {
-            height: 4px;
-        }
-        .formula::-webkit-scrollbar-thumb {
-            background: rgba(255, 203, 107, 0.3);
-            border-radius: 4px;
-        }
-        .formula::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        /* MathJax公式颜色适配深色背景 */
-        .formula mjx-container[jax="CHTML"][display="true"] {
-            color: #ffcb6b !important;
-        }
-        .formula mjx-container[jax="CHTML"] {
-            color: #ffcb6b !important;
-        }
-        /* 单个跳转链接 居中 增大触摸区域 */
-        .jump-link {
-            text-align: center;
-            margin-top: 20px;
-            padding-top: 12px;
-            border-top: 1px solid rgba(51, 51, 51, 0.45);
-        }
-        .jump-link a {
-            display: inline-block;
-            color: #89ddff;
-            text-decoration: none;
-            /* 上下内边距加大，手机更容易点到 */
-            padding: 10px 16px;
-            border: 1px solid rgba(137, 221, 255, 0.65);
-            border-radius: 6px;
-            font-size: clamp(13px, 3vw, 14px);
-            transition: all 0.25s ease;
-            min-width: 120px;
-        }
-        .jump-link a:active {
-            background-color: rgba(137, 221, 255, 0.2);
-            color: #ffffff;
-            border-color: #89ddff;
-        }
-        .jump-link a:hover {
-            background-color: rgba(137, 221, 255, 0.12);
-            color: #ffffff;
-            border-color: #89ddff;
-        }
-        /* 备注文本 */
-        .note {
-            color: #888;
-            font-size: clamp(12px, 2.7vw, 14px);
-            margin: 6px 0;
-            padding-left: 8px;
-            border-left: 2px solid rgba(68, 68, 68, 0.6);
-            line-height: 1.6;
-        }
-        /* 小屏手机极限适配（480px以下） */
-        @media (max-width: 480px) {
-            h1 {
-                margin-bottom: 20px;
-            }
-            h2 {
-                margin: 24px 0 12px;
-            }
-            .section {
-                border-radius: 10px;
-            }
-            .formula {
-                border-radius: 6px;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>羽化哲</title>
+<script>
+  MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  /* ===== 主题变量 ===== */
+  html[data-theme="paper"] {
+    --bg: #f7f3ec;
+    --surface: #fffcf7;
+    --surface-2: #f2ece0;
+    --ink: #2a2520;
+    --ink-2: #7a6e5e;
+    --ink-3: #a89880;
+    --accent: #9a3412;
+    --rule: #e8dfd0;
+    --rule-2: #d9cdb8;
+    --zebra: #fdfaf5;
+    --hover: #fdf0e4;
+  }
+  html[data-theme="dark"] {
+    --bg: #16181d;
+    --surface: #1e2128;
+    --surface-2: #262a33;
+    --ink: #e8eaed;
+    --ink-2: #a5adba;
+    --ink-3: #6b7280;
+    --accent: #f0a05a;
+    --rule: #2d323c;
+    --rule-2: #3a4150;
+    --zebra: #21252c;
+    --hover: #2a2f3a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.85;
+    padding: 56px 24px 96px;
+    transition: background-color 0.25s, color 0.25s;
+  }
+  .page { max-width: 860px; margin: 0 auto; }
+
+  /* ===== 主题切换 ===== */
+  .theme-switch {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+    display: flex;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--rule-2);
+    border-radius: 999px;
+    padding: 6px 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    transition: background-color 0.25s, border-color 0.25s;
+  }
+  .theme-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform 0.15s, border-color 0.15s;
+    padding: 0;
+    outline: none;
+  }
+  .theme-btn:hover { transform: scale(1.12); }
+  .theme-btn.active { border-color: var(--accent); }
+  .theme-btn[data-theme="paper"] { background: linear-gradient(135deg, #f7f3ec 50%, #d9cdb8 50%); }
+  .theme-btn[data-theme="dark"]  { background: linear-gradient(135deg, #1e2128 50%, #f0a05a 50%); }
+
+  /* ===== 页头 & 更新日期 ===== */
+  .page-header {
+    margin-bottom: 56px;
+    padding-bottom: 28px;
+    border-bottom: 2px solid var(--ink);
+    transition: border-color 0.25s;
+  }
+  .page-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .page-header h1 {
+    font-family: Georgia, "Noto Serif SC", "Songti SC", serif;
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+    margin: 0;
+  }
+  .update-badge {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--surface-2);
+    border: 1px solid var(--rule-2);
+    padding: 4px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    transition: background-color 0.25s, border-color 0.25s, color 0.25s;
+  }
+  .page-header .sub {
+    font-size: 13px;
+    color: var(--ink-2);
+    letter-spacing: 0.5px;
+  }
+  .page-header .sub::before {
+    content: "—— ";
+    color: var(--ink-3);
+  }
+
+  /* ===== 章节 ===== */
+  .section { margin-bottom: 72px; }
+  .sec-head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 24px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--rule);
+    transition: border-color 0.25s;
+  }
+  .sec-num {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 42px;
+    font-weight: 700;
+    color: var(--rule-2);
+    line-height: 1;
+    flex: none;
+    letter-spacing: -1px;
+    transition: color 0.25s;
+  }
+  .sec-title {
+    font-family: Georgia, "Noto Serif SC", serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ink);
+    flex: none;
+  }
+  .sec-en {
+    font-size: 11px;
+    color: var(--ink-3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-left: auto;
+    flex: none;
+  }
+
+  /* ===== 子部分 ===== */
+  .part {
+    margin-bottom: 48px;
+    padding-left: 18px;
+    border-left: 2px solid var(--rule-2);
+    transition: border-color 0.25s;
+  }
+  .part:last-child { margin-bottom: 0; }
+  .part-head {
+    font-family: Georgia, "Noto Serif SC", serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    transition: color 0.25s;
+  }
+  .part-head .part-tag {
+    font-family: "SF Mono", "Consolas", monospace;
+    font-size: 11px;
+    color: #fff;
+    background: var(--accent);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    vertical-align: 2px;
+    transition: background-color 0.25s;
+  }
+  .part-head .part-en {
+    font-size: 11px;
+    color: var(--ink-3);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 400;
+    margin-left: auto;
+  }
+
+  /* ===== 药丸 ===== */
+  .chip {
+    display: inline-block;
+    padding: 1px 10px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid;
+    vertical-align: 2px;
+    white-space: nowrap;
+    letter-spacing: 0.3px;
+  }
+  .c-base    { background: #e6efff; color: #1e40af; border-color: #c7d9fb; }
+  .c-dmg     { background: #e6f7f0; color: #166534; border-color: #b3e4cb; }
+  .c-crit    { background: #ede9fe; color: #7c3aed; border-color: #d4cbf7; }
+  .c-res     { background: #ffedd5; color: #c2410c; border-color: #fdd7a3; }
+  .c-def     { background: #fee2e2; color: #b91c1c; border-color: #fbc4c4; }
+  .c-react   { background: #cffafe; color: #0e7490; border-color: #a5e4f0; }
+  .c-em      { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+  .c-lunar   { background: #fae8ff; color: #86198f; border-color: #f0c2f8; }
+  .c-star    { background: #e0f2fe; color: #0369a1; border-color: #bae0fc; }
+  .c-extra   { background: #f1f5f9; color: #475569; border-color: #dbe1ea; }
+  html[data-theme="dark"] .c-base    { background: #1e2a4a; color: #93b4f7; border-color: #2c3d66; }
+  html[data-theme="dark"] .c-dmg     { background: #163326; color: #6ee7b7; border-color: #1f4a37; }
+  html[data-theme="dark"] .c-crit    { background: #2a1f4a; color: #c4b5fd; border-color: #3d2d66; }
+  html[data-theme="dark"] .c-res     { background: #3a2413; color: #fbbf72; border-color: #55381e; }
+  html[data-theme="dark"] .c-def     { background: #3a1a1a; color: #fca5a5; border-color: #552626; }
+  html[data-theme="dark"] .c-react   { background: #143741; color: #67e8f9; border-color: #1e505c; }
+  html[data-theme="dark"] .c-em      { background: #3a2d10; color: #fcd34d; border-color: #55411a; }
+  html[data-theme="dark"] .c-lunar   { background: #3a1a3d; color: #f0abfc; border-color: #55295a; }
+  html[data-theme="dark"] .c-star    { background: #132c42; color: #7dd3fc; border-color: #1d415e; }
+  html[data-theme="dark"] .c-extra   { background: #2a2f3a; color: #cbd5e1; border-color: #3b4250; }
+
+  /* ===== 结构公式 ===== */
+  .struct {
+    background: var(--surface);
+    border: 1px dashed var(--rule-2);
+    border-radius: 10px;
+    padding: 20px 22px;
+    margin: 16px 0 20px;
+    line-height: 2.4;
+    font-size: 15px;
+    color: var(--ink);
+    overflow-x: auto;
+    transition: background-color 0.25s, border-color 0.25s;
+  }
+  .struct .op {
+    color: var(--ink-3);
+    margin: 0 4px;
+    font-weight: 700;
+  }
+  .struct .eq {
+    color: var(--ink);
+    font-weight: 700;
+    margin-right: 6px;
+  }
+
+  /* ===== 逐项定义（横向醒目样式） ===== */
+  .sub-head.toggle-defs {
+    display: block;
+    width: 100%;
+    font-size: 14px;
+    letter-spacing: 1px;
+    color: var(--accent);
+    margin: 32px 0 0; /* 底部 margin 改为 0，与面板衔接 */
+    font-weight: 700;
+    cursor: pointer;
+    user-select: none;
+    padding: 10px 16px;
+    background: var(--surface-2);
+    border-left: 4px solid var(--accent);
+    border-radius: 4px 4px 0 0;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+  }
+  .sub-head.toggle-defs:hover {
+    background-color: var(--hover);
+  }
+  .sub-head.toggle-defs::before {
+    content: "▼";
+    margin-right: 10px;
+    font-size: 12px;
+    display: inline-block;
+    transition: transform 0.3s ease;
+    color: var(--accent);
+  }
+  .sub-head.toggle-defs.collapsed::before {
+    transform: rotate(-90deg);
+  }
+
+  /* ===== 定义面板（包裹全部下方内容） ===== */
+  .defs-panel {
+    margin: 0 0 20px;
+    padding: 12px 18px 16px 22px;
+    border-left: 4px solid var(--accent);
+    background: var(--surface);
+    border-radius: 0 0 6px 6px;
+    transition: background-color 0.25s, border-color 0.25s;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.02);
+  }
+  .defs-panel.hidden {
+    display: none;
+  }
+  
+  /* 面板内部子标题样式覆盖，使其看起来像内部标题而非可点击标题 */
+  .defs-panel .sub-head {
+    margin: 24px 0 12px;
+    padding: 0 0 6px 0;
+    border-bottom: 1px solid var(--rule);
+    background: transparent;
+    border-left: none;
+    border-radius: 0;
+    color: var(--ink-2);
+    font-size: 14px;
+    letter-spacing: 1px;
+    cursor: default;
+    font-family: inherit;
+  }
+  .defs-panel .sub-head::before {
+    content: none; /* 移除箭头 */
+  }
+  .defs-panel .sub-head:hover {
+    background: transparent;
+  }
+
+  /* 面板内部表格与注释样式微调 */
+  .defs-panel .table-wrap {
+    margin: 12px 0 16px;
+  }
+  .defs-panel .notes {
+    margin: 12px 0 8px;
+    padding-left: 14px;
+  }
+  .defs-panel .defs {
+    margin-top: 8px;
+  }
+
+  /* ===== 定义列表 ===== */
+  .defs {
+    margin: 8px 0 20px;
+    padding: 0;
+  }
+  .defs.hidden {
+    display: none;
+  }
+  .def-row {
+    display: grid;
+    grid-template-columns: 112px 1fr;
+    gap: 14px;
+    align-items: start;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--rule);
+    transition: border-color 0.25s;
+  }
+  .def-row:last-child { border-bottom: none; }
+  .def-row dt { padding-top: 2px; }
+  .def-row dd {
+    margin: 0;
+    color: var(--ink);
+    font-size: 14.5px;
+    line-height: 2;
+    overflow-x: auto;
+  }
+  .def-row dd .MathJax { font-size: 105% !important; }
+
+  /* ===== 注释 ===== */
+  .notes {
+    margin: 16px 0 0;
+    padding: 12px 0 4px 16px;
+    border-left: 2px solid var(--rule-2);
+    font-size: 13px;
+    color: var(--ink-2);
+    line-height: 1.85;
+    transition: border-color 0.25s;
+  }
+  .notes p { margin: 5px 0; }
+  .notes p::before {
+    content: "· ";
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .notes strong { color: var(--ink); }
+
+  /* ===== 表格 ===== */
+  .table-wrap {
+    margin: 14px 0;
+    overflow-x: auto;
+    border: 1px solid var(--rule-2);
+    border-radius: 6px;
+    transition: border-color 0.25s;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    min-width: 300px;
+  }
+  thead th {
+    background: var(--surface-2);
+    color: var(--ink);
+    font-weight: 700;
+    text-align: left;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--rule-2);
+    white-space: nowrap;
+    font-family: Georgia, "Noto Serif SC", serif;
+    font-size: 13px;
+    transition: background-color 0.25s, border-color 0.25s;
+  }
+  tbody td {
+    padding: 9px 16px;
+    border-bottom: 1px solid var(--rule);
+    color: var(--ink);
+    transition: background-color 0.25s, border-color 0.25s;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:nth-child(even) { background: var(--zebra); }
+  tbody tr:hover { background: var(--hover); }
+  .level-table { max-width: 380px; }
+  .level-table td {
+    font-family: "SF Mono", "Consolas", monospace;
+    font-size: 13px;
+  }
+  .level-table td:first-child {
+    font-weight: 700;
+    color: var(--accent);
+    font-family: Georgia, serif;
+  }
+  /* ===== 横向 Excel 表 ===== */
+  .matrix-table {
+    min-width: 720px;
+    font-size: 13px;
+  }
+  .matrix-table thead th {
+    text-align: center;
+    padding: 10px 8px;
+    min-width: 52px;
+    font-size: 12.5px;
+  }
+  .matrix-table thead th:first-child {
+    text-align: left;
+    padding-left: 16px;
+    position: sticky;
+    left: 0;
+    background: var(--surface-2);
+    z-index: 2;
+    border-right: 1px solid var(--rule-2);
+    min-width: 120px;
+  }
+  .matrix-table tbody td {
+    text-align: center;
+    padding: 9px 8px;
+    font-family: "SF Mono", "Consolas", monospace;
+    font-size: 13px;
+  }
+  .matrix-table tbody td:first-child {
+    text-align: left;
+    padding-left: 16px;
+    font-family: Georgia, "Noto Serif SC", serif;
+    font-weight: 700;
+    color: var(--accent);
+    position: sticky;
+    left: 0;
+    background: var(--surface);
+    z-index: 1;
+    border-right: 1px solid var(--rule-2);
+    white-space: nowrap;
+  }
+  .matrix-table tbody tr:nth-child(even) td:first-child {
+    background: var(--zebra);
+  }
+  .matrix-table tbody tr:hover td:first-child {
+    background: var(--hover);
+  }
+
+  /* ===== 响应式适配 ===== */
+  @media (max-width: 768px) {
+    .page-header-top {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .sec-head { flex-wrap: wrap; gap: 8px; }
+    .sec-num { font-size: 32px; }
+    .sec-title { font-size: 17px; }
+    .sec-en { display: none; }
+    .def-row { grid-template-columns: 1fr; gap: 4px; padding: 10px 0; }
+    .struct { padding: 16px 14px; font-size: 14px; line-height: 2.6; }
+    .section { margin-bottom: 52px; }
+    .part { padding-left: 12px; margin-bottom: 36px; }
+    .part-head { font-size: 15px; flex-wrap: wrap; }
+    .part-head .part-en { display: none; }
+    .matrix-table { min-width: 100%; }
+  }
+  @media (max-width: 480px) {
+    body { padding: 72px 12px 48px; font-size: 14px; }
+    .theme-switch { top: 12px; right: 12px; padding: 4px 6px; }
+    .theme-btn { width: 22px; height: 22px; }
+    .struct { padding: 12px 10px; font-size: 13px; line-height: 2.4; }
+    .sub-head.toggle-defs { font-size: 13px; padding: 8px 12px; }
+    .defs-panel { padding: 6px 10px 2px 14px; }
+  }
+</style>
 </head>
 <body>
-    <h1>伤害计算公式</h1>
-    <h2>部分公式存在展示异常，请注意查看</h2>
-    <h2>声明:以下公式源于网络收集并上传,若有错误请及时反馈</h2>
-    <!-- 1. 等级修正系数 -->
-    <div class="section" id="level">
-        <h2>等级修正系数</h2>
-        <div class="formula">
-            若角色为 95 级，将公式中的 1446.85 替换为 1561.46
-        </div>
-        <div class="formula">
-            若角色为 100 级，将公式中的 1446.85 替换为 1674.81
-        </div>
-        <div class="jump-link">
-            <a href="#defense">跳转至下一板块</a>
-        </div>
+<!-- 主题切换 -->
+<div class="theme-switch" role="group" aria-label="背景配色">
+  <button class="theme-btn active" data-theme="paper" title="暖色纸张（原色）" aria-label="暖色纸张"></button>
+  <button class="theme-btn" data-theme="dark" title="暗色模式（黑色）" aria-label="暗色模式"></button>
+</div>
+<div class="page">
+  <header class="page-header">
+    <div class="page-header-top">
+      <h1>公式与算法</h1>
+      <div class="update-badge">更新于 2026-09-27</div>
     </div>
-    <!-- 2. 防御力 & 抗性 -->
-    <div class="section" id="defense">
-        <h2>防御力 & 抗性</h2>
-        <h3>通用抗性公式:</h3>
-        <div class="formula">
-            $$
-            \begin{cases}
-            1 - \dfrac{抗性}{2} & 抗性 \le 0 \\
-            1 - 抗性 & 0 < 抗性 \le 75\% \\
-            \dfrac{1}{4 + 抗性 + 1} & 抗性 \ge 75\%
-            \end{cases}
-            $$
-        </div>
-        <div class="text-desc">角色攻击敌人时的防御系数：</div>
-        <div class="formula">
-            $$
-            \dfrac{角色等级 + 100}{(角色等级 + 100) + (敌人等级 + 100) \times (1-减防) \times (1-无视防御)}
-            $$
-        </div>
-        <div class="note">(来自角色的减防不能超过 90%，无视防御不能超过 100%)</div>
-        <div class="text-desc">敌人攻击角色时的防御系数：</div>
-        <div class="formula">
-            $$
-            \dfrac{5 \times 敌人等级 + 500}{5 \times 敌人等级 + 500 + 角色防御}
-            $$
-        </div>
-        <div class="jump-link">
-            <a href="网页自动化计算/kangxingxishu.html">点击跳转自动化板块</a>
-        </div>
+    <p class="sub">计算公式源于网络收集！验证后及修改后上传！若发现错误请及时与我联系！</p>
+  </header>
+  <!-- ============ 01 角色等级系数 ============ -->
+  <section class="section">
+    <div class="sec-head">
+      <span class="sec-num">01</span>
+      <h2 class="sec-title">角色等级系数</h2>
+      <span class="sec-en">Level Coefficient</span>
     </div>
-    <!-- 3. 常规伤害 -->
-    <div class="section" id="normal">
-        <h2>常规伤害</h2>
-        <div class="formula">
-            $$
-            \begin{aligned}
-            常规伤害 = &(基础值 + 激化值 + 基础值加成) \\
-            &\times (1 + 增伤\% + 易伤\% - 减伤\%) \\
-            &\times 抗性系数 \times 防御系数 \times 暴击区 \times 蒸发融化系数
-            \end{aligned}
-            $$
-        </div>
-        <div class="note">(注: 若攻击没有出现伤害数字（例如命中护盾），则本次伤害不会计算蒸发融化系数)</div>
-        <div class="text-desc">基础值：攻击力*倍率，攻击力可以替换为其他属性（生命值，元素精通等）</div>
-        <div class="text-desc">基础值加成：描述中带有【造成的伤害提高 X】的效果</div>
-        <div class="text-desc">增伤：描述中带有【我方造成的伤害提高 X%】的效果<br>易伤：描述中带有【目标受到的伤害提高 X%】的效果<br>减伤：描述中带有【目标受到的伤害降低 X%】的效果</div>
-        <div class="text-desc">激化值：见【激化反应】章节</div>
-        <div class="text-desc">蒸发融化系数：见【增幅反应】章节</div>
-        <div class="jump-link">
-            <a href="#hyper">跳转至下一板块</a>
-        </div>
+    <div class="table-wrap level-table">
+      <table>
+        <thead><tr><th>等级</th><th>角色等级系数</th></tr></thead>
+        <tbody>
+          <tr><td>90</td><td>1446.853</td></tr>
+          <tr><td>100</td><td>2030.071</td></tr>
+        </tbody>
+      </table>
     </div>
-    <!-- 4. 星超导 -->
-    <div class="section" id="hyper">
-        <h2>星超导</h2>
-        <div class="formula">
-            星超导基础倍率与hit数相关：<br>
-            冰元素伤害与雷元素的附着次数视为hit数，即1次附着视为1hit<br>
-            星超导基础倍率与附着次数相关，当次数为 0/1/2/3/4/5/6/7/8/9/10/11/12 时<br>
-            星超导基础倍率分别为：1.0, 1.45, 1.5, 1.54, 1.60, 1.64, 1.70, 1.75, 1.79, 1.85, 1.89, 1.95, 2.0
-        </div>
-        <div class="formula">
-            $$
-            \begin{aligned}
-            直伤基础 =& 星超导基础倍率 \times \dfrac{攻击力}{精通} \times 倍率 \times (1 + 基础提升\%) \\
-            &\times \left(1 + \dfrac{6 \times 元素精通}{元素精通 + 2000} + 星超导增伤\%\right)
-            \end{aligned}
-            $$
-        </div>
-        <div class="formula">
-            $$
-            最终直伤 = (直伤基础 + 额外提升) \times 抗性系数 \times 暴击区 \times 擢升
-            $$
-            基础提升: 木偶天赋 (14%) <br>
-            额外提升（羽毛: 七七 6 命<br>
-            注：暂未对传统增伤数值进行上传
-        </div>
-        <div class="jump-link">
-            <a href="#starspread">跳转至星扩散板块</a>
-        </div>
+    <div class="notes">
+      <p>若角色为 100 级，将公式中的 1446.85 替换为 1674.81</p>
     </div>
-    <!-- 5. 星扩散（更新完整版） -->
-    <div class="section" id="starspread">
-        <h2>星扩散</h2>
-        
-        <div class="text-desc">当触发星扩散反应时，反应星扩散•风和反应星扩散•冰的过程会同时进行</div>
-        <div class="text-desc"><strong>关于风涡</strong>：每次触发星扩散反应时，风涡系数会增加 1，最高为 6</div>
-        <h3>反应星扩散(风)说明</h3>
-        <div class="text-desc">反应星扩散•风的基础倍率为 0.75，每次触发星扩散反应•风的时候会立刻造成一次风元素星扩散反应伤害，且每 3s （经7.0版本实测之后为3s，而非4.5s）引爆一次风涡(若在3s之前就已叠了6点系数，则立刻引爆并清零)，引爆风涡时，造成一次冰元素星扩散伤害，为附近的敌人附着 1U 冰元素，然后将风涡系数清零</div>
-        <h3>反应星扩散(风)公式</h3>
-        <div class="formula">
-            $$
-            \begin{aligned}
-            反应星扩散(风) &= 1446.85 \times 0.75 \times (1+基础提升\%) \\
-            &\quad \times \left(1 + \dfrac{6 \times 元素精通}{元素精通+2000} + 星扩散增伤\%\right) \\
-            &\quad \times 抗性系数 \times 暴击区 \times 擢升
-            \end{aligned}
-            $$
-        </div>
-        <div class="formula">
-            $$
-            最终伤害 = \dfrac{3}{5}风元素角色 + \dfrac{3}{10}其他角色 + \dfrac{1}{20}其他角色 + \dfrac{1}{20}其他角色
-            $$
-        </div>
-        <div class="note">若原本伤害最高的角色没有暴击，则有可能另一名暴击的角色成为最高<br>上述倍率顺序按照角色造成伤害量从大到小，从左到右排序</div>
-        <h3>反应星扩散(冰)倍率规则</h3>
-        <div class="text-desc">反应星扩散•冰的基础倍率会随着风涡系数的不同而变化，当风涡系数为 1~2 时，基础倍率为 2，当风涡系数为 3~6 时，基础倍率为 3</div>
-        <h3>反应星扩散(冰)公式</h3>
-        <div class="formula">
-            $$
-            \begin{aligned}
-            反应星扩散(冰) &= 1446.85 \times 基础倍率 \times (1+基础提升\%) \\
-            &\quad \times \left(1 + \dfrac{6 \times 元素精通}{元素精通+2000} + 星扩散增伤\%\right) \\
-            &\quad \times 抗性系数 \times 暴击区 \times 擢升
-            \end{aligned}
-            $$
-        </div>
-        <div class="formula">
-            $$
-            最终伤害 = \dfrac{3}{5}冰元素角色 + \dfrac{3}{10}风元素角色 + \dfrac{1}{20}其他角色 + \dfrac{1}{20}其他角色
-            $$
-        </div>
-        <div class="note">若原本伤害最高的角色没有暴击，则有可能另一名暴击的角色成为最高<br>上述倍率顺序按照角色造成伤害量从大到小，从左到右排序</div>
-        <h3>星扩散直伤公式</h3>
-        <div class="formula">
-            $$
-            \begin{aligned}
-            星扩散直伤基础 &= 1 \times 属性 \times 倍率 \times (1+基础提升\%) \\
-            &\quad \times \left(1 + \dfrac{6 \times 元素精通}{元素精通+2000} + 星扩散增伤\%\right)
-            \end{aligned}
-            $$
-        </div>
-        <div class="formula">
-            $$
-            最终直伤 = (直伤基础 + 额外提升) \times 抗性系数 \times 暴击区 \times 擢升
-            $$
-        </div>
-        <div class="jump-link">
-            <a href="#crystal">跳转至月结晶板块</a>
-        </div>
+  </section>
+  <!-- ============ 02 普通直伤 ============ -->
+  <section class="section">
+    <div class="sec-head">
+      <span class="sec-num">02</span>
+      <h2 class="sec-title">普通直伤类型</h2>
+      <span class="sec-en">General Direct Damage</span>
     </div>
-    <!-- 6. 月结晶 -->
-    <div class="section" id="crystal">
-        <h2>月结晶</h2>
-        <div class="text-desc">月结晶的伤害计算和月感电一致，唯一的区别是直伤月结晶需把月感电的 3 换成 1.6，反应月结晶需把月感电的 1.8 换成 0.96</div>
-        <div class="formula">
-            $$
-            \begin{aligned}
-            直伤基础 =& 1.6 \times 属性 \times 倍率 \times (1 + 基础提升\%) \\
-            &\times \left(1 + \dfrac{6 \times 元素精通}{元素精通 + 2000} + 月结晶增伤\%\right) \\
-            最终直伤 =& (直伤基础 + 额外提升) \times 抗性系数 \times 暴击区 \times 擢升
-            \end{aligned}
-            $$
-            基础提升: 兹白天赋 (14%) 哥伦比亚天赋 (7%) 莉奈娅天赋 (14%) <br>
-            额外提升: 兹白天赋一，叶洛亚元素爆发等。
-        </div>
-        <div class="formula">
-            $$
-            \begin{aligned}
-            反应月结晶 =& 1446.85 \times 0.96 \times (1 + 基础提升\%) \\
-            &\times \left(1 + \dfrac{6 \times 元素精通}{元素精通 + 2000} + 月结晶增伤\%\right) \\
-            &\times 抗性系数 \times 暴击区 \times 擢升 \\
-            最终伤害 =& 最高角色伤害 + \dfrac{1}{2}第二高 + \dfrac{1}{12}第三高 + \dfrac{1}{12}第四高
-            \end{aligned}
-            $$
-            注：暂未对此公式进行修正，请等待二次更新
-        </div>
-        <div class="jump-link">
-            <a href="#electro">跳转至下一板块</a>
-        </div>
+    <div class="sub-head">伤害结构</div>
+    <div class="struct">
+      <span class="eq">最终伤害 =</span>
+      <span class="chip c-base">基础</span><span class="op">×</span>
+      <span class="chip c-dmg">增伤</span><span class="op">×</span>
+      <span class="chip c-crit">暴击</span><span class="op">×</span>
+      <span class="chip c-res">抗性</span><span class="op">×</span>
+      <span class="chip c-def">防御</span>
     </div>
-    <!-- 7. 月感电 -->
-    <div class="section" id="electro">
-        <h2>月感电</h2>
-        <div class="text-desc">特定情况下，雷触及水时，会生成一片不可移动的雷暴云，持续 6s。雷暴云: 每 2s 攻击一次附近所有同时具有雷和水的目标，并消耗 0.4 元素量的雷和水（破盾效率极低）。触发月感电时，若附近已有雷暴云，则会刷新持续时间月感电的倍率为 1.8，基础伤害为 1446.85 × 1.8 = 2604.33</div>
-        <div class="formula">
-            $$
-            \begin{aligned}
-            反应月感电 =& 1446.85 \times 1.8 \times (1 + 基础提升\%) \\
-            &\times \left(1 + \dfrac{6 \times 元素精通}{元素精通 + 2000} + 月感电增伤\%\right) \\
-            &\times 抗性系数 \times 暴击区 \times 擢升 \\
-            最终伤害 =& 最高角色伤害 + \dfrac{1}{2}第二高 + \dfrac{1}{12}第三高 + \dfrac{1}{12}第四高
-            \end{aligned}
-            $$
-            月感电造成伤害时，所有参与反应的角色都会提供伤害值，但除伤害最高的角色外，其余角色的提供的伤害值会降低 <br>
-            若原本伤害最高的角色没有暴击，则有可能另一名暴击的角色成为最高
-        </div>
-        <div class="formula">
-            $$
-            \begin{aligned}
-            直伤月感电 =& 3 \times 属性 \times 倍率 \times (1 + 基础提升\%) \\
-            &\times \left(1 + \dfrac{6 \times 元素精通}{元素精通 + 2000} + 反应增伤\%\right) \\
-            &\times 抗性系数 \times 暴击区 \times 擢升
-            \end{aligned}
-            $$
-            某些角色可以基于攻击力，直接造成月感电伤害，通过这种方式造成的伤害无视防御力，不受益于常规增伤/减伤，但受益于元素精通，且有额外系数 3×
-        </div>
-        <div class="jump-link">
-            <a href="网页自动化计算/yuegandian.html">点击跳转自动化板块</a>
-        </div>
+    <div class="sub-head toggle-defs">逐项定义</div>
+    <dl class="defs">
+      <div class="def-row">
+        <dt><span class="chip c-base">基础</span></dt>
+        <dd>\[ \text{某面板属性} \times \text{技能倍率} \times \text{独立乘区} + \text{数值提升} \]</dd>
+      </div>
+      <div class="def-row">
+        <dt><span class="chip c-dmg">增伤</span></dt>
+        <dd>\[ 1 + \sum \text{任意来源增伤} \]</dd>
+      </div>
+      <div class="def-row">
+        <dt><span class="chip c-crit">暴击</span></dt>
+        <dd>\[ 1 + \text{暴击率} \times \text{暴击伤害} \]</dd>
+      </div>
+      <div class="def-row">
+        <dt><span class="chip c-res">抗性</span></dt>
+        <dd>
+          \[
+          \begin{cases}
+          1 - \dfrac{\text{实际抗性}}{2} & \text{实际抗性} < 0 \\[0.8em]
+          1 - \text{实际抗性} & 0 \leq \text{实际抗性} \leq 75\% \\[0.8em]
+          \dfrac{1}{1 + 4 \times \text{实际抗性}} & \text{实际抗性} > 75\%
+          \end{cases}
+          \]
+          <br>
+          \[ \text{实际抗性} = \text{敌人初始抗性} - \text{抗性降低} \]
+        </dd>
+      </div>
+      <div class="def-row">
+        <dt><span class="chip c-def">防御</span></dt>
+        <dd>
+\[
+\frac{\text{角色等级}+100}{(\text{角色等级}+100)+(\text{敌人等级}+100)\times(1-\text{减防})\times(1-\text{无视防御})}
+\]
+<p style="margin-top:8px; font-size:13px;">来自角色的减防不能超过90%</p>
+        </dd>
+      </div>
+    </dl>
+    <div class="notes">
+      <p>若攻击没有出现伤害数字（例如命中护盾），则本次伤害不会计算蒸发融化系数</p>
+      <p><strong>基础值：</strong>攻击力×倍率，攻击力可以替换为其他属性（生命值，元素精通等）</p>
+      <p><strong>基础值加成：</strong>描述中带有【造成的伤害提高 X】的效果</p>
+      <p><strong>增伤：</strong>描述中带有【我方造成的伤害提高 X%】的效果</p>
+      <p><strong>易伤：</strong>描述中带有【目标受到的伤害提高 X%】的效果</p>
+      <p><strong>减伤：</strong>描述中带有【目标受到的伤害降低 X%】的效果</p>
+      <p>激化值：见【激化反应】章节</p>
+      <p>蒸发融化系数：见【增幅反应】章节</p>
+      <p>来自角色的减防不能超过 90%，无视防御不能超过 100%</p>
     </div>
-    <!-- 8. 月绽放 -->
-    <div class="section" id="bloom">
-        <h2>月绽放</h2>
-        <div class="text-desc">特定情况下，草触及水时，会生草原核，并为队伍提供「草露」，可被特定角色消耗。草原核伤害不算月绽放，月绽放伤害只包括直伤月绽放伤害。直伤月绽放无视防御，不受益于常规增伤/减伤，但受益于元素精通</div>
-        <div class="formula">
-            $$
-            \begin{aligned}
-            直伤基础 =& 属性 \times 倍率 \times (1 + 基础提升\%) \\
-            &\times \left(1 + \dfrac{6 \times 元素精通}{元素精通 + 2000} + 月绽放增伤\%\right) \\
-            最终直伤 =& (直伤基础 + 额外提升) \times 抗性系数 \times 暴击区 \times 擢升
-            \end{aligned}
-            $$
-            基础提升: 菈乌玛天赋 (14%) 哥伦比亚天赋 (7%) 奈芙尔天赋 (14%) <br>
-            额外提升: 菈乌玛元素爆发等。
-        </div>
-        <div class="formula">
-            $$
-            \begin{aligned}
-            草原核基础 =& 1446.85 \times 反应倍率 \times \left(1 + \dfrac{16 \times 元素精通}{元素精通 + 2000} + 反应增伤\%\right) \\
-            草原核伤害 =& (草原核基础 + 额外提升) \times 抗性系数
-            \end{aligned}
-            $$
-            草原核伤害仍为绽放/烈绽放/超绽放伤害，反应倍率为: 绽放 2 | 烈绽放、超绽放 3 <br>
-            额外提升: 菈乌玛元素爆发
-        </div>
-        <div class="jump-link">
-            <a href="#intensify">跳转至下一板块</a>
-        </div>
+  </section>
+  <!-- ============ 03 增幅反应 ============ -->
+  <section class="section">
+    <div class="sec-head">
+      <span class="sec-num">03</span>
+      <h2 class="sec-title">增幅反应类型</h2>
+      <span class="sec-en">Amplifying Reaction</span>
     </div>
-    <!-- 9. 激化反应 -->
-    <div class="section" id="intensify">
-        <h2>激化反应</h2>
-        <div class="text-desc">当雷元素触及草元素时，会按照 1:1:1 的比例互相消耗并生成原激化元素。原激化元素可以发生绽放和燃烧反应，在这些反应中的表现和草元素相同。原激化元素的持续时间: (6 + 5 × 元素量) 秒。雷和草不共存，但原激化和雷、原激化和草都可以共存当附着雷/草元素的攻击命中具有原激化的目标时，将分别引发超激化/蔓激化反应，不消耗任何元素，但为本次伤害贡献激化值（完整公式见【常规伤害】章节）</div>
-        <div class="formula">
-            $$
-            \begin{aligned}
-            超激化值 &= 1446.85 \times 1.15 \times \left(1 + \dfrac{5 \times 元素精通}{元素精通 + 2000} + 超激化提高\%\right) \\
-            蔓激化值 &= 1446.85 \times 1.25 \times \left(1 + \dfrac{5 \times 元素精通}{元素精通 + 2000} + 蔓激化提高\%\right)
-            \end{aligned}
-            $$
-        </div>
-        <div class="formula">
-            当敌人触发上述反应时，原本的 1446.85 的数值有变化: <br>
-            90 级 1202.81 | 95 级 1411.74 | 100 级 1674.81 <br>
-            105 级 1884.98 | 110 级 1963.85
-        </div>
-        <div class="jump-link">
-            <a href="#transform">跳转至下一板块</a>
-        </div>
+    <div class="sub-head">伤害结构</div>
+    <div class="struct">
+      <span class="eq">最终伤害 =</span>
+      <span class="chip c-base">基础</span><span class="op">×</span>
+      <span class="chip c-react">反应系数</span><span class="op">×</span>
+      <span class="chip c-em">增幅精通</span><span class="op">×</span>
+      <span class="chip c-dmg">增伤</span><span class="op">×</span>
+      <span class="chip c-crit">暴击</span><span class="op">×</span>
+      <span class="chip c-res">抗性</span><span class="op">×</span>
+      <span class="chip c-def">防御</span>
     </div>
-    <!-- 10. 剧变反应 -->
-    <div class="section" id="transform">
-        <h2>剧变反应</h2>
-        <div class="text-desc">剧变反应包括: 超载、超导、感电、燃烧、碎冰、扩散、绽放、超绽放、烈绽放。剧变反应造成的伤害不受益于常规增伤/易伤/减伤，且无视防御力、不能暴击</div>
-        <div class="formula">
-            $$
-            \begin{aligned}
-            剧变基础 &= 1446.85 \times 反应倍率 \times \left(1 + \dfrac{16 \times 元素精通}{元素精通 + 2000} + 反应增伤\%\right) \\
-            剧变伤害 &= (剧变基础 + 额外提升) \times 抗性系数
-            \end{aligned}
-            $$
-        </div>
-        <div class="formula">
-            反应倍率: <br>
-            扩散 0.65(每 0.25s 一次) <br>
-            燃烧 0.25 <br>
-            超载 2.75 | 碎冰 3 <br>
-            绽放 2 | 烈绽放/超绽放 3
-        </div>
-        <div class="formula">
-            触发剧变反应没有冷却，但剧变反应的伤害有冷却: <br>
-            每 0.5s 最多 1 次: 超载 <br>
-            每 0.5s 最多 2 次: 超导、碎冰、扩散、绽放、烈绽放
-        </div>
-        <div class="formula">
-            当敌人触发上述反应时，原本的 1446.85 的数值有变化: <br>
-            90 级 1202.81 | 95 级 1411.74 | 100 级 1674.81 <br>
-            105 级 1884.98 | 110 级 1963.85
-        </div>
-        <div class="jump-link">
-            <a href="#amplify">跳转至下一板块</a>
-        </div>
+    <div class="sub-head toggle-defs">逐项定义</div>
+    <dl class="defs">
+      <div class="def-row">
+        <dt><span class="chip c-base">基础</span></dt>
+        <dd>\[ \text{某面板属性} \times \text{技能倍率} \times \text{独立乘区} + \text{数值提升} \]</dd>
+      </div>
+      <div class="def-row">
+        <dt><span class="chip c-react">反应系数</span></dt>
+        <dd>火打冰 2.0 ｜ 冰打火 1.5 ｜ 水打火 2.0 ｜ 火打水 1.5</dd>
+      </div>
+      <div class="def-row">
+        <dt><span class="chip c-em">增幅精通</span></dt>
+        <dd>\[ 1 + \frac{2.78 \times \text{元素精通}}{\text{元素精通} + 1400} + \text{附加精通} \]</dd>
+      </div>
+      <div class="def-row">
+        <dt><span class="chip c-dmg">增伤</span></dt>
+        <dd>\[ 1 + \sum \text{任意来源增伤} \]</dd>
+      </div>
+      <div class="def-row">
+        <dt><span class="chip c-crit">暴击</span></dt>
+        <dd>\[ 1 + \text{暴击率} \times \text{暴击伤害} \]</dd>
+      </div>
+      <div class="def-row">
+        <dt><span class="chip c-res">抗性</span></dt>
+        <dd>同普通直伤，按实际抗性分段计算</dd>
+      </div>
+      <div class="def-row">
+        <dt><span class="chip c-def">防御</span></dt>
+        <dd>同普通直伤</dd>
+      </div>
+    </dl>
+    <div class="sub-head">基础系数</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>元素反应</th><th>触发元素类型</th></tr></thead>
+        <tbody>
+          <tr><td rowspan="2">融化反应</td><td>火元素融化反应（火打冰）</td></tr>
+          <tr><td>冰元素融化反应（冰打火）</td></tr>
+          <tr><td rowspan="2">蒸发反应</td><td>水元素蒸发反应（水打火）</td></tr>
+          <tr><td>火元素蒸发反应（火打水）</td></tr>
+        </tbody>
+      </table>
     </div>
-    <!-- 11. 增幅反应 -->
-    <div class="section" id="amplify">
-        <h2>增幅反应</h2>
-        <div class="text-desc">增幅反应包括: 蒸发、融化。触发增幅反应时，会为本次伤害附加蒸发融化系数（完整公式见【常规伤害】章节）。若攻击没有出现伤害数字（例如命中护盾），则本次伤害不会计算蒸发融化系数</div>
-        <div class="formula">
-            $$
-            蒸发融化系数 = 基础系数 \times \left(1 + \dfrac{2.78 \times 元素精通}{元素精通 + 1400} + 反应增伤\%\right)
-            $$
-        </div>
-        <div class="formula">
-            基础系数: <br>
-            2.0 蒸发 火→水 <br>
-            2.0 融化 水→冰 <br>
-            1.5 蒸发 水→火 <br>
-            1.5 融化 冰→火
-        </div>
-        <div class="jump-link">
-            <a href="#crystallize">跳转至下一板块</a>
-        </div>
+    <div class="notes">
+      <p>增幅反应包括：蒸发、融化。触发增幅反应时，会为本次伤害附加蒸发融化系数（完整公式见【常规伤害】章节）。若攻击没有出现伤害数字（例如命中护盾），则本次伤害不会计算蒸发融化系数</p>
     </div>
-    <!-- 12. 结晶反应 -->
-    <div class="section" id="crystallize">
-        <h2>结晶反应</h2>
-        <div class="text-desc">触发结晶反应时，会掉落对应火/水/雷/冰元素的晶片，拾取后可获得护盾。结晶护盾对其自身属性的伤害有 250% 的吸收效率</div>
-        <div class="formula">
-            $$
-            结晶盾量 = 1851.06 \times \left(1 + \dfrac{4.44 \times 元素精通}{元素精通 + 1400}\right)
-            $$
-        </div>
-        <div class="text-desc">角色具有护盾时，护盾量还会受护盾强效影响，护盾强效取决于持有护盾的角色，而非创造晶片的角色</div>
-        <div class="jump-link">
-            <a href="#level">跳转至下一板块</a>
-        </div>
+  </section>
+  <!-- ============ 04 激化反应 ============ -->
+  <section class="section">
+    <div class="sec-head">
+      <span class="sec-num">04</span>
+      <h2 class="sec-title">激化反应类型</h2>
+      <span class="sec-en">Catalyze Reaction</span>
     </div>
+    <div class="sub-head">伤害结构</div>
+    <div class="struct">
+      <span class="eq">最终伤害 =</span>
+      <span>(</span>
+      <span class="chip c-base">基础</span><span class="op">+</span>
+      <span class="chip c-react">激化值</span>
+      <span>)</span><span class="op">×</span>
+      <span class="chip c-dmg">增伤</span><span class="op">×</span>
+      <span class="chip c-crit">暴击</span><span class="op">×</span>
+      <span class="chip c-res">抗性</span><span class="op">×</span>
+      <span class="chip c-def">防御</span>
+    </div>
+    <div class="sub-head toggle-defs">逐项定义</div>
+    <dl class="defs">
+      <div class="def-row">
+        <dt><span class="chip c-base">基础</span></dt>
+        <dd>\[ \text{某面板属性} \times \text{技能倍率} \times \text{独立乘区} + \text{数值提升} \]</dd>
+      </div>
+      <div class="def-row">
+        <dt><span class="chip c-react">激化值</span></dt>
+        <dd>
+          超激化：\[ 1446.85 \times 1.15 \times \left(1 + \frac{5 \times \text{元素精通}}{\text{元素精通} + 1200} + \text{超激化提高}\right) \]<br>
+          蔓激化：\[ 1446.85 \times 1.25 \times \left(1 + \frac{5 \times \text{元素精通}}{\text{元素精通} + 1200} + \text{蔓激化提高}\right) \]
+        </dd>
+      </div>
+      <div class="def-row">
+        <dt><span class="chip c-dmg">增伤</span></dt>
+        <dd>\[ 1 + \sum \text{任意来源增伤} \]</dd>
+      </div>
+      <div class="def-row">
+        <dt><span class="chip c-crit">暴击</span></dt>
+        <dd>\[ 1 + \text{暴击率} \times \text{暴击伤害} \]</dd>
+      </div>
+      <div class="def-row">
+        <dt><span class="chip c-res">抗性 / 防御</span></dt>
+        <dd>同普通直伤</dd>
+      </div>
+    </dl>
+    <div class="notes">
+      <p>当雷元素触及草元素时，会按照 1:1:1 的比例互相消耗并生成原激化元素。原激化元素可以发生绽放和燃烧反应，在这些反应中的表现和草元素相同。原激化元素的持续时间：(6 + 5 × 元素量) 秒。雷和草不共存，但原激化和雷、原激化和草都可以共存</p>
+      <p>当附着雷/草元素的攻击命中具有原激化的目标时，将分别引发超激化/蔓激化反应，不消耗任何元素，但为本次伤害贡献激化值（完整公式见【常规伤害】章节）</p>
+    </div>
+  </section>
+  <!-- ============ 05 剧变伤害 ============ -->
+  <section class="section">
+    <div class="sec-head">
+      <span class="sec-num">05</span>
+      <h2 class="sec-title">剧变伤害类型</h2>
+      <span class="sec-en">Transformative Reaction</span>
+    </div>
+    <div class="sub-head">伤害结构</div>
+    <div class="struct">
+      <span class="eq">最终伤害 =</span>
+      <span>(</span>
+      <span class="chip c-react">剧变基础</span><span class="op">+</span>
+      <span class="chip c-extra">额外提升</span>
+      <span>)</span><span class="op">×</span>
+      <span class="chip c-crit">暴击</span><span class="op">×</span>
+      <span class="chip c-res">抗性</span>
+    </div>
+    <div class="sub-head toggle-defs">逐项定义</div>
+    <dl class="defs">
+      <div class="def-row">
+        <dt><span class="chip c-react">剧变基础</span></dt>
+        <dd>\[ 1446.85 \times \text{反应倍率} \times \left(1 + \frac{16 \times \text{元素精通}}{\text{元素精通} + 2000} + \text{反应增伤}\right) \]</dd>
+      </div>
+      <div class="def-row">
+        <dt><span class="chip c-extra">额外提升</span></dt>
+        <dd>来自角色天赋、武器特效等额外附加数值</dd>
+      </div>
+      <div class="def-row">
+        <dt><span class="chip c-crit">暴击</span></dt>
+        <dd>通常为 1（剧变反应不暴击）；特殊效果（纳西妲二命、菈乌玛天赋等）另计</dd>
+      </div>
+      <div class="def-row">
+        <dt><span class="chip c-res">抗性</span></dt>
+        <dd>同普通直伤</dd>
+      </div>
+    </dl>
+    <div class="sub-head">反应系数（V5.2.0 增强后）</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>元素反应</th><th>反应系数</th></tr></thead>
+        <tbody>
+          <tr><td>碎冰反应</td><td>3.0</td></tr>
+          <tr><td>超/烈绽放反应</td><td>3.0</td></tr>
+          <tr><td>超载反应</td><td>2.75</td></tr>
+          <tr><td>绽放反应</td><td>2.0</td></tr>
+          <tr><td>感电反应</td><td>2.0</td></tr>
+          <tr><td>超导反应</td><td>1.5</td></tr>
+          <tr><td>扩散反应</td><td>0.6</td></tr>
+          <tr><td>燃烧反应</td><td>0.25</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="notes">
+      <p>剧变反应包括：超载、超导、感电、燃烧、碎冰、扩散、绽放、超绽放、烈绽放。剧变反应造成的伤害不受益于常规增伤/易伤/减伤，且无视防御力、不能暴击</p>
+      <p>反应倍率：扩散 0.65（每 0.25s 一次）；燃烧 0.25；超载 2.75；碎冰 3；绽放 2；烈绽放/超绽放 3</p>
+      <p>触发剧变反应没有冷却，但剧变反应的伤害有冷却：每 0.5s 最多 1 次：超载；每 0.5s 最多 2 次：超导、碎冰、扩散、绽放、烈绽放</p>
+    </div>
+  </section>
+  <!-- ============ 07 月曜直伤 ============ -->
+  <section class="section">
+    <div class="sec-head">
+      <span class="sec-num">07</span>
+      <h2 class="sec-title">月曜直伤类型</h2>
+      <span class="sec-en">Lunar Direct Damage</span>
+    </div>
+    <div class="sub-head">伤害结构</div>
+    <div class="struct">
+      <span class="eq">最终伤害 =</span>
+      <span>(</span>
+      <span class="chip c-lunar">月曜直伤基础</span><span class="op">+</span>
+      <span class="chip c-extra">数值提升</span>
+      <span>)</span><span class="op">×</span>
+      <span class="chip c-crit">暴击</span><span class="op">×</span>
+      <span class="chip c-res">抗性</span><span class="op">×</span>
+      <span class="chip c-lunar">擢升</span>
+    </div>
+    <div class="sub-head toggle-defs">逐项定义</div>
+    <dl class="defs">
+      <div class="def-row">
+        <dt><span class="chip c-lunar">月曜直伤基础</span></dt>
+        <dd>\[ \text{某面板属性} \times \text{技能倍率} \times \text{基础提升} \times \text{独立乘区} \times \text{月乘区} \times \left(1 + \frac{6 \times \text{元素精通}}{\text{元素精通} + 2000} + \text{附加精通}\right) \]</dd>
+      </div>
+      <div class="def-row">
+        <dt><span class="chip c-lunar">月乘区</span></dt>
+        <dd>月感电 3.0 ｜ 月结晶 1.6 ｜ 月绽放 1.0</dd>
+      </div>
+      <div class="def-row">
+        <dt><span class="chip c-crit">暴击 / 抗性 / 擢升</span></dt>
+        <dd>同月曜反应</dd>
+      </div>
+    </dl>
+    <div class="notes">
+      <p>某些角色可以基于攻击力，直接造成月感电伤害，通过这种方式造成的伤害无视防御力，不受益于常规增伤/减伤，但受益于元素精通，且有额外系数 3×</p>
+      <p><strong>月感电/月结晶基础提升：</strong>兹白天赋 (14%)、哥伦比亚天赋 (7%)、莉奈娅天赋 (14%)</p>
+      <p><strong>月感电/月结晶额外提升：</strong>兹白天赋一，叶洛亚元素爆发等</p>
+      <p>特定情况下，草触及水时，会生草原核，并为队伍提供「草露」，可被特定角色消耗。草原核伤害不算月绽放，月绽放伤害只包括直伤月绽放伤害。直伤月绽放无视防御，不受益于常规增伤/减伤，但受益于元素精通</p>
+      <p><strong>月绽放基础提升：</strong>菈乌玛天赋 (14%)、哥伦比亚天赋 (7%)、奈芙尔天赋 (14%)</p>
+      <p><strong>月绽放额外提升：</strong>菈乌玛元素爆发等</p>
+    </div>
+  </section>
+  <!-- ============ 06 月曜反应伤害计算 ============ -->
+  <section class="section">
+    <div class="sec-head">
+      <span class="sec-num">06</span>
+      <h2 class="sec-title">月曜反应伤害计算</h2>
+      <span class="sec-en">Lunar Reaction</span>
+    </div>
+    <div class="sub-head">每名角色贡献伤害</div>
+    <div class="struct">
+      <span class="eq">贡献伤害 =</span>
+      <span>(</span>
+      <span class="chip c-react">月曜基础</span><span class="op">+</span>
+      <span class="chip c-extra">数值提升</span>
+      <span>)</span><span class="op">×</span>
+      <span class="chip c-crit">暴击</span><span class="op">×</span>
+      <span class="chip c-res">抗性</span><span class="op">×</span>
+      <span class="chip c-lunar">擢升</span>
+    </div>
+    <div class="sub-head">最终伤害（贡献权重）</div>
+    <div class="struct">
+      <span class="eq">最终伤害 =</span>
+      <span class="chip c-react">0.6 × 第1贡献</span><span class="op">+</span>
+      <span class="chip c-react">0.3 × 第2贡献</span><span class="op">+</span>
+      <span class="chip c-react">0.05 × 第3贡献</span><span class="op">+</span>
+      <span class="chip c-react">0.05 × 第4贡献</span>
+    </div>
+    <div class="sub-head toggle-defs">逐项定义</div>
+    <dl class="defs">
+      <div class="def-row">
+        <dt><span class="chip c-react">月曜基础</span></dt>
+        <dd>\[ 1446.85 \times \text{反应系数} \times \text{基础提升} \times \left(1 + \frac{6 \times \text{元素精通}}{\text{元素精通} + 2000} + \text{附加精通}\right) \]</dd>
+      </div>
+      <div class="def-row">
+        <dt><span class="chip c-react">反应系数</span></dt>
+        <dd>月感电 1.8（倍率）｜ 月结晶 0.96（倍率）</dd>
+      </div>
+      <div class="def-row">
+        <dt><span class="chip c-crit">暴击</span></dt>
+        <dd>\[ 1 + \text{暴击率} \times \text{暴击伤害} \]</dd>
+      </div>
+      <div class="def-row">
+        <dt><span class="chip c-res">抗性</span></dt>
+        <dd>同普通直伤</dd>
+      </div>
+      <div class="def-row">
+        <dt><span class="chip c-lunar">擢升</span></dt>
+        <dd>来自角色天赋或武器特效的提升系数</dd>
+      </div>
+    </dl>
+    <div class="notes">
+      <p>特定情况下，雷触及水时，会生成一片不可移动的雷暴云，持续 6s。雷暴云：每 2s 攻击一次附近所有同时具有雷和水的目标，并消耗 0.4 元素量的雷和水（破盾效率极低）。触发月感电时，若附近已有雷暴云，则会刷新持续时间。月感电的倍率为 1.8，基础伤害为 1446.85 × 1.8 = 2604.33</p>
+      <p>月感电造成伤害时，所有参与反应的角色都会提供伤害值，但除伤害最高的角色外，其余角色的提供的伤害值会降低</p>
+      <p>若原本伤害最高的角色没有暴击，则有可能另一名暴击的角色成为最高</p>
+     
+    </div>
+  </section>
+  <!-- ============ 08 星烁反应 ============ -->
+  <section class="section">
+    <div class="sec-head">
+      <span class="sec-num">08</span>
+      <h2 class="sec-title">星烁反应类型</h2>
+      <span class="sec-en">Stellar Reaction</span>
+    </div>
+    <!-- ---------- 8.1 星超导直伤 ---------- -->
+    <div class="part">
+      <div class="part-head">
+        <span class="part-tag">8.1</span>
+        <span>星超导直伤</span>
+        <span class="part-en">Stellar Superconduct</span>
+      </div>
+      <div class="sub-head">伤害结构</div>
+      <div class="struct">
+        <span class="eq">最终伤害 =</span>
+        <span class="chip c-star">星超导基础</span><span class="op">×</span>
+        <span class="chip c-crit">暴击</span><span class="op">×</span>
+        <span class="chip c-res">抗性</span><span class="op">×</span>
+        <span class="chip c-lunar">擢升</span>
+      </div>
+      <div class="sub-head toggle-defs">逐项定义</div>
+      <dl class="defs">
+        <div class="def-row">
+          <dt><span class="chip c-star">星超导基础</span></dt>
+          <dd>\[ \text{某面板属性} \times \text{技能倍率} \times \text{反应系数} \times \text{基础提升} \times \left(1 + \frac{6 \times \text{元素精通}}{\text{元素精通} + 2000} + \text{附加精通}\right) \]</dd>
+        </div>
+        <div class="def-row">
+          <dt><span class="chip c-star">反应系数</span></dt>
+          <dd>根据附着次数（hit 数）查表确定，详见下方表格</dd>
+        </div>
+        <div class="def-row">
+          <dt><span class="chip c-crit">暴击 / 抗性 / 擢升</span></dt>
+          <dd>同月曜反应</dd>
+        </div>
+      </dl>
+      <div class="sub-head">反应系数与伤害加成</div>
+      <div class="table-wrap">
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th>记录次数</th>
+              <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th>
+              <th>7</th><th>8</th><th>9</th><th>10</th><th>11</th><th>12</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>反应系数</td>
+              <td>1.45</td><td>1.50</td><td>1.55</td><td>1.60</td><td>1.65</td><td>1.70</td>
+              <td>1.75</td><td>1.80</td><td>1.85</td><td>1.90</td><td>1.95</td><td>2.00</td>
+            </tr>
+            <tr>
+              <td>雷/冰伤害加成</td>
+              <td>29%</td><td>30%</td><td>31%</td><td>32%</td><td>33%</td><td>34%</td>
+              <td>35%</td><td>36%</td><td>37%</td><td>38%</td><td>39%</td><td>40%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="notes">
+        <p>星超导基础倍率与hit数相关：冰元素伤害与雷元素的附着次数视为hit数，即1次附着视为1hit</p>
+        <p>星超导基础倍率与附着次数相关，当次数为 0/1/2/3/4/5/6/7/8/9/10/11/12 时，星超导基础倍率分别为：1.0, 1.45, 1.5, 1.54, 1.60, 1.64, 1.70, 1.75, 1.79, 1.85, 1.89, 1.95, 2.0</p>
+        <p><strong>基础提升：</strong>木偶天赋 (14%)</p>
+        <p><strong>额外提升：</strong>羽毛：七七 6 命</p>
+      </div>
+    </div>
+    <!-- ---------- 8.2 星扩散直伤 ---------- -->
+    <div class="part">
+      <div class="part-head">
+        <span class="part-tag">8.2</span>
+        <span>星扩散直伤</span>
+        <span class="part-en">Stellar Swirl</span>
+      </div>
+      <div class="sub-head">伤害结构</div>
+      <div class="struct">
+        <span class="eq">最终伤害 =</span>
+        <span class="chip c-star">星扩散基础</span><span class="op">×</span>
+        <span class="chip c-crit">暴击</span><span class="op">×</span>
+        <span class="chip c-res">抗性</span><span class="op">×</span>
+        <span class="chip c-lunar">擢升</span>
+      </div>
+      <div class="sub-head toggle-defs">逐项定义</div>
+      <dl class="defs">
+        <div class="def-row">
+          <dt><span class="chip c-star">星扩散基础</span></dt>
+          <dd>\[ 1 \times \text{属性} \times \text{倍率} \times (1 + \text{基础提升}) \times \left(1 + \frac{6 \times \text{元素精通}}{\text{元素精通} + 2000} + \text{星扩散增伤}\right) \]</dd>
+        </div>
+        <div class="def-row">
+          <dt><span class="chip c-star">反应系数</span></dt>
+          <dd>反应系数始终为 1</dd>
+        </div>
+        <div class="def-row">
+          <dt><span class="chip c-crit">暴击 / 抗性 / 擢升</span></dt>
+          <dd>同月曜反应</dd>
+        </div>
+      </dl>
+      <div class="notes">
+        <p>星扩散直伤基础 = 1 × 属性 × 倍率 × (1 + 基础提升%) × (1 + 6 × 元素精通 / (元素精通 + 2000) + 星扩散增伤%)</p>
+        <p>最终直伤 = (直伤基础 + 额外提升) × 抗性系数 × 暴击区 × 擢升</p>
+      </div>
+    </div>
+    <!-- ---------- 8.3 星扩散反应伤害 ---------- -->
+    <div class="part">
+      <div class="part-head">
+        <span class="part-tag">8.3</span>
+        <span>星扩散反应伤害</span>
+        <span class="part-en">Stellar Reaction Damage</span>
+      </div>
+      <div class="sub-head">每名角色贡献伤害</div>
+      <div class="struct">
+        <span class="eq">贡献伤害 =</span>
+        <span>(</span>
+        <span class="chip c-star">星扩散基础</span><span class="op">+</span>
+        <span class="chip c-extra">数值提升</span>
+        <span>)</span><span class="op">×</span>
+        <span class="chip c-crit">暴击</span><span class="op">×</span>
+        <span class="chip c-res">抗性</span><span class="op">×</span>
+        <span class="chip c-lunar">擢升</span>
+      </div>
+      <div class="sub-head">最终伤害（贡献权重）</div>
+      <div class="struct">
+        <span class="eq">最终伤害 =</span>
+        <span class="chip c-star">0.6 × 第1贡献</span><span class="op">+</span>
+        <span class="chip c-star">0.3 × 第2贡献</span><span class="op">+</span>
+        <span class="chip c-star">0.05 × 第3贡献</span><span class="op">+</span>
+        <span class="chip c-star">0.05 × 第4贡献</span>
+      </div>
+      <div class="sub-head toggle-defs">逐项定义</div>
+      <dl class="defs">
+        <div class="def-row">
+          <dt><span class="chip c-star">星扩散基础</span></dt>
+          <dd>\[ 1446.85 \times \text{反应系数} \times \text{基础提升} \times \left(1 + \frac{6 \times \text{元素精通}}{\text{元素精通} + 2000} + \text{附加精通}\right) \]</dd>
+        </div>
+        <div class="def-row">
+          <dt><span class="chip c-star">反应系数</span></dt>
+          <dd>冰元素星扩散：风涡 1–2 级 → 2 ｜ 风涡 ≥3 级 → 3<br>风元素星扩散：0.75</dd>
+        </div>
+        <div class="def-row">
+          <dt><span class="chip c-crit">暴击 / 抗性 / 擢升</span></dt>
+          <dd>同月曜反应</dd>
+        </div>
+      </dl>
+      <div class="notes">
+        <p>当触发星扩散反应时，反应星扩散·风和反应星扩散·冰的过程会同时进行</p>
+        <p><strong>关于风涡：</strong>每次触发星扩散反应时，风涡系数会增加 1，最高为 6</p>
+        <p>反应星扩散·风的基础倍率为 0.75，每次触发星扩散反应·风的时候会立刻造成一次风元素星扩散反应伤害，且每 3s（经7.0版本实测之后为3s，而非4.5s）引爆一次风涡（若在3s之前就已叠了6点系数，则立刻引爆并清零），引爆风涡时，造成一次冰元素星扩散伤害，为附近的敌人附着 1U 冰元素，然后将风涡系数清零</p>
+        <p>反应星扩散·冰的基础倍率会随着风涡系数的不同而变化，当风涡系数为 1~2 时，基础倍率为 2，当风涡系数为 3~6 时，基础倍率为 3</p>
+        <p>若原本伤害最高的角色没有暴击，则有可能另一名暴击的角色成为最高</p>
+        <p>上述倍率顺序按照角色造成伤害量从大到小，从左到右排序</p>
+      </div>
+    </div>
+  </section>
+  <!-- ============ 09 抗打断系数 ============ -->
+  <section class="section">
+    <div class="sec-head">
+      <span class="sec-num">09</span>
+      <h2 class="sec-title">抗打断系数</h2>
+      <span class="sec-en">Interrupt Resistance</span>
+    </div>
+    <div class="sub-head">计算结构</div>
+    <div class="struct">
+      <span class="eq">最终抗打断数值 =</span>
+      <span class="chip c-base">a</span><span class="op">×</span>
+      <span class="chip c-extra">b</span>
+    </div>
+    <div class="sub-head toggle-defs">逐项定义</div>
+    <dl class="defs">
+      <div class="def-row">
+        <dt><span class="chip c-base">a</span></dt>
+        <dd>角色本身所拥有的抗打断数值</dd>
+      </div>
+      <div class="def-row">
+        <dt><span class="chip c-extra">b</span></dt>
+        <dd>队友提供的抗打断数值</dd>
+      </div>
+      <div class="def-row">
+        <dt><span class="chip c-res">最终抗打断数值</span></dt>
+        <dd>\[ \text{最终抗打断数值} = a \times b \]</dd>
+      </div>
+    </dl>
+    <div class="notes">
+      <p><strong>示例：</strong>a 为 0.5，b 为 0.3，则角色最终的抗打断系数为 0.5 × 0.3 = 0.15</p>
+      <p><strong>注：</strong>抗打断系数越小，角色自身抗打断能力越强！</p>
+    </div>
+  </section>
+</div>
+<script>
+/* ========== 主题切换 ========== */
+document.addEventListener('DOMContentLoaded', function(){
+  const html = document.documentElement;
+  const buttons = document.querySelectorAll('.theme-btn');
+  const saved = localStorage.getItem('gensri-theme');
+  
+  // 只保留 paper 和 dark 两个主题
+  if (saved && ['paper', 'dark'].includes(saved)) {
+    html.setAttribute('data-theme', saved);
+    buttons.forEach(b => b.classList.toggle('active', b.dataset.theme === saved));
+  }
+  
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const theme = btn.dataset.theme;
+      html.setAttribute('data-theme', theme);
+      buttons.forEach(b => b.classList.toggle('active', b === btn));
+      try { localStorage.setItem('gensri-theme', theme); } catch (e) {}
+    });
+  });
+
+  /* ========== 为“逐项定义”添加范围面板，包含下方全部内容 ========== */
+  function wrapDefsPanels() {
+    document.querySelectorAll('.toggle-defs').forEach(title => {
+      // 防止重复包裹
+      if (title.nextElementSibling && title.nextElementSibling.classList.contains('defs-panel')) {
+        return;
+      }
+      const panel = document.createElement('div');
+      panel.className = 'defs-panel';
+      
+      // 收集后续兄弟节点，直到遇到下一个 .toggle-defs 或 .part-head 或 .sec-head
+      let next = title.nextElementSibling;
+      const toMove = [];
+      while (next) {
+        // 停止条件：遇到下一个逐项定义、子部分标题、章节标题，或者已经没有下一个元素
+        if (next.classList.contains('toggle-defs') || 
+            next.classList.contains('part-head') || 
+            next.classList.contains('sec-head') ||
+            next.tagName === 'SECTION') {
+          break;
+        }
+        toMove.push(next);
+        next = next.nextElementSibling;
+      }
+      
+      if (toMove.length === 0) return;
+      
+      // 将收集到的节点移入面板
+      toMove.forEach(el => panel.appendChild(el));
+      
+      // 将面板插入到标题之后
+      title.parentNode.insertBefore(panel, title.nextElementSibling);
+      
+      // 默认不展开（添加 hidden 类，并让标题显示为折叠状态）
+      panel.classList.add('hidden');
+      title.classList.add('collapsed');
+      
+      // 绑定点击事件：切换面板显隐
+      title.addEventListener('click', function() {
+        panel.classList.toggle('hidden');
+        this.classList.toggle('collapsed');
+      });
+    });
+  }
+
+  // 执行包裹
+  wrapDefsPanels();
+
+  // 如果 MathJax 可用，重新排版以确保公式显示正确
+  if (window.MathJax && MathJax.typesetPromise) {
+    MathJax.typesetPromise().catch(err => console.warn('MathJax typeset error:', err));
+  }
+});
+</script>
 </body>
 </html>

@@ -1,57 +1,131 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="paper">
 <head>
-    <!-- 前端预连接、预加载，纯代码提速，无需配置文件 -->
+    <!-- 前端预连接、预加载 -->
     <link rel="preconnect" href="https://yuhuazhe.github.io" crossorigin>
     <link rel="dns-prefetch" href="https://yuhuazhe.github.io">
     <link rel="preload" href="zhanshi/1.0.jpg" as="image" type="image/jpeg">
     
     <meta charset="UTF-8">
-    <!-- 修复手机端缩放、截图拉伸问题 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
     <title>怪物机制</title>
-    <!-- 引入html2canvas CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <style>
+        /* ===== 主题变量 ===== */
+        html[data-theme="paper"] {
+            --bg-mask: rgba(247, 243, 236, 0.86);
+            --surface: rgba(255, 252, 247, 0.82);
+            --surface-2: rgba(242, 236, 224, 0.88);
+            --ink: #2a2520;
+            --ink-2: #6b6053;
+            --ink-3: #968872;
+            --accent: #9a3412;
+            --rule: rgba(180, 168, 148, 0.42);
+            --rule-2: rgba(160, 146, 124, 0.55);
+            --hover: rgba(253, 240, 228, 0.9);
+            --mask: rgba(0, 0, 0, 0.5);
+        }
+        html[data-theme="dark"] {
+            --bg-mask: rgba(16, 18, 23, 0.82);
+            --surface: rgba(30, 33, 40, 0.72);
+            --surface-2: rgba(38, 42, 51, 0.8);
+            --ink: #e8eaed;
+            --ink-2: #a5adba;
+            --ink-3: #6b7280;
+            --accent: #f0a05a;
+            --rule: rgba(90, 100, 118, 0.42);
+            --rule-2: rgba(110, 122, 142, 0.52);
+            --hover: rgba(42, 47, 58, 0.85);
+            --mask: rgba(0, 0, 0, 0.55);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
         }
+
         body {
-            background: #0a0a0f;
-            color: #eee;
+            /* 固定背景图 */
+            background-color: #16181d;
+            background-image: url("zhanshi/1.0.jpg");
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: var(--ink);
             padding: 20px;
             min-height: 100vh;
+            transition: color 0.25s;
         }
+
+        /* 主题遮罩层 */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background: var(--bg-mask);
+            transition: background-color 0.35s ease;
+            pointer-events: none;
+        }
+
+        /* ===== 内容包装器（浮于遮罩之上） ===== */
+        .page-wrap {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* ===== 主题切换按钮 ===== */
+        .theme-switch {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            display: flex;
+            gap: 8px;
+            background: var(--surface);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--rule-2);
+            border-radius: 999px;
+            padding: 6px 8px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+            transition: background-color 0.25s, border-color 0.25s;
+        }
+        .theme-btn {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: transform 0.15s, border-color 0.15s;
+            padding: 0;
+            outline: none;
+        }
+        .theme-btn:hover { transform: scale(1.12); }
+        .theme-btn.active { border-color: var(--accent); }
+        .theme-btn[data-theme="paper"] { background: linear-gradient(135deg, #f7f3ec 50%, #d9cdb8 50%); }
+        .theme-btn[data-theme="dark"]  { background: linear-gradient(135deg, #1e2128 50%, #f0a05a 50%); }
+
+        /* ===== 页头 ===== */
         .header-top {
             display: flex;
             align-items: center;
             gap: 12px;
             margin-bottom: 24px;
         }
-        .back-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 6px;
-            background: transparent;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(44, 44, 64, 0.3);
-            color: #fff;
-            font-size: 18px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .back-btn:hover {
-            background: rgba(39, 39, 56, 0.25);
-            border-color: rgba(96, 66, 117, 0.5);
-        }
         .page-title {
             font-size: 28px;
             font-weight: 700;
+            color: var(--ink);
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+            transition: color 0.25s;
         }
+
+        /* ===== 搜索筛选栏 ===== */
         .search-filter-bar {
             display: flex;
             flex-wrap: wrap;
@@ -65,33 +139,37 @@
         }
         .filter-tag {
             padding: 8px 16px;
-            background: transparent;
+            background: var(--surface);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(44, 44, 64, 0.3);
+            border: 1px solid var(--rule-2);
             border-radius: 6px;
             cursor: pointer;
+            color: var(--ink);
             transition: all 0.2s;
+            user-select: none;
         }
         .filter-tag.active {
-            background: rgba(56, 34, 70, 0.3);
-            border-color: rgba(157, 88, 192, 0.6);
-            color: #e9c8ff;
+            background: var(--hover);
+            border-color: var(--accent);
+            color: var(--accent);
+            font-weight: 600;
         }
         .filter-tag:hover {
-            border-color: rgba(96, 66, 117, 0.5);
-            background: rgba(39, 39, 56, 0.2);
+            border-color: var(--accent);
+            background: var(--hover);
         }
         .search-box-wrap {
             flex: 1;
             min-width: 220px;
             display: flex;
-            background: transparent;
+            background: var(--surface);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(44, 44, 64, 0.3);
+            border: 1px solid var(--rule-2);
             border-radius: 6px;
             overflow: hidden;
+            transition: border-color 0.25s, background-color 0.25s;
         }
         .search-input {
             flex: 1;
@@ -99,42 +177,51 @@
             background: transparent;
             border: none;
             outline: none;
-            color: #fff;
+            color: var(--ink);
             font-size: 15px;
+            transition: color 0.25s;
+        }
+        .search-input::placeholder {
+            color: var(--ink-3);
         }
         .search-btn {
             padding: 0 14px;
             border: none;
             background: transparent;
-            color: #aaa;
+            color: var(--ink-2);
             cursor: pointer;
+            font-size: 15px;
+            transition: color 0.2s;
         }
         .search-btn:hover {
-            color: #fff;
+            color: var(--accent);
         }
+
+        /* ===== 怪物网格 ===== */
         .monster-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
             gap: 18px;
         }
         .monster-card {
-            background: transparent;
+            background: var(--surface);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(37, 37, 56, 0.35);
+            border: 1px solid var(--rule-2);
             border-radius: 10px;
             padding: 16px 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
             cursor: pointer;
-            transition: 0.2s;
+            transition: background-color 0.25s, border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.07);
         }
         .monster-card:hover {
-            border-color: rgba(128, 72, 163, 0.7);
+            border-color: var(--accent);
             transform: translateY(-3px);
-            box-shadow: 0 6px 16px rgba(71, 40, 92, 0.2);
-            background: rgba(56, 34, 70, 0.15);
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.15);
+            background: var(--hover);
         }
         .monster-avatar {
             width: 90px;
@@ -142,16 +229,21 @@
             border-radius: 8px;
             margin-bottom: 12px;
             object-fit: cover;
+            background: var(--surface-2);
         }
         .monster-name {
             text-align: center;
             font-size: 15px;
             line-height: 1.4;
+            color: var(--ink);
+            transition: color 0.25s;
         }
+
+        /* ===== 详情弹窗 ===== */
         .detail-mask {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.55);
+            background: var(--mask);
             backdrop-filter: blur(4px);
             -webkit-backdrop-filter: blur(4px);
             display: none;
@@ -165,13 +257,15 @@
             max-width: 700px;
             max-height: 90vh;
             overflow-y: auto;
-            background: transparent;
+            background: var(--surface);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(128, 72, 163, 0.5);
+            border: 1px solid var(--rule-2);
             border-radius: 12px;
             padding: 24px;
             position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.25s, border-color 0.25s;
         }
         .close-detail {
             position: absolute;
@@ -180,66 +274,61 @@
             width: 32px;
             height: 32px;
             border-radius: 50%;
-            background: transparent;
+            background: var(--surface-2);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(44, 44, 64, 0.3);
-            color: #fff;
+            border: 1px solid var(--rule-2);
+            color: var(--ink);
             font-size: 18px;
+            line-height: 1;
             cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s, color 0.2s;
         }
         .close-detail:hover {
-            background: rgba(56, 34, 70, 0.35);
-            border-color: rgba(157, 88, 192, 0.6);
-        }
-        .download-btn {
-            position: absolute;
-            top: 16px;
-            right: 60px;
-            padding: 6px 12px;
-            border-radius: 6px;
-            background: transparent;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(157, 88, 192, 0.5);
-            color: #e9c8ff;
-            cursor: pointer;
-        }
-        .download-btn:hover {
-            background: rgba(76, 45, 95, 0.3);
+            background: var(--hover);
+            border-color: var(--accent);
+            color: var(--accent);
         }
         .detail-header {
             display: flex;
             gap: 20px;
             margin-bottom: 20px;
             flex-wrap: wrap;
+            padding-right: 40px;
         }
         .detail-avatar {
             width: 140px;
             height: 140px;
             border-radius: 10px;
             object-fit: cover;
+            background: var(--surface-2);
         }
         .detail-title h2 {
             font-size: 26px;
             margin-bottom: 8px;
+            color: var(--ink);
+            transition: color 0.25s;
         }
         .detail-type-tag {
             display: inline-block;
             padding: 4px 12px;
-            background: rgba(56, 34, 70, 0.3);
+            background: var(--surface-2);
             backdrop-filter: blur(6px);
             -webkit-backdrop-filter: blur(6px);
+            border: 1px solid var(--rule-2);
             border-radius: 4px;
-            color: #e9c8ff;
+            color: var(--accent);
             font-size: 14px;
+            transition: color 0.25s, background-color 0.25s, border-color 0.25s;
         }
         .detail-content {
             line-height: 1.7;
-            color: #ccc;
+            color: var(--ink-2);
             white-space: pre-line;
+            transition: color 0.25s;
         }
-        /* 滚动条美化 适配透明面板 */
+
+        /* 滚动条美化 */
         .detail-wrap::-webkit-scrollbar {
             width: 6px;
         }
@@ -247,13 +336,17 @@
             background: transparent;
         }
         .detail-wrap::-webkit-scrollbar-thumb {
-            background: rgba(157, 88, 192, 0.4);
+            background: var(--rule-2);
             border-radius: 3px;
         }
+        .detail-wrap::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+
+        /* ===== 移动端适配 ===== */
         @media (max-width: 600px) {
-            .page-title {
-                font-size: 22px;
-            }
+            body { padding: 72px 12px 48px; }
+            .page-title { font-size: 22px; }
             .monster-grid {
                 grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
                 gap: 12px;
@@ -265,38 +358,51 @@
             .detail-header {
                 justify-content: center;
                 text-align: center;
+                padding-right: 0;
             }
             .detail-avatar {
                 width: 100px;
                 height: 100px;
             }
-            .download-btn {
-                right: 50px;
-                padding: 4px 8px;
-                font-size: 12px;
+            .theme-switch {
+                top: 12px;
+                right: 12px;
+                padding: 4px 6px;
+            }
+            .theme-btn {
+                width: 22px;
+                height: 22px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="header-top">
-        <h1 class="page-title">怪物机制</h1>
+    <!-- 主题切换按钮 -->
+    <div class="theme-switch" role="group" aria-label="背景配色">
+        <button class="theme-btn active" data-theme="paper" title="暖色纸张（原色）" aria-label="暖色纸张"></button>
+        <button class="theme-btn" data-theme="dark" title="暗色模式（黑色）" aria-label="暗色模式"></button>
     </div>
-    <div class="search-filter-bar">
-        <div class="filter-group">
-            <div class="filter-tag" data-type="abyss">深渊</div>
-            <div class="filter-tag" data-type="realm">幽境</div>
-            <div class="filter-tag" data-type="drama">剧诗</div>
+
+    <div class="page-wrap">
+        <div class="header-top">
+            <h1 class="page-title">怪物机制</h1>
         </div>
-        <div class="search-box-wrap">
-            <input class="search-input" placeholder="搜索怪物">
-            <button class="search-btn">搜索</button>
+        <div class="search-filter-bar">
+            <div class="filter-group">
+                <div class="filter-tag" data-type="abyss">深渊</div>
+                <div class="filter-tag" data-type="realm">幽境</div>
+                <div class="filter-tag" data-type="drama">剧诗</div>
+            </div>
+            <div class="search-box-wrap">
+                <input class="search-input" placeholder="搜索怪物">
+                <button class="search-btn">搜索</button>
+            </div>
         </div>
+        <div class="monster-grid" id="monsterContainer"></div>
     </div>
-    <div class="monster-grid" id="monsterContainer"></div>
+
     <div class="detail-mask" id="detailMask">
-        <div class="detail-wrap" id="captureBox">
-            <button class="download-btn" id="downloadDetailBtn">下载详情图</button>
+        <div class="detail-wrap">
             <button class="close-detail" id="closeDetailBtn">×</button>
             <div class="detail-header">
                 <img class="detail-avatar" id="detailImg" alt="">
@@ -308,7 +414,37 @@
             <div class="detail-content" id="detailDesc"></div>
         </div>
     </div>
+
     <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        /* ===== 主题切换 ===== */
+        (function () {
+            var html = document.documentElement;
+            var buttons = document.querySelectorAll('.theme-btn');
+            var saved = null;
+            try { saved = localStorage.getItem('gensri-theme'); } catch (e) { saved = null; }
+            if (saved && ['paper', 'dark'].indexOf(saved) !== -1) {
+                html.setAttribute('data-theme', saved);
+                for (var i = 0; i < buttons.length; i++) {
+                    buttons[i].classList.toggle('active', buttons[i].dataset.theme === saved);
+                }
+            }
+            for (var j = 0; j < buttons.length; j++) {
+                (function (btn) {
+                    btn.addEventListener('click', function () {
+                        var theme = btn.dataset.theme;
+                        html.setAttribute('data-theme', theme);
+                        for (var k = 0; k < buttons.length; k++) {
+                            buttons[k].classList.toggle('active', buttons[k] === btn);
+                        }
+                        try { localStorage.setItem('gensri-theme', theme); } catch (e) {}
+                    });
+                })(buttons[j]);
+            }
+        })();
+
+        /* ===== 图片资源 ===== */
         const imgQianHeShi = "./1.png";
         const imgFengYiRen = "./2.png";
         const imgZhongJiaYa = "./3.png";
@@ -333,7 +469,8 @@
         const imgshuixing = "./shuixing.png";
         const imghuoguo = "./huoguo.png";
         const imgshuangyiren = "./shuangyiren.png";
-        
+
+        /* ===== 怪物数据 ===== */
         const monsterList = [
             {
                 id:1,
@@ -458,7 +595,6 @@
 深古遗迹的制造用机械体、远古遗迹的主人们用这种会改变形态的机器进行各种制造的工作，
 在地脉洪流的错乱重构下,其抵御熔岩的外壳化作了盔甲，构筑庞然巨城的作力铸成了巨钳，曾经的「制造」指令被篡改为「毁灭」的意志，正驱使着它无休止地践行着将一切化为废墟的「伟大事业」`
             },
-          
             {
                 id:7,
                 name:"霜夜巡天灵主·惊惘愔愤",
@@ -554,8 +690,7 @@
 另外，若「分裂状态」产生出的所有孢子均被击毁，则强散会提前退出「分裂状态」，并转变为「脆性聚合状态」。
 空洞结构
 受到地脉紊乱的影响，强散处于「分裂状态」或「脆性聚合状态」时，风元素抗性大幅降低。`
-            }
-            ,
+            },
             {
                 id:12,
                 name:"历经百战的火刃突击队员·决死武装",
@@ -568,8 +703,7 @@
 3.在一定时间内破除护盾，使敌人虚弱：所有抗性降低 50%，恢复后雷元素抗性降低 60%
 4.每层护盾被破坏时，损失 6% 生命值，且产生晶球：雷元素能量恢复 18 点，其他元素恢复 6 点
 `
-            }
-             ,
+            },
             {
                 id:13,
                 name:"铁甲熔火帝皇·敕命远征",
@@ -580,8 +714,7 @@
 1.具有 64U 火元素器官「熔火双角」，使全部抗性提升 150%，破坏后损失 10% 生命值
 2.会召唤「坚盾重甲蟹」，其具有 12U 火元素，火元素被耗尽时将失控撞向首领，使其损失 12U 火元素
 3.首领被撞时还会基于「坚盾重甲蟹」受到的伤害损失生命值，等同于其受到的 60% 水元素伤害 + 10% 非水元素伤害，不超过首领 15% 生命值`
-            }
-             ,
+            },
             {
                 id:14,
                 name:"深罪浸礼者·肃烈狂音",
@@ -592,8 +725,7 @@
 1.会依次展开雷元素、火元素、水元素护盾，每次破除时将损失生命值，全部破除后敌人将瘫痪一段时间
 2.护盾量：12U / 18U / 18U（大世界的 150%）
 3.损失生命值：50% 护盾受到的伤害，不超过 12.5% 生命值，不计入护盾自身元素`
-            }
-            ,
+            },
             {
                 id:15,
                 name:"历经百战的暝视龙·霜雪苛念",
@@ -606,8 +738,7 @@
 3.会出现可以被牵引的「扰乱风涡」，命中敌人时降低 15% 风元素抗性，可叠加 10 层
 4.护盾量：24U，物件 16U ，破坏削减 9.6U 护盾
 5.损失生命值：10% 生命值 + 50% 护盾受到的伤害，不超过 22.5% 生命值`
-            }
-            ,
+            },
             {
                 id:16,
                 name:"实验性场力发生装置·极端势能",
@@ -617,8 +748,7 @@
                 desc:`N5：13231421--------------N6：23020735
 1.会展开「重力削减力场」使跳跃能力大幅提升，同时在地面展开极为猛烈的、无法闪避的攻势，且每 5s 使自身的威力获得一层大幅强化
 2.角色跳跃至一定高度时，使接下来的 1.5s 内自身攻击力提升 600% ，且下落攻击命中敌人后将降低敌人的一层威力强化`
-            }
-            ,
+            },
             {
                 id:17,
                 name:"历经百战的执灯人·哀恸回响",
@@ -630,8 +760,7 @@
 2.狂猎：生命值削减至 0 后，或角色施放满辉（二级月兆）强化的技能后，进入临界状态，并在一段时间后恢复至【生命上限】
 3.临界状态：受到伤害时，基于队伍是否为满辉，会以 65% / 90% 比例削减【生命上限】，降至 0 时被击败
 4.场上会出现狂猎幽魂；一段时间后，首领将猎杀场上的全部狂猎幽魂，并基于猎物的剩余生命值治疗自身`
-            }
-            ,
+            },
             {
                 id:18,
                 name:"兆载永劫龙兽·歼灭构型",
@@ -648,8 +777,7 @@
 受到地脉紊乱的影响，初始会以地面状态开始战斗。如果长时间未释放能量洪流，就会切换到升空状态进行战斗。
 核心装甲隔绝
 受到地脉紊乱的影响，身体的诸多核心都被保护了起来，不再会因为核心受到攻击而瘫痪，也不会因此而清除已有的元素抗性。`
-            }
-            ,
+            },
             {
                 id:19,
                 name:"历经百战的岩居蟹·百万爆轰",
@@ -667,8 +795,7 @@
 伟大岩临轰袭
 受到地脉紊乱的影响，战斗开始后，岩居蟹会升空，散布大量「岩居之种」后开始蓄力，并在蓄力完成后引爆「岩居之种」，造成大范围伤害使我方当前场上的角色直接倒下，并使自身所有抗性在一段时间内大幅提升。
 蓄力期间，岩居蟹将展开护盾，通过转化一定数量的「岩居之种」破坏护盾，即可打断岩居蟹的蓄力并使其瘫痪。`
-            }
-            ,
+            },
             {
                 id:20,
                 name:"历经百战的玳龟·坚盾轰霆",
@@ -680,8 +807,7 @@
 受到一定次数的攻击后，会展开「雷棘护罩」：护罩存在期间受到攻击时，会对附近的角色造成反震伤害；通过元素反应耗尽护罩的雷元素，才能破除护罩。
 久续之霆
 受到地脉紊乱的影响，每次受到攻击时，该敌人展开「雷棘护罩」的进度将以更高的幅度累积，但进度将随着时间流逝缓慢回退；此外，破除「雷棘护罩」所需的元素将显著增加。`
-            }
-            ,
+            },
             {
                 id:21,
                 name:"历经百战的皮皮潘偶像·百诈瞬变",
@@ -700,8 +826,7 @@
 帽子被破坏时本体所受到的伤害，会基于帽子受到水元素伤害、雷元素伤害、感电或月感电伤害而提高。
 帽子拒绝
 受到地脉紊乱的影响，该敌人会发动强力的「帽子拒绝」攻击：持续投掷能够造成高额雷元素伤害的帽子，且帽子具有强大打断效果。`
-            }
-            ,
+            },
             {
                 id:22,
                 name:"水形幻人·极旋湍流",
@@ -720,8 +845,7 @@
 闭环环伺
 受到地脉紊乱的影响，战斗中，水形幻人将蓄能，并可以积攒能量释放「闭环环伺」。如果「闭环环伺」释放，将把我方当前场上的角色直接击倒。
 水形人展开护盾时，将开始吞噬所有残血的半幻人来恢复自身血量，且持续积攒攻击所需要的能量。在水形人蓄能期间持续攻击，即可打断「闭环环伺」的释放。`
-            }
-            ,
+            },
             {
                 id:23,
                 name:"熔岩辉龙像·炽烈流焰",
@@ -741,8 +865,7 @@
 燥热熔化
 受到地脉紊乱的影响，强敌的所有抗性进一步提升，并且致使其所需积攒的火元素伤害数值增加。
 能够自身持续产生热量，以维持灼热状态的运转。`
-            }
-            ,
+            },
             {
                 id:24,
                 name:"历经百战的霜役人·涉血芒锋",
@@ -755,165 +878,91 @@
 3.「护盾」：等同于 22.5% 生命值，为全体角色施加 27100 / 29028 生命之契，且每秒额外施加 8130 / 8708 生命之契（N5/N6）
 4.「护盾」被破除时，损失 22.5% 生命值，瘫痪 2s`
             }
-        ]
+        ];
+
+        /* ===== DOM 引用 ===== */
         const container = document.getElementById('monsterContainer');
         const filterTags = document.querySelectorAll('.filter-tag');
         const searchInput = document.querySelector('.search-input');
         const searchBtn = document.querySelector('.search-btn');
         const detailMask = document.getElementById('detailMask');
         const closeDetailBtn = document.getElementById('closeDetailBtn');
-        const downloadDetailBtn = document.getElementById('downloadDetailBtn');
-        const captureBox = document.getElementById('captureBox');
         const detailImg = document.getElementById('detailImg');
         const detailName = document.getElementById('detailName');
         const detailType = document.getElementById('detailType');
         const detailDesc = document.getElementById('detailDesc');
+
         let currentFilter = null;
         let searchKey = '';
         let currentMonster = null;
-        // 判断iOS/手机内置浏览器
-        function isMobileNoAutoDownload() {
-            const ua = navigator.userAgent.toLowerCase();
-            const isIOS = /ipad|iphone|ipod/.test(ua) && !window.MSStream;
-            const isWechat = /micromessenger/.test(ua);
-            const isQQ = /qqbrowser/.test(ua);
-            return isIOS || isWechat || isQQ;
-        }
-        // 预加载图片
-        function loadImage(src) {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.crossOrigin = "anonymous";
-                img.onload = () => resolve(img);
-                img.onerror = reject;
-                img.src = src;
-            })
-        }
-        function renderList(){
-            let data = [...monsterList];
-            if(currentFilter) data = data.filter(item=>item.type===currentFilter);
-            if(searchKey) data = data.filter(item=>item.name.includes(searchKey));
+
+        /* ===== 渲染列表 ===== */
+        function renderList() {
+            let data = monsterList.slice();
+            if (currentFilter) data = data.filter(item => item.type === currentFilter);
+            if (searchKey) data = data.filter(item => item.name.indexOf(searchKey) !== -1);
             container.innerHTML = '';
-            data.forEach(monster=>{
+            data.forEach(monster => {
                 const card = document.createElement('div');
                 card.className = 'monster-card';
-                card.innerHTML = `
-                    <img class="monster-avatar" src="${monster.img}" alt="${monster.name}" crossorigin="anonymous">
-                    <div class="monster-name">${monster.name}</div>
-                `
-                card.addEventListener('click',()=>openDetail(monster));
+                card.innerHTML =
+                    '<img class="monster-avatar" src="' + monster.img + '" alt="' + monster.name + '">' +
+                    '<div class="monster-name">' + monster.name + '</div>';
+                card.addEventListener('click', () => openDetail(monster));
                 container.appendChild(card);
-            })
+            });
         }
-        function openDetail(monster){
+
+        /* ===== 打开详情 ===== */
+        function openDetail(monster) {
             currentMonster = monster;
             detailImg.src = monster.img;
-            detailImg.crossOrigin = "anonymous";
             detailName.innerText = monster.name;
             detailType.innerText = monster.typeText;
             detailDesc.innerText = monster.desc;
             detailMask.style.display = 'flex';
             document.body.style.overflow = 'hidden';
         }
-        function closeDetail(){
+
+        /* ===== 关闭详情 ===== */
+        function closeDetail() {
             detailMask.style.display = 'none';
             document.body.style.overflow = '';
         }
-        // 下载函数：PC自动下载，手机弹出预览长按保存
-        async function downloadDetailImage() {
-            if (!currentMonster) return;
-            try {
-                await loadImage(detailImg.src);
-                // 保存原有滚动样式，完整截图
-                const originalOverflow = captureBox.style.overflowY;
-                const originalMaxHeight = captureBox.style.maxHeight;
-                captureBox.style.overflowY = 'visible';
-                captureBox.style.maxHeight = 'unset';
-                await new Promise(resolve => setTimeout(resolve, 300));
-                const canvas = await html2canvas(captureBox, {
-                    backgroundColor: '#0a0a0f',
-                    useCORS: true,
-                    allowTaint: true,
-                    scale: 2,
-                    letterRendering: true,
-                    logging: false
-                });
-                // 恢复样式
-                captureBox.style.overflowY = originalOverflow;
-                captureBox.style.maxHeight = originalMaxHeight;
-                canvas.toBlob(async (blob) => {
-                    if (!blob) throw new Error("图片生成失败");
-                    const blobUrl = URL.createObjectURL(blob);
-                    const fileName = `${currentMonster.name}_怪物详情.png`;
-                    // 手机iOS/微信/QQ：弹出预览图，长按保存
-                    if (isMobileNoAutoDownload()) {
-                        const previewMask = document.createElement('div');
-                        previewMask.style.cssText = `
-                            position:fixed;inset:0;background:#000;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;
-                        `;
-                        const tipText = document.createElement('p');
-                        tipText.style.cssText = 'color:#fff;margin-bottom:12px;font-size:14px;text-align:center;';
-                        tipText.innerText = '长按图片保存到相册，点击空白关闭';
-                        const previewImg = new Image();
-                        previewImg.src = blobUrl;
-                        previewImg.style.maxWidth = '100%';
-                        previewImg.style.maxHeight = '85vh';
-                        previewMask.appendChild(tipText);
-                        previewMask.appendChild(previewImg);
-                        previewMask.addEventListener('click', e => {
-                            if (e.target === previewMask) {
-                                document.body.removeChild(previewMask);
-                                URL.revokeObjectURL(blobUrl);
-                            }
-                        })
-                        document.body.appendChild(previewMask);
-                        return;
-                    }
-                    // PC/安卓Chrome等正常自动下载
-                    const a = document.createElement('a');
-                    a.href = blobUrl;
-                    a.download = fileName;
-                    document.body.appendChild(a);
-                    a.click();
-                    setTimeout(() => {
-                        document.body.removeChild(a);
-                        URL.revokeObjectURL(blobUrl);
-                    }, 400);
-                }, 'image/png', 1);
-            } catch (err) {
-                console.error("下载失败：", err);
-                alert("生成图片失败：\n1.检查图片是否全部上传\n2.微信请复制链接到系统浏览器打开");
-            }
-        }
-        // 绑定事件
-        downloadDetailBtn.addEventListener('click', downloadDetailImage);
+
+        /* ===== 事件绑定 ===== */
         closeDetailBtn.addEventListener('click', closeDetail);
-        detailMask.addEventListener('click', (e)=>{
-            if(e.target === detailMask) closeDetail();
-        })
-        filterTags.forEach(tag=>{
-            tag.addEventListener('click',()=>{
+        detailMask.addEventListener('click', (e) => {
+            if (e.target === detailMask) closeDetail();
+        });
+
+        filterTags.forEach(tag => {
+            tag.addEventListener('click', () => {
                 const type = tag.dataset.type;
-                if(currentFilter === type){
+                if (currentFilter === type) {
                     currentFilter = null;
                     tag.classList.remove('active');
-                }else{
-                    filterTags.forEach(t=>t.classList.remove('active'));
+                } else {
+                    filterTags.forEach(t => t.classList.remove('active'));
                     currentFilter = type;
                     tag.classList.add('active');
                 }
                 renderList();
-            })
-        })
-        searchInput.addEventListener('input',e=>{
+            });
+        });
+
+        searchInput.addEventListener('input', e => {
             searchKey = e.target.value.trim();
             renderList();
-        })
-        searchBtn.addEventListener('click',()=>{
+        });
+        searchBtn.addEventListener('click', () => {
             searchKey = searchInput.value.trim();
             renderList();
-        })
+        });
+
+        /* ===== 初始化 ===== */
         renderList();
+    });
     </script>
 </body>
 </html>

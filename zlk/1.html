@@ -1,41 +1,108 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="paper">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>原神时间表</title>
-    <!-- 引入html2canvas用于DOM转图片 -->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <style>
+        /* ===== 主题变量（与公式页面一致） ===== */
+        html[data-theme="paper"] {
+            --bg: #f7f3ec;
+            --surface: #fffcf7;
+            --surface-2: #f2ece0;
+            --ink: #2a2520;
+            --ink-2: #7a6e5e;
+            --ink-3: #a89880;
+            --accent: #9a3412;
+            --rule: #e8dfd0;
+            --rule-2: #d9cdb8;
+            --zebra: #fdfaf5;
+            --hover: #fdf0e4;
+            --shadow: rgba(0,0,0,0.06);
+        }
+        html[data-theme="dark"] {
+            --bg: #16181d;
+            --surface: #1e2128;
+            --surface-2: #262a33;
+            --ink: #e8eaed;
+            --ink-2: #a5adba;
+            --ink-3: #6b7280;
+            --accent: #f0a05a;
+            --rule: #2d323c;
+            --rule-2: #3a4150;
+            --zebra: #21252c;
+            --hover: #2a2f3a;
+            --shadow: rgba(0,0,0,0.35);
+        }
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: "Microsoft Yahei", sans-serif;
+            font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
         }
         body {
-            /* 背景底图位置，替换为你的图片 */
-            background: url("1.0.jpg") center/cover no-repeat fixed;
+            background: var(--bg);
+            color: var(--ink);
             min-height: 100vh;
-            padding: 40px 20px;
-            color: #f0f0f0;
+            padding: 56px 24px 96px;
+            transition: background-color 0.25s, color 0.25s;
         }
+        /* ===== 主题切换 ===== */
+        .theme-switch {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            display: flex;
+            gap: 8px;
+            background: var(--surface);
+            border: 1px solid var(--rule-2);
+            border-radius: 999px;
+            padding: 6px 8px;
+            box-shadow: 0 4px 16px var(--shadow);
+            transition: background-color 0.25s, border-color 0.25s;
+        }
+        .theme-btn {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: transform 0.15s, border-color 0.15s;
+            padding: 0;
+            outline: none;
+        }
+        .theme-btn:hover { transform: scale(1.12); }
+        .theme-btn.active { border-color: var(--accent); }
+        .theme-btn[data-theme="paper"] { background: linear-gradient(135deg, #f7f3ec 50%, #d9cdb8 50%); }
+        .theme-btn[data-theme="dark"]  { background: linear-gradient(135deg, #1e2128 50%, #f0a05a 50%); }
+
+        /* ===== 页面标题 ===== */
         .main-title {
             text-align: center;
-            font-size: 32px;
-            color: #89b4fa;
-            margin-bottom: 24px;
+            font-family: Georgia, "Noto Serif SC", "Songti SC", serif;
+            font-size: clamp(28px, 5vw, 42px);
+            font-weight: 700;
+            color: var(--ink);
+            margin-bottom: 32px;
             letter-spacing: 3px;
+            transition: color 0.25s;
         }
+
+        /* ===== 主体容器 ===== */
         .time-axis-wrap {
             max-width: 680px;
             margin: 0 auto;
-            background: rgba(12,12,18,0.65);
+            background: var(--surface);
             padding: 30px;
             border-radius: 16px;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid var(--rule-2);
+            box-shadow: 0 8px 30px var(--shadow);
+            transition: background-color 0.25s, border-color 0.25s, box-shadow 0.25s;
         }
-        /* 贡献者总容器 */
+
+        /* ===== 贡献者区域 ===== */
         .contributor-block {
             display: flex;
             flex-direction: column;
@@ -46,16 +113,15 @@
         }
         .contributor-label {
             font-size: 18px;
-            color: #ddd;
+            color: var(--ink-2);
             text-align: center;
+            transition: color 0.25s;
         }
-        /* 两个人横向排列，间距拉大 */
         .contributor-row {
             display: flex;
             gap: 60px;
             justify-content: center;
         }
-        /* 单人单元：头像在上，名字在下，各自居中对齐 */
         .person-card {
             display: flex;
             flex-direction: column;
@@ -66,57 +132,73 @@
             width: 42px;
             height: 42px;
             border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.25);
+            border: 1px solid var(--rule-2);
             object-fit: cover;
+            background: var(--surface-2);
+            transition: border-color 0.25s, background-color 0.25s;
         }
         .person-name {
             font-size: 17px;
-            color: #ddd;
+            color: var(--ink);
             text-align: center;
+            transition: color 0.25s;
         }
         .person-name span {
-            color: #89b4fa;
+            color: var(--accent);
+            transition: color 0.25s;
         }
-        .btn-group{
-            display:flex;
-            gap:12px;
-            justify-content:center;
-            margin-bottom:24px;
+
+        /* ===== 按钮组 ===== */
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 24px;
         }
         .btn-desc {
             padding: 8px 22px;
-            background: rgba(60,100,180,0.3);
-            border: 1px solid rgba(137,180,250,0.4);
+            background: var(--surface-2);
+            border: 1px solid var(--rule-2);
             border-radius: 8px;
-            color: #b8d1f8;
+            color: var(--accent);
             cursor: pointer;
             font-size: 15px;
-            transition: all 0.2s;
+            font-weight: 600;
+            transition: background-color 0.2s, border-color 0.2s, color 0.2s, opacity 0.2s;
         }
         .btn-desc:hover {
-            background: rgba(60,100,180,0.5);
+            background: var(--hover);
         }
-        .btn-desc:disabled{
-            opacity:0.45;
-            cursor:not-allowed;
+        .btn-desc:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
         }
+
+        /* ===== 倒计时 ===== */
         .countdown-box {
             text-align: center;
             padding: 16px;
-            background: rgba(30,30,45,0.5);
+            background: var(--surface-2);
+            border: 1px solid var(--rule);
             border-radius: 10px;
             margin-bottom: 28px;
+            transition: background-color 0.25s, border-color 0.25s;
         }
         .countdown-title {
             font-size: 16px;
             margin-bottom: 10px;
-            color: #ccc;
+            color: var(--ink-2);
+            transition: color 0.25s;
         }
         .countdown-text {
             font-size: 24px;
-            color: #89b4fa;
+            color: var(--accent);
             letter-spacing: 2px;
+            font-weight: 700;
+            transition: color 0.25s;
         }
+
+        /* ===== 时间轴列表 ===== */
         .timeline-list {
             display: flex;
             flex-direction: column;
@@ -125,36 +207,45 @@
         .timeline-item {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             padding: 12px 16px;
-            background: rgba(25,25,38,0.45);
+            background: var(--surface-2);
             border-radius: 8px;
-            border-left: 3px solid rgba(137,180,250,0.5);
+            border: 1px solid var(--rule);
+            border-left: 3px solid var(--accent);
+            box-shadow: 0 2px 6px var(--shadow);
+            transition: background-color 0.25s, border-color 0.25s, opacity 0.25s, box-shadow 0.25s;
         }
-        /* 已经过期但还保留2天的条目，换个边框颜色做区分 */
         .timeline-item.passed {
-            border-left: 3px solid rgba(180,180,180,0.5);
-            opacity:0.75;
+            border-left: 3px solid var(--rule-2);
+            opacity: 0.7;
+            box-shadow: none;
         }
         .timeline-name {
             font-size: 15px;
-            color: #eee;
+            color: var(--ink);
+            transition: color 0.25s;
         }
         .timeline-date {
             font-size: 15px;
-            color: #a0b8e0;
+            color: var(--ink-2);
+            transition: color 0.25s;
         }
-        .empty-tip{
-            text-align:center;
-            padding:20px;
-            color:#aaa;
+        .empty-tip {
+            text-align: center;
+            padding: 20px;
+            color: var(--ink-3);
+            transition: color 0.25s;
         }
+
+        /* ===== 弹窗 ===== */
         .modal-mask {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.75);
+            background: rgba(0,0,0,0.6);
             display: none;
             align-items: center;
             justify-content: center;
@@ -163,34 +254,43 @@
         .modal-box {
             width: 90%;
             max-width: 520px;
-            background: rgba(15,15,22,0.92);
+            background: var(--surface);
             padding: 26px;
             border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.12);
+            border: 1px solid var(--rule-2);
+            box-shadow: 0 12px 40px var(--shadow);
+            transition: background-color 0.25s, border-color 0.25s;
         }
         .modal-title {
             font-size: 18px;
             margin-bottom: 16px;
-            color: #89b4fa;
+            color: var(--accent);
+            transition: color 0.25s;
         }
         .modal-content {
             font-size: 15px;
             line-height: 1.7;
-            color: #ddd;
+            color: var(--ink);
+            transition: color 0.25s;
         }
         .modal-close {
             margin-top: 20px;
             padding: 7px 20px;
-            background: rgba(80,80,100,0.4);
-            border: 1px solid rgba(255,255,255,0.18);
+            background: var(--surface-2);
+            border: 1px solid var(--rule-2);
             border-radius: 6px;
-            color: #eee;
+            color: var(--ink);
             cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s, color 0.2s;
         }
-        /* 移动端适配 */
+        .modal-close:hover {
+            background: var(--hover);
+        }
+
+        /* ===== 移动端适配 ===== */
         @media screen and (max-width: 600px) {
             body {
-                padding: 20px 12px;
+                padding: 72px 12px 48px;
             }
             .main-title {
                 font-size: 24px;
@@ -212,8 +312,8 @@
             .contributor-row {
                 gap: 40px;
             }
-            .btn-group{
-                flex-wrap:wrap;
+            .btn-group {
+                flex-wrap: wrap;
             }
             .countdown-title {
                 font-size: 14px;
@@ -224,6 +324,7 @@
             .timeline-item {
                 padding: 10px 12px;
                 flex-direction: column;
+                align-items: flex-start;
                 gap: 4px;
             }
             .timeline-name, .timeline-date {
@@ -232,13 +333,21 @@
             .modal-box {
                 padding: 18px;
             }
+            .theme-switch { top: 12px; right: 12px; padding: 4px 6px; }
+            .theme-btn { width: 22px; height: 22px; }
         }
     </style>
 </head>
 <body>
+    <!-- 主题切换按钮 -->
+    <div class="theme-switch" role="group" aria-label="背景配色">
+        <button class="theme-btn active" data-theme="paper" title="暖色纸张（原色）" aria-label="暖色纸张"></button>
+        <button class="theme-btn" data-theme="dark" title="暗色模式（黑色）" aria-label="暗色模式"></button>
+    </div>
+
     <h1 class="main-title">原神时间表</h1>
     <div class="time-axis-wrap" id="captureWrap">
-        <!-- 贡献者区域：单独头像对应单独名字，上下对齐 -->
+        <!-- 贡献者区域 -->
         <div class="contributor-block">
             <div class="contributor-label">贡献者</div>
             <div class="contributor-row">
@@ -277,8 +386,39 @@
             <button class="modal-close" id="closeModalBtn">关闭</button>
         </div>
     </div>
+
     <script>
-        const timeNodeList = [
+    // ============ 全部逻辑包在 DOMContentLoaded 内，确保 DOM 就绪 ============
+    document.addEventListener('DOMContentLoaded', function () {
+
+        /* ---------- 1. 主题切换 ---------- */
+        (function initTheme() {
+            var html = document.documentElement;
+            var buttons = document.querySelectorAll('.theme-btn');
+            var saved = null;
+            try { saved = localStorage.getItem('gensri-theme'); } catch (e) { saved = null; }
+            if (saved && ['paper', 'dark'].indexOf(saved) !== -1) {
+                html.setAttribute('data-theme', saved);
+                for (var i = 0; i < buttons.length; i++) {
+                    buttons[i].classList.toggle('active', buttons[i].dataset.theme === saved);
+                }
+            }
+            for (var j = 0; j < buttons.length; j++) {
+                (function (btn) {
+                    btn.addEventListener('click', function () {
+                        var theme = btn.dataset.theme;
+                        html.setAttribute('data-theme', theme);
+                        for (var k = 0; k < buttons.length; k++) {
+                            buttons[k].classList.toggle('active', buttons[k] === btn);
+                        }
+                        try { localStorage.setItem('gensri-theme', theme); } catch (e) {}
+                    });
+                })(buttons[j]);
+            }
+        })();
+
+        /* ---------- 2. 时间节点数据 ---------- */
+        var timeNodeList = [
             {name:"7.0版本前瞻", date:"2026-07-31"},
             {name:"7.0版本创体", date:"2026-08-07"},
             {name:"7.0版本开启", date:"2026-08-12"},
@@ -347,105 +487,122 @@
             {name:"7.8版本创体", date:"2027-07-09"},
             {name:"7.8版本开启", date:"2027-07-14"}
         ];
-        const timelineWrap = document.getElementById("timelineList");
-        const TWO_DAY_MS = 2 * 24 * 60 * 60 * 1000; // 2天毫秒数
-        const captureWrap = document.getElementById("captureWrap");
-        const downloadBtn = document.getElementById("downloadImgBtn");
 
-        function renderTimeline(){
-            const nowTime = new Date().getTime();
-            // 过滤：节点日期 + 2天 大于当前时间才保留显示
-            const showList = timeNodeList.filter(item=>{
-                const target = new Date(item.date).getTime();
-                const expireHide = target + TWO_DAY_MS;
+        var TWO_DAY_MS = 2 * 24 * 60 * 60 * 1000;
+        var timelineWrap = document.getElementById("timelineList");
+        var captureWrap = document.getElementById("captureWrap");
+        var downloadBtn = document.getElementById("downloadImgBtn");
+        var countdownDom = document.getElementById("countdownDom");
+        var modal = document.getElementById("descModal");
+        var openModalBtn = document.getElementById("openModalBtn");
+        var closeModalBtn = document.getElementById("closeModalBtn");
+
+        /* ---------- 3. 渲染时间轴 ---------- */
+        function renderTimeline() {
+            if (!timelineWrap) return;
+            var nowTime = new Date().getTime();
+            var showList = timeNodeList.filter(function (item) {
+                var target = new Date(item.date).getTime();
+                var expireHide = target + TWO_DAY_MS;
                 return nowTime < expireHide;
             });
-            let htmlStr = "";
-            if(showList.length === 0){
-                htmlStr = `<div class="empty-tip">暂无后续时间节点</div>`;
-            }else{
-                showList.forEach(item=>{
-                    const target = new Date(item.date).getTime();
-                    const isPassed = nowTime >= target;
-                    const passClass = isPassed ? 'passed' : '';
-                    htmlStr += `
-                        <div class="timeline-item ${passClass}">
-                            <div class="timeline-name">${item.name}</div>
-                            <div class="timeline-date">${item.date}</div>
-                        </div>
-                    `;
-                })
+            var htmlStr = "";
+            if (showList.length === 0) {
+                htmlStr = '<div class="empty-tip">暂无后续时间节点</div>';
+            } else {
+                showList.forEach(function (item) {
+                    var target = new Date(item.date).getTime();
+                    var isPassed = nowTime >= target;
+                    var passClass = isPassed ? 'passed' : '';
+                    htmlStr += '<div class="timeline-item ' + passClass + '">' +
+                                   '<div class="timeline-name">' + item.name + '</div>' +
+                                   '<div class="timeline-date">' + item.date + '</div>' +
+                               '</div>';
+                });
             }
             timelineWrap.innerHTML = htmlStr;
         }
 
-        // 下载图片功能
-        downloadBtn.addEventListener('click', async ()=>{
-            downloadBtn.disabled = true;
-            downloadBtn.innerText = "生成中…";
-            try{
-                const canvas = await html2canvas(captureWrap, {
-                    useCORS:true,
-                    backgroundColor:null,
-                    scale:2
-                });
-                const link = document.createElement('a');
-                link.download = "原神时间表.png";
-                link.href = canvas.toDataURL("image/png");
-                link.click();
-            }catch(e){
-                alert("图片生成失败："+e.message);
-            }finally{
-                downloadBtn.disabled = false;
-                downloadBtn.innerText = "下载时间点图片";
-            }
-        });
-
-        // 弹窗控制
-        const modal = document.getElementById("descModal");
-        document.getElementById("openModalBtn").addEventListener("click",()=>{
-            modal.style.display = "flex";
-        })
-        document.getElementById("closeModalBtn").addEventListener("click",()=>{
-            modal.style.display = "none";
-        })
-        modal.addEventListener("click",(e)=>{
-            if(e.target === modal) modal.style.display = "none";
-        })
-
-        // 倒计时逻辑
-        const countdownDom = document.getElementById("countdownDom");
-        function getNextTargetTime(){
-            const nowTime = new Date().getTime();
-            // 倒计时只取还没到的节点，已经到期的不作为下一个目标
-            const futureNodes = timeNodeList.filter(item=>{
-                const target = new Date(item.date).getTime();
+        /* ---------- 4. 倒计时 ---------- */
+        function getNextTargetTime() {
+            var nowTime = new Date().getTime();
+            var futureNodes = timeNodeList.filter(function (item) {
+                var target = new Date(item.date).getTime();
                 return target > nowTime;
-            })
-            if(futureNodes.length === 0) return null;
+            });
+            if (futureNodes.length === 0) return null;
             return futureNodes[0];
         }
-        function updateCountdown(){
-            renderTimeline(); // 每秒刷新列表，过期2天后自动移除
-            const targetNode = getNextTargetTime();
-            if(!targetNode){
+
+        function updateCountdown() {
+            renderTimeline();
+            if (!countdownDom) return;
+            var targetNode = getNextTargetTime();
+            if (!targetNode) {
                 countdownDom.innerText = "所有时间节点已全部过期";
                 return;
             }
-            const now = new Date().getTime();
-            const targetTime = new Date(targetNode.date).getTime();
-            let diff = targetTime - now;
-            const day = Math.floor(diff / (1000 * 60 * 60 * 24));
+            var now = new Date().getTime();
+            var targetTime = new Date(targetNode.date).getTime();
+            var diff = targetTime - now;
+            var day = Math.floor(diff / (1000 * 60 * 60 * 24));
             diff = diff % (1000 * 60 * 60 * 24);
-            const hour = Math.floor(diff / (1000 * 60 * 60));
+            var hour = Math.floor(diff / (1000 * 60 * 60));
             diff = diff % (1000 * 60 * 60);
-            const minute = Math.floor(diff / (1000 * 60));
+            var minute = Math.floor(diff / (1000 * 60));
             diff = diff % (1000 * 60);
-            const second = Math.floor(diff / 1000);
-            countdownDom.innerText = `${targetNode.name} | ${day}天 ${hour}时 ${minute}分 ${second}秒`;
+            var second = Math.floor(diff / 1000);
+            countdownDom.innerText = targetNode.name + ' | ' + day + '天 ' + hour + '时 ' + minute + '分 ' + second + '秒';
         }
+
+        /* ---------- 5. 下载图片 ---------- */
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', function () {
+                if (typeof html2canvas !== 'function') {
+                    alert("html2canvas 未加载，无法生成图片");
+                    return;
+                }
+                downloadBtn.disabled = true;
+                downloadBtn.innerText = "生成中…";
+                html2canvas(captureWrap, {
+                    useCORS: true,
+                    backgroundColor: null,
+                    scale: 2
+                }).then(function (canvas) {
+                    var link = document.createElement('a');
+                    link.download = "原神时间表.png";
+                    link.href = canvas.toDataURL("image/png");
+                    link.click();
+                }).catch(function (e) {
+                    alert("图片生成失败：" + e.message);
+                }).then(function () {
+                    downloadBtn.disabled = false;
+                    downloadBtn.innerText = "下载时间点图片";
+                });
+            });
+        }
+
+        /* ---------- 6. 弹窗 ---------- */
+        if (openModalBtn && modal) {
+            openModalBtn.addEventListener('click', function () {
+                modal.style.display = "flex";
+            });
+        }
+        if (closeModalBtn && modal) {
+            closeModalBtn.addEventListener('click', function () {
+                modal.style.display = "none";
+            });
+        }
+        if (modal) {
+            modal.addEventListener('click', function (e) {
+                if (e.target === modal) modal.style.display = "none";
+            });
+        }
+
+        /* ---------- 7. 启动 ---------- */
         updateCountdown();
         setInterval(updateCountdown, 1000);
+    });
     </script>
 </body>
 </html>

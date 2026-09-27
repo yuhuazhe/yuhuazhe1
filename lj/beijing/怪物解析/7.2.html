@@ -1,218 +1,326 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="paper">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>7.2版本 幽境危战</title>
+<title>羽化哲</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:"Microsoft Yahei",sans-serif;}
-body{
-  color:#fff;
-  min-height:100vh;
-  padding:24px 16px;
-  position:relative;
-}
-/* 背景底图预留位置 */
-.bg-layer{
-  position:fixed;
-  inset:0;
-  z-index:-2;
-  background:#0b0b1a;
-}
-.bg-layer img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  opacity:0.6;   /* 背景底图稍微提高不透明度，使其更清晰 */
-}
-.bg-overlay{
-  position:fixed;
-  inset:0;
-  z-index:-1;
-  background:linear-gradient(180deg, rgba(10,12,30,0.25), rgba(5,6,20,0.45));
-}
-.wrapper{
-  max-width:1440px;
-  margin:0 auto;
-}
-.header{
-  text-align:center;
-  margin-bottom:28px;
-}
-.main-title{
-  font-size:34px;
-  font-weight:700;
-  letter-spacing:2px;
-  color:#f4f1ff;
-  text-shadow:0 0 18px rgba(126,91,255,0.45);
-  margin-bottom:14px;
-}
-.download-btn{
-  padding:10px 22px;
-  border-radius:10px;
-  border:1px solid rgba(255,255,255,0.18);
-  background:rgba(255,255,255,0.06);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  color:#fff;
-  font-size:14px;
-  cursor:pointer;
-  transition:.2s ease;
-}
-.download-btn:hover{
-  background:rgba(255,255,255,0.14);
-  transform:translateY(-1px);
-}
-/* 三栏布局 */
-.card-container{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:20px;
-}
-@media (max-width:1100px){
-  .card-container{
-    grid-template-columns:repeat(2,1fr);
+  /* ===== 主题变量 ===== */
+  html[data-theme="paper"] {
+    --bg-mask: rgba(247, 243, 236, 0.86);
+    --surface: rgba(255, 252, 247, 0.82);
+    --surface-2: rgba(242, 236, 224, 0.88);
+    --ink: #2a2520;
+    --ink-2: #6b6053;
+    --ink-3: #968872;
+    --accent: #9a3412;
+    --rule: rgba(180, 168, 148, 0.42);
+    --rule-2: rgba(160, 146, 124, 0.55);
+    --hover: rgba(253, 240, 228, 0.9);
+    --highlight: #c2410c;
+    --shadow: rgba(0, 0, 0, 0.08);
   }
-}
-@media (max-width:720px){
-  .card-container{
-    grid-template-columns:1fr;
+  html[data-theme="dark"] {
+    --bg-mask: rgba(16, 18, 23, 0.82);
+    --surface: rgba(30, 33, 40, 0.72);
+    --surface-2: rgba(38, 42, 51, 0.8);
+    --ink: #e8eaed;
+    --ink-2: #a5adba;
+    --ink-3: #6b7280;
+    --accent: #f0a05a;
+    --rule: rgba(90, 100, 118, 0.42);
+    --rule-2: rgba(110, 122, 142, 0.52);
+    --hover: rgba(42, 47, 58, 0.85);
+    --highlight: #ff7a8a;
+    --shadow: rgba(0, 0, 0, 0.4);
   }
-  .main-title{
-    font-size:26px;
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
   }
-}
-/* 液态玻璃卡片：直接全透明 */
-.glass-card{
-  background: rgba(255,255,255,0);
-  backdrop-filter: blur(18px) saturate(140%);
-  -webkit-backdrop-filter: blur(18px) saturate(140%);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius:18px;
-  box-shadow:
-    0 8px 32px rgba(0,0,0,0.18),
-    inset 0 1px 0 rgba(255,255,255,0.08);
-  padding:18px;
-}
-/* Boss图片添加位置 */
-.boss-img-box{
-  width:100%;
-  height:180px;
-  border-radius:14px;
-  margin-bottom:14px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#cfd6ff;
-  font-size:13px;
-  background: transparent;   /* 完全透出底图 */
-  border:1px dashed rgba(255,255,255,0.18);
-  overflow:hidden;
-  position:relative;
-}
-.boss-img-box img{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit:contain;
-  border-radius:12px;
-  /* 透明度调整：既能看清怪物，又能透出底图 */
-  opacity:0.62;
-  display:none;
-}
-.boss-img-box img.load-ok{
-  display:block;
-}
-.placeholder-text{
-  text-align:center;
-}
-.boss-name{
-  font-size:18px;
-  font-weight:700;
-  margin-bottom:4px;
-  color:#ffffff;
-}
-.boss-sub{
-  font-size:13px;
-  color:#d9ddf7;
-  margin-bottom:14px;
-}
-/* 血量独立框架 */
-.hp-block{
-  border-radius:14px;
-  padding:14px;
-  margin-bottom:14px;
-  background: rgba(255,255,255,0);
-  border:1px solid rgba(255,255,255,0.12);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);
-}
-.hp-title{
-  font-size:13px;
-  font-weight:600;
-  color:#b9c0ff;
-  margin-bottom:8px;
-}
-.hp-row{
-  display:flex;
-  flex-wrap:wrap;
-  gap:24px;
-  align-items:center;
-  font-size:14px;
-  line-height:1.7;
-  color:#f3f4ff;
-  margin-bottom:6px;
-}
-.fit-row{
-  font-size:13px;
-  color:#c5c9e8;
-}
-/*重点高亮文字改为红色*/
-.text-highlight{
-  color:#ff5c6c;
-  font-weight:bold;
-}
-/* 机制独立框架 */
-.mechanic-block{
-  border-radius:14px;
-  padding:14px;
-  background: rgba(255,255,255,0);
-  border:1px solid rgba(255,255,255,0.12);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);
-}
-.mechanic-title{
-  font-size:14px;
-  font-weight:700;
-  color:#e4dcff;
-  margin-bottom:12px;
-}
-.mechanic-content{
-  font-size:12.5px;
-  line-height:1.8;
-  color:#ececff;
-  text-align:justify;
-}
-.mechanic-content p{
-  margin-bottom:8px;
-}
-.mechanic-content p:last-child{
-  margin-bottom:0;
-}
-/* 底部留白 */
-.footer-tip{
-  text-align:center;
-  margin-top:24px;
-  font-size:12px;
-  color:#9aa0d6;
-}
+
+  body {
+    /* 固定背景图 */
+    background-color: #16181d;
+    background-image: url("bj.webp");
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 56px 24px 96px;
+    transition: color 0.25s;
+  }
+
+  /* 主题遮罩层 */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background: var(--bg-mask);
+    transition: background-color 0.35s ease;
+    pointer-events: none;
+  }
+
+  /* ===== 主题切换按钮 ===== */
+  .theme-switch {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+    display: flex;
+    gap: 8px;
+    background: var(--surface);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--rule-2);
+    border-radius: 999px;
+    padding: 6px 8px;
+    box-shadow: 0 4px 16px var(--shadow);
+    transition: background-color 0.25s, border-color 0.25s;
+  }
+  .theme-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform 0.15s, border-color 0.15s;
+    padding: 0;
+    outline: none;
+  }
+  .theme-btn:hover { transform: scale(1.12); }
+  .theme-btn.active { border-color: var(--accent); }
+  .theme-btn[data-theme="paper"] { background: linear-gradient(135deg, #f7f3ec 50%, #d9cdb8 50%); }
+  .theme-btn[data-theme="dark"]  { background: linear-gradient(135deg, #1e2128 50%, #f0a05a 50%); }
+
+  /* ===== 主容器 ===== */
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 1440px;
+    margin: 0 auto;
+  }
+
+  /* ===== 页头 ===== */
+  .header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .main-title {
+    font-family: Georgia, "Noto Serif SC", "Songti SC", serif;
+    font-size: clamp(24px, 3.4vw, 34px);
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--ink);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    margin-bottom: 14px;
+    transition: color 0.25s;
+  }
+  .download-btn {
+    padding: 10px 22px;
+    border-radius: 10px;
+    border: 1px solid var(--rule-2);
+    background: var(--surface);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: var(--accent);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s, transform 0.2s;
+  }
+  .download-btn:hover {
+    background: var(--hover);
+    border-color: var(--accent);
+    transform: translateY(-1px);
+  }
+
+  /* ===== 三栏布局 ===== */
+  .card-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  @media (max-width: 1100px) {
+    .card-container { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 720px) {
+    .card-container { grid-template-columns: 1fr; }
+  }
+
+  /* ===== 毛玻璃卡片 ===== */
+  .glass-card {
+    background: var(--surface);
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    border: 1px solid var(--rule-2);
+    border-radius: 18px;
+    box-shadow: 0 8px 28px var(--shadow);
+    padding: 18px;
+    transition: background-color 0.25s, border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+  }
+  .glass-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 32px var(--shadow);
+  }
+
+  /* ===== Boss 图片区域 ===== */
+  .boss-img-box {
+    width: 100%;
+    height: 180px;
+    border-radius: 14px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-3);
+    font-size: 13px;
+    background: var(--surface-2);
+    border: 1px dashed var(--rule-2);
+    overflow: hidden;
+    position: relative;
+    transition: background-color 0.25s, border-color 0.25s, color 0.25s;
+  }
+  .boss-img-box img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 12px;
+    opacity: 0.92;
+    display: none;
+  }
+  .boss-img-box img.load-ok {
+    display: block;
+  }
+  .placeholder-text {
+    text-align: center;
+  }
+
+  /* ===== Boss 名称 ===== */
+  .boss-name {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: var(--ink);
+    transition: color 0.25s;
+  }
+  .boss-sub {
+    font-size: 13px;
+    color: var(--ink-3);
+    margin-bottom: 14px;
+    transition: color 0.25s;
+  }
+
+  /* ===== 血量独立框架 ===== */
+  .hp-block {
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 14px;
+    background: var(--surface-2);
+    border: 1px solid var(--rule);
+    transition: background-color 0.25s, border-color 0.25s;
+  }
+  .hp-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 8px;
+    transition: color 0.25s;
+  }
+  .hp-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    align-items: center;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--ink);
+    margin-bottom: 6px;
+    transition: color 0.25s;
+  }
+  .fit-row {
+    font-size: 13px;
+    color: var(--ink-2);
+    transition: color 0.25s;
+  }
+
+  /* ===== 重点高亮文字 ===== */
+  .text-highlight {
+    color: var(--highlight);
+    font-weight: 700;
+  }
+
+  /* ===== 机制独立框架 ===== */
+  .mechanic-block {
+    border-radius: 14px;
+    padding: 14px;
+    background: var(--surface-2);
+    border: 1px solid var(--rule);
+    transition: background-color 0.25s, border-color 0.25s;
+  }
+  .mechanic-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 12px;
+    transition: color 0.25s;
+  }
+  .mechanic-content {
+    font-size: 12.5px;
+    line-height: 1.8;
+    color: var(--ink-2);
+    text-align: justify;
+    transition: color 0.25s;
+  }
+  .mechanic-content p {
+    margin-bottom: 8px;
+  }
+  .mechanic-content p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* ===== 底部留白 ===== */
+  .footer-tip {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 12px;
+    color: var(--ink-3);
+    transition: color 0.25s;
+  }
+
+  /* ===== 移动端适配 ===== */
+  @media (max-width: 720px) {
+    body {
+      padding: 72px 12px 48px;
+    }
+    .theme-switch {
+      top: 12px;
+      right: 12px;
+      padding: 4px 6px;
+    }
+    .theme-btn {
+      width: 22px;
+      height: 22px;
+    }
+  }
 </style>
 </head>
 <body>
-<!-- 全局背景底图添加位置 -->
-<div class="bg-layer">
-  <img id="globalBg" src="bj.webp" alt="背景底图" crossorigin="anonymous">
+<!-- 主题切换按钮 -->
+<div class="theme-switch" role="group" aria-label="背景配色">
+  <button class="theme-btn active" data-theme="paper" title="暖色纸张（原色）" aria-label="暖色纸张"></button>
+  <button class="theme-btn" data-theme="dark" title="暗色模式（黑色）" aria-label="暗色模式"></button>
 </div>
-<div class="bg-overlay"></div>
+
 <div class="wrapper" id="capture-area">
   <div class="header">
     <h1 class="main-title">7.2版本 幽境危战</h1>
@@ -242,8 +350,8 @@ body{
         <div class="mechanic-content">
           <p>• 强抗寒态 <span class="text-highlight">-10% 雷抗，70% 水抗，10% 其他抗</span></p>
           <p>• 开局 <span class="text-highlight">9s</span>，以及后续每 <span class="text-highlight">16s</span>，会进行「豪饮」，该过程持续 <span class="text-highlight">2s</span>，期间受到伤害降低 <span class="text-highlight">50%</span>，且不被冰冻影响，会积累 <span class="text-highlight">95%「豪饮值」</span>，否则豪饮100%。不处于「豪饮」状态时，对其造成<span class="text-highlight">雷元素反应伤害</span>可以降低其「豪饮值」。</p>
-          <p>•【豪饮值】积累满时，会进入<span class="text-highlight">「奋勇状态」</span>：此时强毁不会消耗【豪饮值】，并获得一个护盾，期间水元素抗性 <span class="text-highlight">130%</span>，其余抗性 <span class="text-highlight">10%</span>。在此状态期间，对其造成雷或元素反应可以更迅速地降低【豪饮值】，若完全靠自然消耗，则该状态会持续 <span class="text-highlight">40s</span>。</p>
-          <p>• 退出「奋勇状态」时，强毁会受到所承受的 <span class="text-highlight">150%星辉反应伤害+60%其他伤害</span>的反噬伤害，该伤害的15%，会拉回强毁最大生命值，之后会继续开始「豪饮」。</p>
+          <p>•【豪饮值】积累满时，会进入<span class="text-highlight">「奋勇状态」</span>：此时强敌不会消耗【豪饮值】，并获得一个护盾，期间水元素抗性 <span class="text-highlight">130%</span>，其余抗性 <span class="text-highlight">10%</span>。在此状态期间，对其造成雷或元素反应可以更迅速地降低【豪饮值】，若完全靠自然消耗，则该状态会持续 <span class="text-highlight">40s</span>。</p>
+          <p>• 退出「奋勇状态」时，强敌会受到所承受的 <span class="text-highlight">150%星辉反应伤害+60%其他伤害</span>的反噬伤害，该伤害的15%，全抗回到常态，之后会继续开始「豪饮」。</p>
         </div>
       </div>
     </div>
@@ -295,10 +403,10 @@ body{
       <div class="mechanic-block">
         <div class="mechanic-title">机制</div>
         <div class="mechanic-content">
-          <p>• 入战后，会展开 <span class="text-highlight">9 层岩元素护盾</span>，在护盾上一层岩元素护盾前，无法对元素护盾的层数造成减损。全部护盾被击破后，强毁会基于被击破的岩元素护盾的 <span class="text-highlight">70%</span> 和其他伤害的 <span class="text-highlight">10%</span>，受到一次高额伤害，不超过强毁最大生命的 <span class="text-highlight">40%</span>，并晕眩 <span class="text-highlight">15s</span>。</p>
-          <p>• 护盾结束后的 <span class="text-highlight">4s</span>，强毁会为队伍中附近的所有角色施加<span class="text-highlight">【蕴光之茧】</span>：使全部角色基于自身最大生命值的 <span class="text-highlight">15% 损失生命值</span>，造成的伤害 <span class="text-highlight">-50%</span>，受到的治疗 <span class="text-highlight">-40%</span>，暴击率 <span class="text-highlight">-100%</span>，持续<span class="text-highlight">40s</span>，期间首领获得额外的 <span class="text-highlight">60% 岩元素抗性</span>。</p>
-          <p>• 为任意我方角色恢复生命值至上限可解除【蕴光之茧】，使其造成的伤害提升 <span class="text-highlight">50%</span>，暴击率提升 <span class="text-highlight">15%</span>，持续 <span class="text-highlight">15s</span>，并使强毁失去额外获得的岩元素抗性。</p>
-          <p>• 在破除全部岩元素护盾的 <span class="text-highlight">55s</span> 后，强毁会重新展开护盾。</p>
+          <p>• 入战后，会展开 <span class="text-highlight">9 层岩元素护盾</span>，在护盾上一层岩元素护盾前，无法对元素护盾的层数造成减损。全部护盾被击破后，强敌会基于被击破的岩元素护盾的 <span class="text-highlight">70%</span> 和其他伤害的 <span class="text-highlight">10%</span>，受到一次高额伤害，不超过强敌最大生命的 <span class="text-highlight">40%</span>，并晕眩 <span class="text-highlight">15s</span>。</p>
+          <p>• 护盾结束后的 <span class="text-highlight">4s</span>，强敌会为队伍中附近的所有角色施加<span class="text-highlight">【蕴光之茧】</span>：使全部角色基于自身最大生命值的 <span class="text-highlight">15% 损失生命值</span>，造成的伤害 <span class="text-highlight">-50%</span>，受到的治疗 <span class="text-highlight">-40%</span>，暴击率 <span class="text-highlight">-100%</span>，持续<span class="text-highlight">40s</span>，期间首领获得额外的 <span class="text-highlight">60% 岩元素抗性</span>。</p>
+          <p>• 为任意我方角色恢复生命值至上限可解除【蕴光之茧】，使其造成的伤害提升 <span class="text-highlight">50%</span>，暴击率提升 <span class="text-highlight">15%</span>，持续 <span class="text-highlight">15s</span>，并使强敌失去额外获得的岩元素抗性。</p>
+          <p>• 在破除全部岩元素护盾的 <span class="text-highlight">55s</span> 后，强敌会重新展开护盾。</p>
         </div>
       </div>
     </div>
@@ -307,68 +415,90 @@ body{
 </div>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
+// ===== 主题切换逻辑 =====
+(function () {
+  var html = document.documentElement;
+  var buttons = document.querySelectorAll('.theme-btn');
+  var saved = null;
+  try { saved = localStorage.getItem('gensri-theme'); } catch (e) { saved = null; }
 
-// 处理单张图片加载（兼容缓存，加载成功/失败都处理）
+  if (saved && ['paper', 'dark'].indexOf(saved) !== -1) {
+    html.setAttribute('data-theme', saved);
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].classList.toggle('active', buttons[i].dataset.theme === saved);
+    }
+  }
+
+  for (var j = 0; j < buttons.length; j++) {
+    (function (btn) {
+      btn.addEventListener('click', function () {
+        var theme = btn.dataset.theme;
+        html.setAttribute('data-theme', theme);
+        for (var k = 0; k < buttons.length; k++) {
+          buttons[k].classList.toggle('active', buttons[k] === btn);
+        }
+        try { localStorage.setItem('gensri-theme', theme); } catch (e) {}
+      });
+    })(buttons[j]);
+  }
+})();
+
+// ===== 图片加载处理 =====
 function setupImage(imgEl, boxEl){
+  if (!imgEl || !boxEl) return;
   const placeholder = boxEl.querySelector('.placeholder-text');
 
   function onLoaded(){
-    placeholder.style.display = 'none';
+    if (placeholder) placeholder.style.display = 'none';
     imgEl.classList.add('load-ok');
   }
   function onError(){
-    placeholder.textContent = "图片加载失败";
-    placeholder.style.display = 'block';
+    if (placeholder) {
+      placeholder.textContent = "图片加载失败";
+      placeholder.style.display = 'block';
+    }
     imgEl.classList.remove('load-ok');
   }
 
-  // 已经缓存完成直接执行
-  if(imgEl.complete){
-    if(imgEl.naturalWidth > 0){
-      onLoaded();
-    }else{
-      onError();
-    }
-  }else{
+  if (imgEl.complete) {
+    if (imgEl.naturalWidth > 0) onLoaded();
+    else onError();
+  } else {
     imgEl.addEventListener('load', onLoaded);
     imgEl.addEventListener('error', onError);
   }
 }
 
-// 页面初始化绑定图片监听
 document.addEventListener('DOMContentLoaded', function(){
   setupImage(document.getElementById('bossImg1Tag'), document.getElementById('bossImg1'));
   setupImage(document.getElementById('bossImg2Tag'), document.getElementById('bossImg2'));
   setupImage(document.getElementById('bossImg3Tag'), document.getElementById('bossImg3'));
-  setupImage(document.getElementById('globalBg'), document.querySelector('.bg-layer'));
 });
 
-// 返回图片加载Promise，截图前等待全部图片就绪
+// ===== 截图前等待图片就绪 =====
 function awaitImage(img){
   return new Promise(resolve => {
-    if(img.complete){
-      resolve();
-      return;
-    }
+    if (!img || img.complete) { resolve(); return; }
     img.addEventListener('load', ()=>resolve(), {once:true});
     img.addEventListener('error', ()=>resolve(), {once:true});
-  })
+  });
 }
 
-// 下载功能：直接截取整个页面，效果与预览一致
+// ===== 下载功能 =====
 async function downloadImage(){
-  const bgImg = document.getElementById('globalBg');
   const bossImgs = document.querySelectorAll('#capture-area img');
-  // 等待所有图片加载完成（成功或者失败都放行）
-  await Promise.all([awaitImage(bgImg), ...Array.from(bossImgs).map(img=>awaitImage(img))]);
+  await Promise.all(Array.from(bossImgs).map(img=>awaitImage(img)));
 
   try {
     const fullWidth = document.documentElement.scrollWidth;
     const fullHeight = document.documentElement.scrollHeight;
+    // 读取当前主题背景色作为截图底色
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const bgColor = isDark ? '#16181d' : '#f7f3ec';
     const canvas = await html2canvas(document.body, {
-      backgroundColor: '#0b0b1a',
+      backgroundColor: bgColor,
       useCORS: true,
-      allowTaint: false, // 关闭allowTaint，防止CORS冲突画布污染
+      allowTaint: false,
       scale: window.devicePixelRatio >= 2 ? 2 : 1.5,
       logging: false,
       width: fullWidth,
@@ -388,16 +518,6 @@ async function downloadImage(){
     console.error('截图失败:', err);
     alert('下载截图失败，请检查图片文件路径是否正确！');
   }
-}
-
-// 图片填充辅助函数：填入全局背景
-function setGlobalBg(src){
-  document.getElementById('globalBg').src = src;
-}
-// 图片填充辅助函数：填入Boss图片
-function setBossImg(index, src){
-  const tag = document.getElementById('bossImg' + index + 'Tag');
-  tag.src = src;
 }
 </script>
 </body>

@@ -1,103 +1,233 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="paper">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>羽化哲</title>
 <style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:system-ui,"Microsoft YaHei",sans-serif;
-}
-body{
-    background:#090912;
-    padding:30px 14px;
-    color:#e6e6f2;
-}
-.wrap{
-    max-width:680px; /* 缩小整体容器宽度，原来920 */
-    margin:0 auto;
-    display:flex;
-    flex-direction:column;
-    gap:18px;
-}
-.version-box{
-    background:#151526;
-    border:1px solid #323255;
-    border-radius:14px;
-    padding:22px 20px; /* 缩小内边距 */
-    text-align:center; /* 强制居中 */
-    transition: all 0.25s ease;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.35);
-}
-.version-box:hover{
-    border-color:#9157c2;
-    box-shadow: 0 0 14px rgba(145, 87, 194, 0.25), 0 4px 12px rgba(0,0,0,0.4);
-    transform: translateY(-2px);
-    background:#18182c;
-}
-.version-box a{
-    font-size:20px; /* 字号适当缩小 */
-    color:#e9ccff;
-    text-decoration:none;
-    transition:0.2s;
-    display:block;
-    margin-bottom:6px;
-}
-.version-box a:hover{
-    color:#ffd8ff;
-    text-shadow:0 0 8px #b378dd;
-}
-.version-box p{
-    font-size:14px;
-    color:#b8b8d8;
-    line-height:1.5;
-}
+  /* ===== 主题变量 ===== */
+  html[data-theme="paper"] {
+    --bg-mask: rgba(247, 243, 236, 0.86);
+    --surface: rgba(255, 252, 247, 0.82);
+    --surface-2: rgba(242, 236, 224, 0.88);
+    --ink: #2a2520;
+    --ink-2: #6b6053;
+    --ink-3: #968872;
+    --accent: #9a3412;
+    --rule: rgba(180, 168, 148, 0.42);
+    --rule-2: rgba(160, 146, 124, 0.55);
+    --hover: rgba(253, 240, 228, 0.9);
+  }
+  html[data-theme="dark"] {
+    --bg-mask: rgba(16, 18, 23, 0.82);
+    --surface: rgba(30, 33, 40, 0.72);
+    --surface-2: rgba(38, 42, 51, 0.8);
+    --ink: #e8eaed;
+    --ink-2: #a5adba;
+    --ink-3: #6b7280;
+    --accent: #f0a05a;
+    --rule: rgba(90, 100, 118, 0.42);
+    --rule-2: rgba(110, 122, 142, 0.52);
+    --hover: rgba(42, 47, 58, 0.85);
+  }
 
-/*手机适配*/
-@media(max-width:600px){
-    body{
-        padding:20px 10px;
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  }
+
+  body {
+    /* 固定背景图，与公式页面一致；可替换为你自己的图片 */
+    background-color: #16181d;
+    background-image: url("");
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 56px 24px 96px;
+    transition: color 0.25s;
+  }
+
+  /* 主题遮罩层 */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background: var(--bg-mask);
+    transition: background-color 0.35s ease;
+    pointer-events: none;
+  }
+
+  /* ===== 主题切换按钮 ===== */
+  .theme-switch {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+    display: flex;
+    gap: 8px;
+    background: var(--surface);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--rule-2);
+    border-radius: 999px;
+    padding: 6px 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+    transition: background-color 0.25s, border-color 0.25s;
+  }
+  .theme-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform 0.15s, border-color 0.15s;
+    padding: 0;
+    outline: none;
+  }
+  .theme-btn:hover { transform: scale(1.12); }
+  .theme-btn.active { border-color: var(--accent); }
+  .theme-btn[data-theme="paper"] { background: linear-gradient(135deg, #f7f3ec 50%, #d9cdb8 50%); }
+  .theme-btn[data-theme="dark"]  { background: linear-gradient(135deg, #1e2128 50%, #f0a05a 50%); }
+
+  /* ===== 主容器 ===== */
+  .wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 680px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  /* ===== 导航卡片 ===== */
+  .version-box {
+    background: var(--surface);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--rule-2);
+    border-radius: 14px;
+    padding: 22px 20px;
+    text-align: center;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+    transition: background-color 0.25s, border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+  }
+  .version-box:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 14px rgba(154, 52, 18, 0.12), 0 6px 20px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+    background: var(--hover);
+  }
+  html[data-theme="dark"] .version-box:hover {
+    box-shadow: 0 0 14px rgba(240, 160, 90, 0.18), 0 6px 20px rgba(0, 0, 0, 0.4);
+  }
+
+  .version-box a {
+    font-size: 20px;
+    color: var(--accent);
+    text-decoration: none;
+    transition: color 0.2s, text-shadow 0.2s;
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  .version-box a:hover {
+    color: var(--ink);
+    text-shadow: 0 0 8px var(--accent);
+  }
+
+  .version-box p {
+    font-size: 14px;
+    color: var(--ink-2);
+    line-height: 1.5;
+    transition: color 0.25s;
+  }
+
+  /* ===== 移动端适配 ===== */
+  @media (max-width: 600px) {
+    body {
+      padding: 72px 12px 48px;
     }
-    .wrap{
-        gap:14px;
+    .wrap {
+      gap: 14px;
     }
-    .version-box{
-        padding:18px 14px;
-        border-radius:12px;
+    .version-box {
+      padding: 18px 14px;
+      border-radius: 12px;
     }
-    .version-box a{
-        font-size:17px;
+    .version-box a {
+      font-size: 17px;
     }
-    .version-box p{
-        font-size:13px;
+    .version-box p {
+      font-size: 13px;
     }
-}
+    .theme-switch {
+      top: 12px;
+      right: 12px;
+      padding: 4px 6px;
+    }
+    .theme-btn {
+      width: 22px;
+      height: 22px;
+    }
+  }
 </style>
 </head>
 <body>
-<div class="wrap">
-     <div class="version-box">
-        <a href="gongshi.html">计算公式</a>
-        <p>伤害计算公式/等级系数</p>
+  <!-- 主题切换按钮 -->
+  <div class="theme-switch" role="group" aria-label="背景配色">
+    <button class="theme-btn active" data-theme="paper" title="暖色纸张（原色）" aria-label="暖色纸张"></button>
+    <button class="theme-btn" data-theme="dark" title="暗色模式（黑色）" aria-label="暗色模式"></button>
+  </div>
+
+  <div class="wrap">
+    <div class="version-box">
+      <a href="gongshi.html">计算公式</a>
+      <p>计算公式 / 等级系数</p>
+       <p>重磅更新：9.27</p>
     </div>
     <div class="version-box">
-        <a href="1.html">原神时间表</a>
-        <p>记录版本时间，ct，cs，前瞻时间</p>
+      <a href="1.html">原神时间表</a>
+      <p>记录版本时间，ct，cs，前瞻时间</p>
+        <p>重磅更新：9.27</p>
     </div>
-    <div class="version-box">
-        <a href="3.html">附着查询</a>
-        <p>有关星超导角色叠层查询</p>
-    </div>
-    <div class="version-box">
-        <a href="4.html">千星奇域boss模拟查询</a>
-        <p>记录千星奇遇内的boss模拟奇域</p>
-    </div>
-    
    
-    </div>
-</div>
+
+  <script>
+    // ===== 主题切换逻辑 =====
+    (function () {
+      var html = document.documentElement;
+      var buttons = document.querySelectorAll('.theme-btn');
+      var saved = null;
+      try { saved = localStorage.getItem('gensri-theme'); } catch (e) { saved = null; }
+
+      if (saved && ['paper', 'dark'].indexOf(saved) !== -1) {
+        html.setAttribute('data-theme', saved);
+        for (var i = 0; i < buttons.length; i++) {
+          buttons[i].classList.toggle('active', buttons[i].dataset.theme === saved);
+        }
+      }
+
+      for (var j = 0; j < buttons.length; j++) {
+        (function (btn) {
+          btn.addEventListener('click', function () {
+            var theme = btn.dataset.theme;
+            html.setAttribute('data-theme', theme);
+            for (var k = 0; k < buttons.length; k++) {
+              buttons[k].classList.toggle('active', buttons[k] === btn);
+            }
+            try { localStorage.setItem('gensri-theme', theme); } catch (e) {}
+          });
+        })(buttons[j]);
+      }
+    })();
+  </script>
 </body>
 </html>
