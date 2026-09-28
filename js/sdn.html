@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="paper" style="scroll-behavior: smooth;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>羽化哲</title>
+<style>
+  /* ===== 主题变量 ===== */
+  html {
+    --mono: "SF Mono", "JetBrains Mono", "Fira Code", Consolas, "Courier New", monospace;
+  }
+  html[data-theme="paper"] {
+    --bg-mask: rgba(247, 243, 236, 0.86);
+    --surface: rgba(255, 252, 247, 0.82);
+    --surface-2: rgba(242, 236, 224, 0.88);
+    --ink: #2a2520;
+    --ink-2: #6b6053;
+    --ink-3: #968872;
+    --accent: #9a3412;
+    --accent-2: #c2410c;
+    --rule: rgba(180, 168, 148, 0.35);
+    --rule-2: rgba(160, 146, 124, 0.55);
+    --hover: rgba(253, 240, 228, 0.9);
+    --shadow: rgba(0, 0, 0, 0.08);
+    --shadow-strong: rgba(0, 0, 0, 0.14);
+    --hl-bg: rgba(154, 52, 18, 0.13);
+    --hl-bg-strong: rgba(154, 52, 18, 0.22);
+  }
+  html[data-theme="dark"] {
+    --bg-mask: rgba(16, 18, 23, 0.82);
+    --surface: rgba(30, 33, 40, 0.72);
+    --surface-2: rgba(38, 42, 51, 0.8);
+    --ink: #e8eaed;
+    --ink-2: #a5adba;
+    --ink-3: #6b7280;
+    --accent: #f0a05a;
+    --accent-2: #ff7a8a;
+    --rule: rgba(90, 100, 118, 0.35);
+    --rule-2: rgba(110, 122, 142, 0.52);
+    --hover: rgba(42, 47, 58, 0.85);
+    --shadow: rgba(0, 0, 0, 0.4);
+    --shadow-strong: rgba(0, 0, 0, 0.55);
+    --hl-bg: rgba(240, 160, 90, 0.20);
+    --hl-bg-strong: rgba(240, 160, 90, 0.32);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; overflow-x: hidden; }
+  ::-webkit-scrollbar { display: none !important; width: 0; }
+  html { scrollbar-width: none; -ms-overflow-style: none; }
+
+  body {
+    background-color: #16181d;
+    background-image: url("zhanshi/1.0.jpg");
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color: var(--ink);
+    font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    font-size: 13px;
+    min-height: 100vh;
+    padding: 34px 16px 52px;
+    position: relative;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background: var(--bg-mask);
+    pointer-events: none;
+  }
+
+  .page-container {
+    position: relative;
+    z-index: 1;
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  /* ===== 主题切换 ===== */
+  .theme-switch {
+    position: fixed;
+    top: 12px;
+    right: 14px;
+    z-index: 100;
+    display: flex;
+    gap: 6px;
+    background: var(--surface);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--rule-2);
+    border-radius: 999px;
+    padding: 4px 6px;
+    box-shadow: 0 3px 12px var(--shadow);
+  }
+  .theme-btn {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    padding: 0; outline: none;
+  }
+  .theme-btn.active { border-color: var(--accent); }
+  .theme-btn[data-theme="paper"] { background: linear-gradient(135deg, #f7f3ec 50%, #d9cdb8 50%); }
+  .theme-btn[data-theme="dark"]  { background: linear-gradient(135deg, #1e2128 50%, #f0a05a 50%); }
+
+  /* ===== 页头 ===== */
+  .page-header {
+    text-align: center;
+    padding: 2px 0 2px;
+  }
+  .page-header h1 {
+    font-family: Georgia, "Noto Serif SC", "Songti SC", serif;
+    font-size: clamp(20px, 3vw, 27px);
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 3px;
+    line-height: 1.2;
+    margin-bottom: 7px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  .page-header .subtitle {
+    font-size: 11.5px;
+    color: var(--ink-2);
+    letter-spacing: 0.8px;
+  }
+  .page-header .subtitle::before,
+  .page-header .subtitle::after {
+    content: "—";
+    margin: 0 8px;
+    color: var(--rule-2);
+  }
+
+  /* ===== 图表卡片 ===== */
+  .chart-list {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .chart-card {
+    background: var(--surface);
+    backdrop-filter: blur(14px) saturate(180%);
+    -webkit-backdrop-filter: blur(14px) saturate(180%);
+    border: 1px solid var(--rule-2);
+    border-radius: 12px;
+    box-shadow: 0 6px 20px var(--shadow);
+    overflow: hidden;
+  }
+
+  .chart-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 15px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .chart-head-left {
+    display: flex;
+    align-items: baseline;
+    gap: 9px;
+    flex-wrap: wrap;
+    min-width: 0;
+  }
+  .chart-title {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: 0.4px;
+  }
+  .chart-ver {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    color: #fff;
+    background: var(--accent);
+    padding: 2px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.4px;
+  }
+  .chart-hint {
+    font-size: 10.5px;
+    color: var(--ink-3);
+    white-space: nowrap;
+  }
+
+  .chart-img-box {
+    position: relative;
+    background: rgba(0, 0, 0, 0.18);
+    cursor: zoom-in;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 130px;
+  }
+  html[data-theme="paper"] .chart-img-box {
+    background: rgba(120, 110, 96, 0.08);
+  }
+  .chart-img-box img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .chart-img-box .fallback {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    padding: 44px 18px;
+    color: var(--ink-3);
+    font-size: 12.5px;
+  }
+  .chart-img-box.error .fallback { display: flex; }
+  .chart-img-box.error img { display: none; }
+  .fallback-icon { font-size: 26px; opacity: 0.4; }
+
+  .chart-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 15px;
+    font-size: 11px;
+    color: var(--ink-3);
+    flex-wrap: wrap;
+  }
+  .chart-foot .meta b {
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .zoom-tip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    opacity: 0.85;
+  }
+
+  /* ============================================================
+     备注面板（只读高亮展示，无动态）
+  ============================================================ */
+  .note-panel {
+    border-top: 1px solid var(--rule);
+  }
+
+  .note-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 10px 15px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--ink-2);
+    letter-spacing: 0.4px;
+    text-align: left;
+  }
+  .note-toggle:hover {
+    background: var(--hover);
+    color: var(--accent);
+  }
+  .note-toggle .note-arrow {
+    display: inline-block;
+    font-size: 10px;
+    color: var(--accent);
+    flex: none;
+  }
+  .note-panel.open .note-toggle .note-arrow {
+    transform: rotate(90deg);
+  }
+
+  .note-toggle .note-label { flex: none; }
+  .note-toggle .note-hint {
+    flex: 1;
+    font-size: 10.5px;
+    font-weight: 400;
+    color: var(--ink-3);
+    letter-spacing: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .note-body { display: none; }
+  .note-panel.open .note-body { display: block; }
+
+  .note-content {
+    padding: 0 15px 14px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* —— 高亮展示卡 —— */
+  .cfg-preview {
+    border: 1px solid var(--rule);
+    border-radius: 9px;
+    background: var(--surface-2);
+    padding: 11px 13px;
+  }
+  .cfg-empty {
+    font-size: 12px;
+    color: var(--ink-3);
+    text-align: center;
+    padding: 8px 0;
+    letter-spacing: 0.4px;
+  }
+
+  .cfg-sec {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #fff;
+    background: var(--accent);
+    padding: 3px 10px 3px 8px;
+    border-radius: 999px;
+    margin-bottom: 9px;
+  }
+  .cfg-sec-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.85);
+    flex: none;
+  }
+
+  .cfg-list { list-style: none; }
+
+  .cfg-row {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px dashed var(--rule);
+    flex-wrap: wrap;
+  }
+  .cfg-row:last-child { border-bottom: none; padding-bottom: 2px; }
+
+  .cfg-role {
+    flex: none;
+    min-width: 60px;
+    font-size: 13.5px;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: 0.8px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .cfg-role::before {
+    content: "";
+    width: 3px;
+    height: 13px;
+    border-radius: 2px;
+    background: var(--accent);
+    margin-right: 7px;
+    flex: none;
+  }
+
+  .cfg-gear {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--ink); /* 改为主文本颜色，让装备文字更醒目 */
+    font-weight: 600;  /* 加粗，不再灰淡 */
+    line-height: 1.8;
+    letter-spacing: 0.2px;
+    word-break: break-word;
+  }
+
+  /* 高亮：数字 / 词条 / 双爆 —— 加大、加粗、带底色块 */
+  .hl {
+    font-family: inherit;
+    font-style: normal;
+    font-weight: 800;
+    color: var(--accent);
+    background: var(--hl-bg-strong); /* 使用更明显的背景色 */
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 1.08em;
+    letter-spacing: 0.3px;
+    margin: 0 2px;
+  }
+
+  /* 高亮：r1 / r5 —— 深色胶囊徽章 */
+  .hl-badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-style: normal;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1.7;
+    padding: 0 9px;
+    margin: 0 2px;
+    border-radius: 999px;
+    color: #fff;
+    background: var(--accent);
+    letter-spacing: 0.4px;
+    vertical-align: 1px;
+  }
+
+  /* 结论强调条 */
+  .cfg-summary {
+    margin-top: 10px;
+    padding: 9px 13px;
+    border-radius: 7px;
+    border-left: 4px solid var(--accent);
+    background: var(--hl-bg-strong);
+    font-size: 12.5px;
+    line-height: 1.8;
+    color: var(--ink);
+    letter-spacing: 0.2px;
+    font-weight: 600; /* 让结论文字也更醒目 */
+  }
+
+  /* ============================================================
+     图片放大器
+  ============================================================ */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 8, 12, 0.92);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    cursor: zoom-out;
+  }
+  .lightbox.show { display: flex; }
+  .lightbox img {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 8px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  }
+  .lightbox-close {
+    position: absolute;
+    top: 16px;
+    right: 18px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    font-size: 19px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .lightbox-close:hover { background: rgba(255, 255, 255, 0.22); }
+  .lightbox-caption {
+    position: absolute;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 11.5px;
+    letter-spacing: 0.8px;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    white-space: nowrap;
+  }
+
+  /* ===== 页脚 ===== */
+  .page-footer {
+    text-align: center;
+    padding: 12px 0 0;
+    font-size: 11px;
+    color: var(--ink-3);
+    line-height: 1.85;
+  }
+  .page-footer b { color: var(--accent); font-weight: 700; }
+
+  /* ============================================================
+     响应式
+  ============================================================ */
+  @media (max-width: 720px) {
+    body { padding: 50px 11px 42px; font-size: 12.5px; }
+    .page-container { gap: 15px; }
+    .chart-list { gap: 15px; }
+
+    .page-header h1 { font-size: 18px; letter-spacing: 2px; margin-bottom: 5px; }
+    .page-header .subtitle { font-size: 10.5px; }
+    .page-header .subtitle::before,
+    .page-header .subtitle::after { margin: 0 5px; }
+
+    .chart-head {
+      padding: 9px 12px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 5px;
+    }
+    .chart-title { font-size: 12.5px; }
+    .chart-ver { font-size: 9.5px; padding: 2px 7px; }
+    .chart-hint { font-size: 10px; }
+
+    .chart-foot { padding: 7px 12px; font-size: 10.5px; }
+    .zoom-tip { display: none; }
+
+    .note-toggle { padding: 9px 12px; font-size: 12px; }
+    .note-toggle .note-hint { display: none; }
+    .note-content { padding: 0 12px 12px; }
+
+    .cfg-preview { padding: 10px 11px; }
+    .cfg-role { min-width: 52px; font-size: 13px; }
+    .cfg-gear { font-size: 12px; font-weight: 600; }
+    .cfg-row { gap: 7px; padding: 6px 0; }
+    .cfg-summary { font-size: 12px; padding: 8px 11px; font-weight: 600; }
+    .hl { padding: 1px 5px; font-size: 1.06em; }
+    .hl-badge { padding: 0 8px; font-size: 10.5px; }
+
+    .theme-switch { top: 9px; right: 9px; padding: 3px 5px; }
+    .theme-btn { width: 18px; height: 18px; }
+
+    .lightbox-close { top: 11px; right: 11px; width: 32px; height: 32px; font-size: 17px; }
+    .lightbox-caption {
+      font-size: 10.5px;
+      padding: 4px 11px;
+      max-width: 90vw;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- 主题切换 -->
+<div class="theme-switch" role="group" aria-label="背景配色">
+  <button class="theme-btn active" data-theme="paper" title="暖色纸张（原色）" aria-label="暖色纸张"></button>
+  <button class="theme-btn" data-theme="dark" title="暗色模式（黑色）" aria-label="暗色模式"></button>
+</div>
+
+<div class="page-container">
+
+  <!-- 页头 -->
+  <header class="page-header">
+    <h1>桑多涅-v7.2DPS 图表</h1>
+    <p class="subtitle">30词|9层|60帧|热启动|桑奥米七</p>
+  </header>
+
+  <!-- 图表列表 -->
+  <div class="chart-list">
+
+    <!-- ========== 图表 1：v7.2.1.2 ========== -->
+    <div class="chart-card">
+      <div class="chart-head">
+        <div class="chart-head-left">
+          <span class="chart-title">桑 c0 奥米七 · 理论 DPS</span>
+          <span class="chart-ver">v7.2.1.2</span>
+        </div>
+        <span class="chart-hint">点击图片可放大查看</span>
+      </div>
+
+      <div class="chart-img-box" onclick="openLightbox(this, '版本 v7.2.1.2')">
+        <img src="桑多涅-v7.2.1.2.png" alt="桑c0奥米七 理论DPS v7.2.1.2" loading="lazy"
+             onerror="this.parentElement.classList.add('error')">
+        <div class="fallback">
+          <div class="fallback-icon"></div>
+          <div>图片加载失败</div>
+        </div>
+      </div>
+
+      <div class="chart-foot">
+        <span class="meta">数据整理：<b>羽化哲</b> · 制图：<b>幼儿园大班班长</b></span>
+       
+      </div>
+
+      <!-- 备注面板 -->
+      <div class="note-panel" id="notePanel1">
+        <button class="note-toggle" type="button" onclick="toggleNote('notePanel1')" aria-expanded="false">
+          <span class="note-arrow">▶</span>
+          <span class="note-label">查看圣遗物/武器</span>
+          <span class="note-hint">点击展开 / 收起</span>
+        </button>
+
+        <div class="note-body">
+          <div class="note-content">
+            <div class="cfg-preview" id="preview1"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 图表 2：v7.2.2.1 ========== -->
+    <div class="chart-card">
+      <div class="chart-head">
+        <div class="chart-head-left">
+          <span class="chart-title">桑 c0 奥米七 · 理论 DPS</span>
+          <span class="chart-ver">v7.2.2.1</span>
+        </div>
+        <span class="chart-hint">点击图片可放大查看</span>
+      </div>
+
+      <div class="chart-img-box" onclick="openLightbox(this, '版本 v7.2.2.1')">
+        <img src="桑多涅-v7.2.2.1.png" alt="桑c0奥米七 理论DPS v7.2.2.1" loading="lazy"
+             onerror="this.parentElement.classList.add('error')">
+        <div class="fallback">
+          <div class="fallback-icon"></div>
+          <div>图片加载失败</div>
+        </div>
+      </div>
+
+      <div class="chart-foot">
+        <span class="meta">数据整理：<b>羽化哲</b> · 制图：<b>幼儿园大班班长</b></span>
+        <span class="zoom-tip">🔍 点击放大</span>
+      </div>
+
+      <!-- 备注面板 -->
+      <div class="note-panel" id="notePanel2">
+        <button class="note-toggle" type="button" onclick="toggleNote('notePanel2')" aria-expanded="false">
+          <span class="note-arrow">▶</span>
+          <span class="note-label">查看圣遗物/武器</span>
+          <span class="note-hint">点击展开 / 收起</span>
+        </button>
+
+        <div class="note-body">
+          <div class="note-content">
+            <div class="cfg-preview" id="preview2"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 页脚 -->
+  <footer class="page-footer">
+    <p>以上数据仅供参考，因存在不确定性因素，请以后续更新数据为准！</p>
+    <p>© <b>羽化哲</b> · 计算标准：30 词条 / 9 层 / 60 帧 / 轴长 18s·20s</p>
+  </footer>
+
+</div>
+
+<!-- 图片放大器 -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" type="button" onclick="closeLightbox()" aria-label="关闭">×</button>
+  <img id="lightboxImg" src="" alt="">
+  <div class="lightbox-caption" id="lightboxCaption"></div>
+</div>
+
+<script>
+/* ============================================================
+   1. 主题切换
+============================================================ */
+(function () {
+  var html = document.documentElement;
+  var buttons = document.querySelectorAll('.theme-btn');
+  var saved = null;
+  try { saved = localStorage.getItem('gensri-theme'); } catch (e) { saved = null; }
+
+  if (saved && ['paper', 'dark'].indexOf(saved) !== -1) {
+    html.setAttribute('data-theme', saved);
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].classList.toggle('active', buttons[i].dataset.theme === saved);
+    }
+  }
+
+  Array.prototype.forEach.call(buttons, function (btn) {
+    btn.addEventListener('click', function () {
+      var theme = btn.dataset.theme;
+      html.setAttribute('data-theme', theme);
+      Array.prototype.forEach.call(buttons, function (b) {
+        b.classList.toggle('active', b === btn);
+      });
+      try { localStorage.setItem('gensri-theme', theme); } catch (e) {}
+    });
+  });
+})();
+
+/* ============================================================
+   2. 备注面板：折叠 / 高亮渲染
+============================================================ */
+function toggleNote(panelId) {
+  var panel = document.getElementById(panelId);
+  if (!panel) return;
+  var isOpen = panel.classList.toggle('open');
+  var btn = panel.querySelector('.note-toggle');
+  if (btn) btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+}
+
+/* —— HTML 转义 —— */
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
+/* —— 行内高亮：r1 / r5 为徽章，词条与数字为主题色高亮块 —— */
+function highlight(s) {
+  return escapeHtml(s).replace(/(r\d+|\d+\s*词|双爆|\d+)/gi, function (t) {
+    if (/^r\d+$/i.test(t)) {
+      return '<em class="hl-badge">' + t + '</em>';
+    }
+    return '<em class="hl">' + t + '</em>';
+  });
+}
+
+/* —— 解析并渲染高亮卡片 —— */
+function renderPreview(text, box) {
+  if (!box) return;
+
+  var lines = String(text || '').split('\n');
+  var title = '';
+  var rows = [];
+  var summary = [];
+
+  lines.forEach(function (raw) {
+    var line = raw.trim();
+    if (!line) return;
+
+    var m = line.match(/^([^：:]+)[：:]\s*(.*)$/);
+    if (m) {
+      var key = m[1].trim();
+      var val = m[2].trim();
+      if (val) {
+        rows.push({ key: key, val: val });
+      } else {
+        title = key;
+      }
+    } else {
+      summary.push(line);
+    }
+  });
+
+  if (!title && !rows.length && !summary.length) {
+    box.innerHTML = '<div class="cfg-empty">暂无备注内容</div>';
+    return;
+  }
+
+  var html = '';
+
+  if (title) {
+    html += '<div class="cfg-sec"><span class="cfg-sec-dot"></span>' + escapeHtml(title) + '</div>';
+  }
+
+  if (rows.length) {
+    html += '<ul class="cfg-list">';
+    rows.forEach(function (r) {
+      html += '<li class="cfg-row">' +
+                '<span class="cfg-role">' + escapeHtml(r.key) + '</span>' +
+                '<span class="cfg-gear">' + highlight(r.val) + '</span>' +
+              '</li>';
+    });
+    html += '</ul>';
+  }
+
+  summary.forEach(function (s) {
+    html += '<div class="cfg-summary">' + highlight(s) + '</div>';
+  });
+
+  box.innerHTML = html;
+}
+
+/* —— 初始化展示内容（原图二内容） —— */
+(function initPreviews() {
+  var configText = [
+    '武器/圣遗物：',
+    '桑多涅：影中沉凝的幻灭，r1专武',
+    '奥黛塔：炉火熔炼之心，星峰剑',
+    '米提亚：精通2+2，非专武为r1凝血沉心',
+    '七七：千岩，r5西风',
+    '桑、奥、米均为30词，其中24为双爆！',
+    '热启动',
+    '转载需标明出处！',
+    
+  ].join('\n');
+
+  var p1 = document.getElementById('preview1');
+  var p2 = document.getElementById('preview2');
+  if (p1) renderPreview(configText, p1);
+  if (p2) renderPreview(configText, p2);
+})();
+
+/* ============================================================
+   3. 图片放大器
+============================================================ */
+var lightbox = document.getElementById('lightbox');
+var lightboxImg = document.getElementById('lightboxImg');
+var lightboxCaption = document.getElementById('lightboxCaption');
+
+function openLightbox(box, caption) {
+  if (box.classList.contains('error')) return;
+  var img = box.querySelector('img');
+  if (!img || !img.complete || img.naturalWidth === 0) return;
+
+  lightboxImg.src = img.src;
+  lightboxImg.alt = img.alt;
+  lightboxCaption.textContent = caption + ' · 点击任意处关闭';
+  lightbox.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+  lightbox.classList.remove('show');
+  document.body.style.overflow = '';
+  setTimeout(function () {
+    if (!lightbox.classList.contains('show')) lightboxImg.src = '';
+  }, 260);
+}
+
+lightbox.addEventListener('click', function (e) {
+  if (e.target === lightbox) closeLightbox();
+});
+
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape' && lightbox.classList.contains('show')) {
+    closeLightbox();
+  }
+});
+</script>
+</body>
+</html>
