@@ -58,7 +58,7 @@
         }
         @media(min-width:680px){
             .filter-box{
-                grid-template-columns:1fr 130px 160px 140px;
+                grid-template-columns:minmax(0,1fr) 100px 110px 130px 120px;
             }
         }
         .filter-item label{
@@ -293,6 +293,14 @@
                 </select>
             </div>
             <div class="filter-item">
+                <label>角色筛选</label>
+                <select id="selChar">
+                    <option value="all">全部角色</option>
+                    <option value="桑多涅">桑多涅</option>
+                    <option value="薇斯纳">薇斯纳</option>
+                </select>
+            </div>
+            <div class="filter-item">
                 <label>DPS排序</label>
                 <select id="selSort">
                     <option value="desc">DPS降序</option>
@@ -327,9 +335,9 @@ const teamMeta = {
         avatars: ["tx/wsn.webp","tx/wyns.webp","tx/adt.webp","tx/fls.webp"],
         video: "https://b23.tv/cwUbVTm"
     },
-    "星超导队": {
-        avatars: ["tx/sdn.png","tx/adt.webp","tx/mty.png","tx/alx.png"],
-        video: ""
+    "桑奥米七": {
+        avatars: ["tx/sdn.png","tx/adt.webp","tx/mty.png","tx/qq.png"],
+        video: "https://b23.tv/oOVSDfx"
     }
 };
 
@@ -393,29 +401,36 @@ let dataList = [
     {team:"星扩散队",config:"61薇21沃20奥6珐",gold:15,dps:840411.3,fullEnergy:"是",configInfo:"v6.1"},
     {team:"星扩散队",config:"61薇61沃20奥6珐",gold:19,dps:1051740.75,fullEnergy:"是",configInfo:"v6.1"},
 
-    // ====================== 星超导队 12条 ======================
-    {team:"星超导队",config:"01桑00奥00米c6阿",gold:4,dps:286269.0668,fullEnergy:"是",configInfo:"v1.1"},
-    {team:"星超导队",config:"01桑00奥10米c6阿",gold:5,dps:329309.6361,fullEnergy:"是",configInfo:"v1.1"},
-    {team:"星超导队",config:"01桑00奥20米c6阿",gold:6,dps:408841.3732,fullEnergy:"是",configInfo:"v1.1"},
-    {team:"星超导队",config:"01桑00奥61米c6阿",gold:11,dps:519484.9807,fullEnergy:"是",configInfo:"v1.1"},
-    {team:"星超导队",config:"21桑00奥00米c6阿",gold:6,dps:333363.0593,fullEnergy:"是",configInfo:"v1.1"},
-    {team:"星超导队",config:"21桑00奥10米c6阿",gold:7,dps:379511.6247,fullEnergy:"是",configInfo:"v1.1"},
-    {team:"星超导队",config:"21桑00奥20米c6阿",gold:8,dps:470176.7052,fullEnergy:"是",configInfo:"v1.1"},
-    {team:"星超导队",config:"21桑00奥61米c6阿",gold:13,dps:591895.3949,fullEnergy:"是",configInfo:"v1.1"},
-    {team:"星超导队",config:"61桑00奥00米c6阿",gold:10,dps:556915.702,fullEnergy:"是",configInfo:"v1.1"},
-    {team:"星超导队",config:"61桑00奥10米c6阿",gold:11,dps:633368.5709,fullEnergy:"是",configInfo:"v1.1"},
-    {team:"星超导队",config:"61桑00奥20米c6阿",gold:12,dps:785523.1688,fullEnergy:"是",configInfo:"v1.1"},
-    {team:"星超导队",config:"61桑00奥61米c6阿",gold:17,dps:947264.04118,fullEnergy:"是",configInfo:"v1.1"},
+    // ====================== 桑奥米七 12条（替换原星超导队，金数保留，去掉c6） ======================
+    {team:"桑奥米七",config:"01桑00奥00米七",gold:4,dps:256800,fullEnergy:"是",configInfo:"v7.2.1.2"},
+    {team:"桑奥米七",config:"01桑00奥10米七",gold:5,dps:295800,fullEnergy:"是",configInfo:"v7.2.1.2"},
+    {team:"桑奥米七",config:"01桑00奥20米七",gold:6,dps:363300,fullEnergy:"是",configInfo:"v7.2.1.2"},
+    {team:"桑奥米七",config:"01桑00奥61米七",gold:11,dps:470500,fullEnergy:"是",configInfo:"v7.2.1.2"},
+    {team:"桑奥米七",config:"21桑00奥00米七",gold:6,dps:293800,fullEnergy:"是",configInfo:"v7.2.1.2"},
+    {team:"桑奥米七",config:"21桑00奥10米七",gold:7,dps:335000,fullEnergy:"是",configInfo:"v7.2.1.2"},
+    {team:"桑奥米七",config:"21桑00奥20米七",gold:8,dps:411900,fullEnergy:"是",configInfo:"v7.2.1.2"},
+    {team:"桑奥米七",config:"21桑00奥61米七",gold:13,dps:527000,fullEnergy:"是",configInfo:"v7.2.1.2"},
+    {team:"桑奥米七",config:"61桑00奥00米七",gold:10,dps:480600,fullEnergy:"是",configInfo:"v7.2.1.2"},
+    {team:"桑奥米七",config:"61桑00奥10米七",gold:11,dps:547500,fullEnergy:"是",configInfo:"v7.2.1.2"},
+    {team:"桑奥米七",config:"61桑00奥20米七",gold:12,dps:677000,fullEnergy:"是",configInfo:"v7.2.1.2"},
+    {team:"桑奥米七",config:"61桑00奥61米七",gold:17,dps:812200,fullEnergy:"是",configInfo:"v7.2.1.2"},
 ];
 
 const inpTeam = document.getElementById("inpTeam");
 const selGold = document.getElementById("selGold");
+const selChar = document.getElementById("selChar");
 const selSort = document.getElementById("selSort");
 const btnTopGold = document.getElementById("btnTopGold");
 const listPc = document.getElementById("listPc");
 const listMobile = document.getElementById("listMobile");
 
 let onlyTopPerGold = false;
+
+/* 角色筛选：下拉值 -> 队伍名/配置串中的关键字 */
+const charKeyword = {
+    "桑多涅": "桑",
+    "薇斯纳": "薇"
+};
 
 function getAvatarHtml(avatars){
     let html = "";
@@ -469,6 +484,16 @@ function render(){
     const g = selGold.value;
     if(g !== "all") arr = arr.filter(x=>x.gold===Number(g));
 
+    // 角色筛选
+    const ch = selChar.value;
+    if(ch !== "all"){
+        const ck = charKeyword[ch] || ch;
+        arr = arr.filter(x =>
+            (x.team && x.team.includes(ck)) ||
+            (x.config && x.config.includes(ck))
+        );
+    }
+
     if(onlyTopPerGold && arr.length){
         if(g !== "all"){
             const top = Math.max(...arr.map(x=>x.dps));
@@ -493,6 +518,7 @@ function render(){
 }
 inpTeam.addEventListener("input",render);
 selGold.addEventListener("change",render);
+selChar.addEventListener("change",render);
 selSort.addEventListener("change",render);
 btnTopGold.addEventListener("click",()=>{
     onlyTopPerGold = !onlyTopPerGold;
