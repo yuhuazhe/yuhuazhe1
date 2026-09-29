@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>羽化哲</title>
     <style>
-        /* ==================== 基础样式 & 充能计算器核心 ==================== */
         body {
             background: url('1.1.webp') no-repeat center center fixed;
             background-size: cover;
@@ -19,7 +18,6 @@
             color: #ecf0f1;
             box-sizing: border-box;
         }
-        /* 主容器：全局上下布局 */
         .calculator-container {
             width: 100%;
             max-width: 100%;
@@ -71,7 +69,7 @@
         .timeline-btn:hover { background: rgba(170, 102, 187, 0.2); }
         .note-btn {border-color:#33bb99;color:#74e2c8;}
         .note-btn:hover{background:rgba(51,187,153,0.2);}
-        /* ==================== 充能计算器粒子表格 ==================== */
+        
         .particle-table-wrapper {
             width: 100%;
             overflow-x: auto;
@@ -124,7 +122,6 @@
         .number-control input::-webkit-inner-spin-button {
             -webkit-appearance: none; margin: 0;
         }
-        /* 手机端缩放 */
         @media (max-width: 1023px) {
             .grid-row { grid-template-columns: 75px repeat(6, 1fr); min-width: 580px; gap: 8px; }
             .grid-row.header { font-size: 12px; }
@@ -140,7 +137,6 @@
             .number-control button { width: 24px; font-size: 14px; }
             .number-control input { font-size: 13px; }
         }
-        /* 配置信息 网格 */
         .settings-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -153,11 +149,19 @@
         }
         .setting-item label { font-size: 14px; color: #b0c4de; }
         .setting-item select, .setting-item .number-control { width: 100%; }
-        /* 结果区 */
         .result-status {
             padding: 12px; border-radius: 8px; text-align: center; margin-bottom: 16px;
             display: flex; justify-content: center; align-items: center; gap: 8px; font-weight: bold;
         }
+        .result-status.calc-trigger {
+            background: rgba(58, 82, 122, 0.4);
+            border: 1px solid #4a6a9a;
+            color: #fff;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .result-status.calc-trigger:hover { background: rgba(74, 106, 154, 0.6); }
+        .result-status.calc-trigger:active { transform: scale(0.99); }
         .result-status.fail { background: rgba(220, 50, 50, 0.4); border: 1px solid #aa3333; color: #ffaaaa; }
         .result-status.success { background: rgba(50, 220, 50, 0.4); border: 1px solid #33aa33; color: #aaffaa; }
         .result-row {
@@ -167,7 +171,6 @@
         .result-row:last-child { border-bottom: none; }
         .result-row .value { color: #ecf0f1; font-weight: bold; }
         .result-row .value.infinity { color: #ff8888; font-size: 20px; }
-        /* ==================== 【说明】模态框 ==================== */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px);
@@ -187,7 +190,6 @@
         }
         .modal-content .close-btn:hover { color: #fff; }
         .highlight-code { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-family: monospace; color: #ffd700; }
-        /* =====产球记录本弹窗样式===== */
         .team-bar{
             display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.1);
         }
@@ -235,7 +237,6 @@
             padding:3px;
             text-align:center;
         }
-        /* ==================== 【时间轴】特殊样式全屏自适应 ==================== */
         .timeline-content {
             max-width: 1200px; width: 95vw; max-height: 90vh;
         }
@@ -256,7 +257,6 @@
         .timeline-header .btn-primary:hover { background: #4a6a9a; }
         .timeline-header .btn-danger { background: #7a3a3a; border-color: #9a4a4a; cursor: pointer; transition: 0.2s; }
         .timeline-header .btn-danger:hover { background: #9a4a4a; }
-        /* 时间轴标尺 */
         .timeline-ruler-wrapper { width: 100%; overflow-x: auto; padding-bottom: 4px; }
         .timeline-ruler {
             display: flex; justify-content: space-between; padding: 0 10px;
@@ -267,7 +267,6 @@
         .timeline-ruler span::after { content: ''; width: 1px; height: 10px; background: #446; margin-top: 4px; }
         .timeline-ruler span.major::after { height: 16px; background: #668; }
         .timeline-ruler span.major { font-weight: bold; color: #ccc; }
-        /* 时间轴网格 */
         .timeline-grid {
             width: 100%; overflow-x: auto; max-height: 400px; overflow-y: auto;
             position: relative; margin-top: 10px;
@@ -284,7 +283,6 @@
         .timeline-row .role-slot {
             flex: 1; height: 100%; position: relative; border-left: 1px solid rgba(255,255,255,0.05);
         }
-        /* BUFF 方块 */
         .timeline-buff {
             position: absolute; height: 30px; border-radius: 4px; top: 7px;
             display: flex; align-items: center; justify-content: center; color: #fff;
@@ -299,7 +297,6 @@
             display: none; align-items: center; justify-content: center; font-size: 10px;
         }
         .timeline-buff:hover .del-buff { display: flex; }
-        /* 大屏PC全屏适应 */
         @media (min-width: 1024px) {
             body { padding: 40px; }
             .calculator-container { padding: 30px; gap: 24px; }
@@ -310,10 +307,10 @@
 </head>
 <body>
 <div class="calculator-container">
-    <!-- 模块1：微粒 & 晶球吸收 -->
     <div class="panel">
         <div class="panel-header">
             <span>原神角色充能计算器</span>
+            <span>BUG急速处理渠道：Q群：1043873841</span>
             <div class="btn-group">
                 <button class="note-btn" onclick="toggleNoteModal()">产球记录本</button>
                 <button class="timeline-btn" onclick="toggleTimeline()">时间轴功能</button>
@@ -331,7 +328,6 @@
                 <div>异元素晶球</div>
                 <div>无元素晶球</div>
             </div>
-            <!-- 前台吸收 -->
             <div class="grid-row">
                 <div class="label-text">前台吸收</div>
                 <div class="number-control"><button onclick="changeVal('f_same_p', -1)">-</button><input type="number" id="f_same_p" value="0" min="0" title="前台 同元素微粒"><button onclick="changeVal('f_same_p', 1)">+</button></div>
@@ -341,7 +337,6 @@
                 <div class="number-control"><button onclick="changeVal('f_diff_o', -1)">-</button><input type="number" id="f_diff_o" value="0" min="0" title="前台 异元素晶球"><button onclick="changeVal('f_diff_o', 1)">+</button></div>
                 <div class="number-control"><button onclick="changeVal('f_none_o', -1)">-</button><input type="number" id="f_none_o" value="0" min="0" title="前台 无元素晶球"><button onclick="changeVal('f_none_o', 1)">+</button></div>
             </div>
-            <!-- 后台吸收 -->
             <div class="grid-row">
                 <div class="label-text">后台吸收</div>
                 <div class="number-control"><button onclick="changeVal('b_same_p', -1)">-</button><input type="number" id="b_same_p" value="0" min="0" title="后台 同元素微粒"><button onclick="changeVal('b_same_p', 1)">+</button></div>
@@ -353,7 +348,6 @@
             </div>
         </div>
     </div>
-    <!-- 模块2：配置信息 -->
     <div class="panel">
         <div class="settings-grid">
             <div class="setting-item">
@@ -366,7 +360,7 @@
             </div>
             <div class="setting-item">
                 <label>固定恢复能量</label>
-                <div class="number-control"><button onclick="changeVal('fixed_recovery', -1)">-</button><input type="number" id="fixed_recovery" value="0" min="0" title="固定恢复能量 (如西风武器产球)"><button onclick="changeVal('fixed_recovery', 1)">+</button></div>
+                <div class="number-control"><button onclick="changeVal('fixed_recovery', -1)">-</button><input type="number" id="fixed_recovery" value="0" min="0" title="固定恢复能量 (如角色天赋直接回能，不受元素充能效率加成)"><button onclick="changeVal('fixed_recovery', 1)">+</button></div>
             </div>
             <div class="setting-item">
                 <label>元素充能效率</label>
@@ -374,21 +368,19 @@
             </div>
         </div>
     </div>
-    <!-- 模块3：计算结果 -->
     <div class="panel">
         <div class="panel-header">
             <span>计算结果</span>
         </div>
-        <div id="status_box" class="result-status fail">
-            <span>✖</span> 充能未达标
+        <div id="status_box" class="result-status calc-trigger" onclick="calculate()">
+            <span></span> 计算充能
         </div>
         <div class="result-row">
             <span>最低充能需求</span>
-            <span id="min_er_needed" class="value infinity">∞</span>
+            <span id="min_er_needed" class="value">--</span>
         </div>
     </div>
 </div>
-<!-- ==========【产球记录本弹窗】 ========== -->
 <div id="noteModal" class="modal-overlay" onclick="toggleNoteModal(event)">
     <div class="modal-content" onclick="event.stopPropagation()">
         <button class="close-btn" onclick="toggleNoteModal()">✕</button>
@@ -403,23 +395,20 @@
         <div id="noteWrap"></div>
     </div>
 </div>
-<!-- ==================== 【说明】模态框 ==================== -->
 <div id="helpModal" class="modal-overlay" onclick="toggleHelp(event)">
     <div class="modal-content" onclick="event.stopPropagation()">
         <button class="close-btn" onclick="toggleHelp()">✕</button>
         <h3>计算器使用说明</h3>
         <ul>
             <li><b>注意！！！：</b><br>
-                <span class="highlight-code">1.本程序为v2.5测试版，可能存在异常bug或异常显示问题，若发现问题请及时反馈，感谢使用！</span>
+                <span class="highlight-code">1.本程序为v3.1测试版，可能存在异常bug或异常显示问题，若发现问题请及时反馈，感谢使用！</span>
                 <br>
-                <span class="highlight-code">最后更新日期：2026.8.25----制作者：幼儿园大班班长</span><br>
+                <span class="highlight-code">最后更新日期：2026.9.29----制作者：幼儿园大班班长</span><br>
                 2.十分感谢大家使用本程序，以及反馈错误
-            </li>
-            <li><b>输入提示：</b><br>
-                1.按照角色实际的产球数量/接受数量填入即可<br>
-                2.若角色存在固定回能，需要填入对应的输入框<br>
                 
             </li>
+           
+          
             <li><b>记忆功能：</b><br>
                 <span class="highlight-code">网页内置记忆代码，每个队伍独立保存计算器状态、时间轴，刷新或二次进入网站不会丢失</span>
             </li>
@@ -443,18 +432,10 @@
                 1.现阶段更推荐使用电脑，手机端的整体体现并不理想<br>
             <li><b>联系制作者：</b><br>
                 1.可通过b站私信/粉丝群联系up，并说明具体的情况<br>
-
-
-
-
-
-
-
             </li>
         </ul>
     </div>
 </div>
-<!-- ==================== 【时间轴】模态框 ==================== -->
 <div id="timelineModal" class="modal-overlay" onclick="toggleTimeline(event)">
     <div class="modal-content timeline-content" onclick="event.stopPropagation()">
         <button class="close-btn" onclick="toggleTimeline()">✕</button>
@@ -472,34 +453,27 @@
             <input type="color" id="tlm_color" value="#4a90e2">
             <button class="btn-danger" onclick="clearTimeline()">清空全部数据</button>
         </div>
-        <!-- 时间轴标尺 -->
         <div class="timeline-ruler-wrapper">
             <div class="timeline-ruler" id="timelineRuler"></div>
         </div>
-        <!-- 时间轴网格 -->
         <div class="timeline-grid">
-            <div class="timeline-grid-inner" id="timelineGridInner">
-                <!-- JS 动态生成行 -->
-            </div>
+            <div class="timeline-grid-inner" id="timelineGridInner"></div>
         </div>
     </div>
 </div>
 <script>
-    // ==================== 充能计算器逻辑 ====================
     const ENERGY_VALUES = {
-        'f_same_p': 3.0, 'f_diff_p': 1.2, 'f_none_p': 1.8,
-        'f_same_o': 9.0, 'f_diff_o': 3.6, 'f_none_o': 5.4,
-        'b_same_p': 3.0, 'b_diff_p': 1.2, 'b_none_p': 1.8,
-        'b_same_o': 9.0, 'b_diff_o': 3.6, 'b_none_o': 5.4
+        'f_same_p': 3.0, 'f_diff_p': 1.0, 'f_none_p': 2.0,
+        'f_same_o': 9.0, 'f_diff_o': 3.0, 'f_none_o': 6.0,
+        'b_same_p': 3.0, 'b_diff_p': 1.0, 'b_none_p': 2.0,
+        'b_same_o': 9.0, 'b_diff_o': 3.0, 'b_none_o': 6.0
     };
     const NOTE_STORAGE_KEY = "genshin_note_multi_team_v4";
-    // 计算器全部输入id列表
     const CALC_INPUT_IDS = [
         'f_same_p','f_diff_p','f_none_p','f_same_o','f_diff_o','f_none_o',
         'b_same_p','b_diff_p','b_none_p','b_same_o','b_diff_o','b_none_o',
         'party_size','req_energy','fixed_recovery','er_stat'
     ];
-    // 获取空白计算器状态
     function getEmptyCalcState(){
         return {
             'f_same_p':0,'f_diff_p':0,'f_none_p':0,'f_same_o':0,'f_diff_o':0,'f_none_o':0,
@@ -507,14 +481,12 @@
             'party_size':4,'req_energy':60,'fixed_recovery':0,'er_stat':100
         };
     }
-    // 获取空白时间轴数据
     function getEmptyTimelineData(){
         return {
             roles: ['角色1', '角色2', '角色3'],
             buffs: []
         };
     }
-    // 单个角色模板
     function getEmptyRole(){
         return {
             name:"新角色",
@@ -522,24 +494,21 @@
             f_same_o:0, f_diff_o:0, f_none_o:0,
             b_same_p:0, b_diff_p:0, b_none_p:0,
             b_same_o:0, b_diff_o:0, b_none_o:0
-        }
+        };
     }
-    // 新建队伍模板，附带独立calcState计算器存档 + timelineData时间轴存档
     function getEmptyTeam(name){
         return {
             teamName: name,
             roles: [getEmptyRole(),getEmptyRole(),getEmptyRole(),getEmptyRole()],
             calcState: getEmptyCalcState(),
             timelineData: getEmptyTimelineData()
-        }
+        };
     }
-    // 多队伍全局数据
     let teamList = [getEmptyTeam("队伍1")];
     let currentTeamIndex = 0;
     let timelineData = getEmptyTimelineData();
     let buffIdCounter = 1;
 
-    // 把页面当前计算器+当前内存timelineData保存进当前队伍对象
     function saveCalcToCurrentTeam(){
         const t = teamList[currentTeamIndex];
         const s = {};
@@ -555,21 +524,23 @@
         t.timelineData = JSON.parse(JSON.stringify(timelineData));
         saveNoteStorage();
     }
-    // 将队伍的全部状态加载渲染：计算器 + 时间轴
     function loadTeamAllState(teamObj){
-        //加载计算器
         const st = teamObj.calcState || getEmptyCalcState();
         CALC_INPUT_IDS.forEach(id=>{
             const el = document.getElementById(id);
             if(el) el.value = st[id] ?? 0;
         });
-        //加载时间轴
         timelineData = (teamObj.timelineData) ? JSON.parse(JSON.stringify(teamObj.timelineData)) : getEmptyTimelineData();
-        //重新计算buffIdCounter，防止新增buff id重复
         const maxId = timelineData.buffs.length > 0 ? timelineData.buffs.reduce((m,b)=>Math.max(m,b.id),0) : 0;
         buffIdCounter = maxId + 1;
 
-        calculate();
+        const statusBox = document.getElementById('status_box');
+        const minErSpan = document.getElementById('min_er_needed');
+        statusBox.className = 'result-status calc-trigger';
+        statusBox.innerHTML = '<span></span> 计算充能';
+        minErSpan.className = 'value';
+        minErSpan.innerText = '--';
+
         renderTimeline();
     }
 
@@ -583,7 +554,6 @@
             const obj = JSON.parse(s);
             if(obj.teamList && Array.isArray(obj.teamList) && obj.teamList.length>0){
                 teamList = obj.teamList;
-                // 兼容旧存档，老队伍缺少字段自动补齐
                 teamList.forEach(t=>{
                     if(!t.calcState) t.calcState = getEmptyCalcState();
                     if(!t.timelineData) t.timelineData = getEmptyTimelineData();
@@ -594,9 +564,7 @@
             }
         }catch(e){console.error(e);}
     }
-    // 队伍操作
     function createNewTeam(){
-        //取最大编号，防止删除队伍后新建重名
         let maxNum = 0;
         teamList.forEach(t=>{
             const m = /队伍(\d+)/.exec(t.teamName);
@@ -631,12 +599,10 @@
         loadTeamAllState(teamList[currentTeamIndex]);
     }
     function switchTeam(){
-        //切换前：把当前页面计算器+时间轴保存给旧队伍
         saveCalcToCurrentTeam();
         const sel = document.getElementById("teamSelect");
         currentTeamIndex = Number(sel.value);
         saveNoteStorage();
-        //加载选中队伍的全部状态（计算器+时间轴）
         loadTeamAllState(teamList[currentTeamIndex]);
         renderNoteUi();
     }
@@ -652,7 +618,6 @@
         modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
     }
     function renderNoteUi(){
-        // 渲染队伍下拉选择框
         const sel = document.getElementById("teamSelect");
         sel.innerHTML = "";
         teamList.forEach((t,idx)=>{
@@ -725,11 +690,10 @@
         if (val < min) val = min;
         if (val > max) val = max;
         input.value = val;
-        calculate();
         saveCalcToCurrentTeam();
+        resetCalcButton();
     }
     function resetAll() {
-        //重置当前队伍计算器，不改动时间轴
         CALC_INPUT_IDS.forEach(id=>{
             const el = document.getElementById(id);
             if(id === 'party_size') el.value = '4';
@@ -737,11 +701,22 @@
             else if(id === 'er_stat') el.value = '100';
             else el.value = '0';
         });
-        calculate();
         saveCalcToCurrentTeam();
+        resetCalcButton();
+    }
+    function resetCalcButton() {
+        const statusBox = document.getElementById('status_box');
+        const minErSpan = document.getElementById('min_er_needed');
+        statusBox.className = 'result-status calc-trigger';
+        statusBox.innerHTML = '<span>⚡</span> 计算充能';
+        minErSpan.className = 'value';
+        minErSpan.innerText = '--';
     }
     function getBackMultiplier(partySize) {
-        if (partySize === 1) return 1.0; if (partySize === 2) return 0.8; if (partySize === 3) return 0.7; return 0.6;
+        if (partySize === 1) return 1.0;
+        if (partySize === 2) return 0.8;
+        if (partySize === 3) return 0.7;
+        return 0.6;
     }
     function calculate() {
         const partySize = Number(document.getElementById('party_size').value) || 4;
@@ -749,19 +724,22 @@
         const fixedRecovery = Number(document.getElementById('fixed_recovery').value) || 0;
         const erStat = Number(document.getElementById('er_stat').value) || 100;
         const backMultiplier = getBackMultiplier(partySize);
-        let baseEnergy = 0;
+
+        let particleEnergy = 0;
         const ids = ['f_same_p', 'f_diff_p', 'f_none_p', 'f_same_o', 'f_diff_o', 'f_none_o',
             'b_same_p', 'b_diff_p', 'b_none_p', 'b_same_o', 'b_diff_o', 'b_none_o'];
         ids.forEach(id => {
             const count = Number(document.getElementById(id).value) || 0;
             const baseVal = ENERGY_VALUES[id];
             const multiplier = id.startsWith('b_') ? backMultiplier : 1.0;
-            baseEnergy += count * baseVal * multiplier;
+            particleEnergy += count * baseVal * multiplier;
         });
-        const totalBaseRecovery = baseEnergy + fixedRecovery;
-        const actualRecovery = totalBaseRecovery * (erStat / 100);
+
+        const actualRecovery = particleEnergy * (erStat / 100) + fixedRecovery;
+
         const statusBox = document.getElementById('status_box');
         const minErSpan = document.getElementById('min_er_needed');
+
         if (actualRecovery >= requiredEnergy && requiredEnergy > 0) {
             statusBox.className = 'result-status success';
             statusBox.innerHTML = '<span>✔</span> 充能已达标';
@@ -769,15 +747,27 @@
             statusBox.className = 'result-status fail';
             statusBox.innerHTML = '<span>✖</span> 充能未达标';
         }
+
         let minER = Infinity;
-        if (totalBaseRecovery > 0 && requiredEnergy > 0) minER = (requiredEnergy / totalBaseRecovery) * 100;
-        if (minER === Infinity) {
-            minErSpan.className = 'value infinity'; minErSpan.innerText = '∞';
+        if (requiredEnergy > 0) {
+            const neededFromParticles = requiredEnergy - fixedRecovery;
+            if (neededFromParticles <= 0) {
+                minER = 0;
+            } else if (particleEnergy > 0) {
+                minER = (neededFromParticles / particleEnergy) * 100;
+            } else {
+                minER = Infinity;
+            }
+        }
+
+        if (!isFinite(minER)) {
+            minErSpan.className = 'value infinity';
+            minErSpan.innerText = '∞';
         } else {
-            minErSpan.className = 'value'; minErSpan.innerText = Math.ceil(minER) + '%';
+            minErSpan.className = 'value';
+            minErSpan.innerText = minER.toFixed(1) + '%';
         }
     }
-    // ==================== 模态框控制 ====================
     function toggleHelp(event) {
         const modal = document.getElementById('helpModal');
         modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
@@ -787,7 +777,6 @@
         modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
         renderTimeline();
     }
-    // ==================== 时间轴核心逻辑 ====================
     function addRole() {
         const name = `角色${timelineData.roles.length + 1}`;
         timelineData.roles.push(name);
@@ -881,23 +870,20 @@
             grid.appendChild(row);
         });
     }
-    // 页面加载
     document.addEventListener('DOMContentLoaded', function() {
         loadNoteStorage();
-        // 页面打开加载当前队伍的计算器+时间轴
         loadTeamAllState(teamList[currentTeamIndex]);
         const inputs = document.querySelectorAll('.calculator-container input[type="number"]');
         inputs.forEach(input => {
             input.addEventListener('input', () => {
-                calculate();
                 saveCalcToCurrentTeam();
+                resetCalcButton();
             });
             input.addEventListener('change', () => {
-                calculate();
                 saveCalcToCurrentTeam();
+                resetCalcButton();
             });
         });
-        calculate();
     });
 </script>
 </body>
