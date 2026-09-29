@@ -5,6 +5,8 @@
     <!-- 前端预连接、预加载，纯代码提速，无需配置文件 -->
     <link rel="preconnect" href="https://yuhuazhe.github.io" crossorigin>
     <link rel="dns-prefetch" href="https://yuhuazhe.github.io">
+    <link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin>
+    <link rel="preconnect" href="https://api.github.com" crossorigin>
     <link rel="preload" href="zhanshi/1.0.jpg" as="image" type="image/jpeg">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -169,6 +171,287 @@
         .modal-close:hover {
             color: rgba(255,255,255,0.8);
         }
+
+        /* ================= 更新展示模块（下拉折叠版，位于倒计时下方） ================= */
+        .update-box {
+            position: relative;
+            width: 100%;
+            max-width: 560px;
+            margin: 6px auto 0;
+            padding: 0;
+            border-radius: 14px;
+            overflow: hidden;
+            isolation: isolate;
+            text-align: left;
+        }
+        .update-box:hover {
+            transform: none !important;
+            border-color: rgba(199, 140, 223, 0.08) !important;
+            box-shadow: 0 0 30px rgba(183, 110, 216, 0.06) !important;
+        }
+        /* 顶部紫光细线 */
+        .update-box::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 12%; right: 12%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(199, 140, 223, 0.5), transparent);
+            pointer-events: none;
+            z-index: 2;
+        }
+        /* 右上角柔光 */
+        .update-box::after {
+            content: "";
+            position: absolute;
+            top: -90px; right: -70px;
+            width: 190px; height: 190px;
+            background: radial-gradient(circle, rgba(183, 110, 216, 0.14), transparent 68%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* 折叠标题栏 —— 收起时就是这一行 */
+        .update-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 13px 18px;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            transition: background .25s ease;
+        }
+        .update-head:hover {
+            background: rgba(199, 140, 223, 0.055);
+        }
+        .update-head h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            white-space: nowrap;
+            background: linear-gradient(90deg, #f0e3f8, #c78cdf 55%, #a86fd0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+        }
+        .update-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #c78cdf;
+            box-shadow: 0 0 10px #c78cdf;
+            animation: updPulse 1.8s ease-in-out infinite;
+            flex: 0 0 auto;
+        }
+        @keyframes updPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: .3; transform: scale(.75); }
+        }
+        .update-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 0 0 auto;
+        }
+        /* 收起时右侧显示最近日期，信息一眼可见 */
+        .update-latest {
+            font-size: 11.5px;
+            color: #a99cb8;
+            letter-spacing: .5px;
+            font-variant-numeric: tabular-nums;
+            transition: opacity .25s ease;
+        }
+        .update-latest:empty { display: none; }
+
+        .update-refresh {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11.5px;
+            letter-spacing: .5px;
+            color: #c9a8dd;
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(199, 140, 223, 0.22);
+            background: rgba(199, 140, 223, 0.06);
+            cursor: pointer;
+            user-select: none;
+            transition: all .25s ease;
+        }
+        .update-refresh::before {
+            content: "⟳";
+            font-size: 12px;
+            display: inline-block;
+            transition: transform .5s ease;
+        }
+        .update-refresh:hover {
+            color: #fff;
+            border-color: rgba(199, 140, 223, 0.6);
+            background: rgba(199, 140, 223, 0.16);
+            box-shadow: 0 0 14px rgba(199, 140, 223, 0.25);
+        }
+        .update-refresh:hover::before { transform: rotate(180deg); }
+        .update-refresh.spinning::before { animation: spin .9s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* 展开箭头 */
+        .update-arrow {
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            color: #c78cdf;
+            border: 1px solid rgba(199, 140, 223, 0.2);
+            background: rgba(199, 140, 223, 0.06);
+            transition: transform .38s cubic-bezier(.4, 0, .2, 1),
+                        background .25s ease,
+                        border-color .25s ease;
+            flex: 0 0 auto;
+        }
+        .update-head:hover .update-arrow {
+            background: rgba(199, 140, 223, 0.16);
+            border-color: rgba(199, 140, 223, 0.45);
+        }
+        .update-box.open .update-arrow {
+            transform: rotate(180deg);
+        }
+
+        /* 折叠内容区：grid-template-rows 0fr -> 1fr 平滑展开 */
+        .update-body {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows .38s cubic-bezier(.4, 0, .2, 1);
+        }
+        .update-box.open .update-body {
+            grid-template-rows: 1fr;
+        }
+        .update-body-inner {
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        .update-list {
+            list-style: none;
+            padding: 6px 14px 14px;
+            margin: 0;
+            max-height: 210px;
+            overflow-y: auto;
+            border-top: 1px solid rgba(255, 255, 255, 0.055);
+            scrollbar-width: thin;
+            scrollbar-color: rgba(199, 140, 223, 0.3) transparent;
+        }
+        .update-list::-webkit-scrollbar {
+            display: block !important;
+            width: 3px !important;
+        }
+        .update-list::-webkit-scrollbar-track { background: transparent; }
+        .update-list::-webkit-scrollbar-thumb {
+            background: rgba(199, 140, 223, 0.28);
+            border-radius: 3px;
+        }
+        .update-list::-webkit-scrollbar-thumb:hover {
+            background: rgba(199, 140, 223, 0.55);
+        }
+
+        /* 时间轴单条 */
+        .update-item {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            padding: 9px 10px 9px 26px;
+            border-radius: 10px;
+            transition: background .25s ease, transform .25s ease;
+            animation: updFade .4s ease both;
+        }
+        .update-item:hover {
+            background: rgba(199, 140, 223, 0.07);
+            transform: translateX(3px);
+        }
+        .update-item::before {
+            content: "";
+            position: absolute;
+            left: 9px;
+            top: 15px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #c78cdf;
+            box-shadow: 0 0 9px rgba(199, 140, 223, 0.9);
+        }
+        .update-item::after {
+            content: "";
+            position: absolute;
+            left: 11.5px;
+            top: 22px;
+            bottom: -10px;
+            width: 1px;
+            background: linear-gradient(180deg, rgba(199, 140, 223, 0.35), rgba(199, 140, 223, 0));
+        }
+        .update-item:last-child::after { display: none; }
+        @keyframes updFade {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .update-date {
+            align-self: flex-start;
+            font-size: 11px;
+            line-height: 1;
+            padding: 3px 9px;
+            border-radius: 6px;
+            color: #d9b3ee;
+            background: rgba(183, 110, 216, 0.12);
+            border: 1px solid rgba(183, 110, 216, 0.22);
+            font-variant-numeric: tabular-nums;
+            letter-spacing: .5px;
+        }
+        .update-text {
+            font-size: 13.5px;
+            line-height: 1.65;
+            color: #ececf1;
+            word-break: break-word;
+        }
+        .update-empty {
+            list-style: none;
+            text-align: center;
+            font-size: 13px;
+            color: #9a92a6;
+            padding: 18px 0 10px;
+            letter-spacing: .5px;
+        }
+
+        /* 骨架屏 */
+        .update-loading {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            padding: 12px 4px 14px 26px;
+        }
+        .sk-line {
+            height: 13px;
+            border-radius: 6px;
+            background: linear-gradient(90deg, rgba(255,255,255,.05) 25%, rgba(199,140,223,.14) 37%, rgba(255,255,255,.05) 63%);
+            background-size: 400% 100%;
+            animation: shimmer 1.4s ease infinite;
+        }
+        .sk-line.w1 { width: 72%; }
+        .sk-line.w2 { width: 90%; }
+        .sk-line.w3 { width: 56%; }
+        @keyframes shimmer {
+            0%   { background-position: 100% 0; }
+            100% { background-position: 0 0; }
+        }
+        /* ================= 更新展示模块结束 ================= */
+
         .card-container {
             display: flex;
             justify-content: center;
@@ -296,6 +579,23 @@
             .char-name {
                 font-size: 18px;
             }
+            /* 移动端更新下拉适配 */
+            .update-box {
+                max-width: 100%;
+                border-radius: 12px;
+            }
+            .update-head { padding: 11px 14px; gap: 8px; }
+            .update-head h2 { font-size: 13.5px; letter-spacing: 1px; }
+            .update-latest { font-size: 10.5px; }
+            .update-refresh { padding: 3px 10px; font-size: 11px; }
+            .update-arrow { width: 20px; height: 20px; }
+            .update-list { padding: 4px 10px 12px; max-height: 190px; }
+            .update-item { padding: 8px 6px 8px 21px; }
+            .update-item::before { left: 6px; top: 14px; }
+            .update-item::after { left: 8.5px; top: 21px; }
+            .update-text { font-size: 12.5px; }
+            .update-date { font-size: 10px; padding: 2px 7px; }
+            .update-loading { padding-left: 21px; }
         }
     </style>
 </head>
@@ -334,8 +634,39 @@
                 <div class="label">秒</div>
             </div>
         </div>
+
+        <!-- ================= 更新展示模块（下拉折叠，位于倒计时下方） ================= -->
+        <div class="update-box glass-box" id="updateBox">
+            <div class="update-head" id="updateToggle">
+                <h2><span class="update-dot"></span>最新更新</h2>
+                <div class="update-actions">
+                    <span class="update-latest" id="updateLatest"></span>
+                    <span class="update-refresh" id="updateRefresh">刷新</span>
+                    <span class="update-arrow">
+                        <svg viewBox="0 0 12 8" width="10" height="7" aria-hidden="true">
+                            <path d="M1 1.5 6 6.5 11 1.5" fill="none" stroke="currentColor"
+                                  stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                </div>
+            </div>
+            <div class="update-body">
+                <div class="update-body-inner">
+                    <ul class="update-list" id="updateList">
+                        <li class="update-loading">
+                            <div class="sk-line w1"></div>
+                            <div class="sk-line w2"></div>
+                            <div class="sk-line w3"></div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- ================= 更新展示模块结束 ================= -->
+
         <div class="tip" id="overTip">数据已更新！</div>
     </div>
+
     <!-- 弹窗遮罩 -->
     <div class="modal-mask" id="mask"></div>
     <!-- 使用指南小弹窗 -->
@@ -380,7 +711,6 @@
         </a>
 
 
-       
 
 
 
@@ -469,6 +799,214 @@
         window.addEventListener('scroll', () => {
             backTopBtn.style.display = window.scrollY > 300 ? 'block' : 'none';
         });
+
+        /* ==========================================================
+           更新展示模块（下拉折叠版，位于倒计时下方）
+           数据来源优先级：
+           1. 仓库根目录的 更新日志.json（推荐，可自定义文案，显示最快）
+           2. GitHub Commits API（自动读取最近提交信息，零维护）
+           3. localStorage 本地缓存（断网/接口限流时兜底）
+           ========================================================== */
+        (function () {
+            const CFG = {
+                owner: 'yuhuazhe',
+                repo: 'yuhuazhe.github.io',
+                branches: ['main', 'master'],
+                changelogFiles: ['更新日志.json', 'changelog.json'],
+                maxItems: 6,
+                cacheKey: 'yh_update_cache_v1',
+                cacheTTL: 30 * 60 * 1000,
+                openKey: 'yh_update_open_v1'
+            };
+
+            const box = document.getElementById('updateBox');
+            const head = document.getElementById('updateToggle');
+            const listEl = document.getElementById('updateList');
+            const refreshBtn = document.getElementById('updateRefresh');
+            const latestEl = document.getElementById('updateLatest');
+            if (!box || !head || !listEl) return;
+
+            let loading = false;
+
+            /* ---------- 折叠交互 ---------- */
+            function setOpen(open, save) {
+                box.classList.toggle('open', open);
+                if (save !== false) {
+                    try { localStorage.setItem(CFG.openKey, open ? '1' : '0'); } catch (e) {}
+                }
+            }
+            let remembered = '0';
+            try { remembered = localStorage.getItem(CFG.openKey) || '0'; } catch (e) {}
+            setOpen(remembered === '1', false);
+
+            head.addEventListener('click', () => {
+                setOpen(!box.classList.contains('open'));
+            });
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', e => {
+                    e.stopPropagation();
+                    load(true);
+                });
+            }
+
+            /* ---------- 工具 ---------- */
+            const esc = s => String(s).replace(/[&<>"']/g, c => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[c]));
+
+            function fmtDate(v) {
+                if (!v) return '';
+                if (/^\d{4}[.\-/]\d{1,2}[.\-/]\d{1,2}/.test(String(v))) {
+                    const p = String(v).split(/[.\-/]/);
+                    return `${p[0]}.${Number(p[1])}.${Number(p[2])}`;
+                }
+                const d = new Date(v);
+                if (isNaN(d.getTime())) return String(v);
+                return `${d.getFullYear()}.${d.getMonth() + 1}.${d.getDate()}`;
+            }
+
+            function normalize(arr) {
+                const out = [];
+                (arr || []).forEach(it => {
+                    if (!it) return;
+                    if (typeof it === 'string') {
+                        out.push({ date: '', text: it });
+                        return;
+                    }
+                    const date = fmtDate(it.date || it.time || it.version || '');
+                    if (Array.isArray(it.items)) {
+                        it.items.forEach(t => out.push({ date, text: String(t) }));
+                    } else {
+                        const t = it.text || it.title || it.content || it.msg || it.message;
+                        if (t) out.push({ date, text: String(t) });
+                    }
+                });
+                return out.filter(x => x.text).slice(0, CFG.maxItems);
+            }
+
+            /* ---------- 渲染 ---------- */
+            function render(items) {
+                if (items && items.length && items[0].date && latestEl) {
+                    latestEl.textContent = '最近 ' + items[0].date;
+                } else if (latestEl) {
+                    latestEl.textContent = '';
+                }
+
+                if (!items || !items.length) {
+                    listEl.innerHTML = '<li class="update-empty">暂无更新记录</li>';
+                    return;
+                }
+                listEl.innerHTML = items.map((it, i) => `
+                    <li class="update-item" style="animation-delay:${i * 50}ms">
+                        ${it.date ? `<span class="update-date">${esc(it.date)}</span>` : ''}
+                        <span class="update-text">${esc(it.text)}</span>
+                    </li>
+                `).join('');
+            }
+
+            /* ---------- 来源1：仓库里的自定义更新日志文件 ---------- */
+            async function fromChangelog() {
+                for (const file of CFG.changelogFiles) {
+                    for (const branch of CFG.branches) {
+                        const url = `https://raw.githubusercontent.com/${CFG.owner}/${CFG.repo}/${branch}/${encodeURIComponent(file)}`;
+                        try {
+                            const res = await fetch(url, { cache: 'no-cache' });
+                            if (!res.ok) continue;
+                            const txt = (await res.text()).replace(/^\uFEFF/, '');
+                            const data = JSON.parse(txt);
+                            const arr = Array.isArray(data)
+                                ? data
+                                : (data.updates || data.list || data.items || []);
+                            const items = normalize(arr);
+                            if (items.length) return items;
+                        } catch (e) {
+                            /* 继续尝试下一个 */
+                        }
+                    }
+                }
+                return null;
+            }
+
+            /* ---------- 来源2：GitHub 提交记录 ---------- */
+            async function fromCommits() {
+                const url = `https://api.github.com/repos/${CFG.owner}/${CFG.repo}/commits?per_page=${CFG.maxItems * 2}`;
+                const res = await fetch(url, {
+                    headers: { 'Accept': 'application/vnd.github+json' },
+                    cache: 'no-store'
+                });
+                if (!res.ok) throw new Error('GitHub API ' + res.status);
+                const data = await res.json();
+                if (!Array.isArray(data)) throw new Error('返回数据格式异常');
+                return data
+                    .filter(c => c && c.commit)
+                    .map(c => ({
+                        date: fmtDate(c.commit.committer?.date || c.commit.author?.date),
+                        text: (c.commit.message || '').split('\n')[0].trim()
+                    }))
+                    .filter(it => it.text && !/^Merge\b/i.test(it.text))
+                    .slice(0, CFG.maxItems);
+            }
+
+            /* ---------- 缓存 ---------- */
+            function writeCache(items) {
+                try {
+                    localStorage.setItem(CFG.cacheKey, JSON.stringify({ time: Date.now(), items }));
+                } catch (e) {}
+            }
+            function readCache() {
+                try {
+                    const raw = localStorage.getItem(CFG.cacheKey);
+                    if (!raw) return null;
+                    const o = JSON.parse(raw);
+                    if (!o || !Array.isArray(o.items) || !o.items.length) return null;
+                    return o;
+                } catch (e) {
+                    return null;
+                }
+            }
+
+            /* ---------- 主流程 ---------- */
+            async function load(force) {
+                if (loading) return;
+
+                const cached = readCache();
+                if (cached) {
+                    render(cached.items);
+                    if (!force && Date.now() - cached.time < CFG.cacheTTL) return;
+                }
+
+                loading = true;
+                if (refreshBtn) {
+                    refreshBtn.classList.add('spinning');
+                    refreshBtn.textContent = '刷新中';
+                }
+
+                try {
+                    let items = await fromChangelog();
+                    if (!items || !items.length) items = await fromCommits();
+
+                    if (items && items.length) {
+                        render(items);
+                        writeCache(items);
+                    } else if (!cached) {
+                        render([]);
+                    }
+                } catch (err) {
+                    console.warn('[更新展示] 获取失败：', err);
+                    if (!cached) {
+                        listEl.innerHTML = '<li class="update-empty">更新内容获取失败，请稍后重试</li>';
+                    }
+                } finally {
+                    loading = false;
+                    if (refreshBtn) {
+                        refreshBtn.classList.remove('spinning');
+                        refreshBtn.textContent = '刷新';
+                    }
+                }
+            }
+
+            load(false);
+        })();
     </script>
 </body>
 </html>
