@@ -2,7 +2,6 @@
 <html lang="zh-CN" style="scroll-behavior: smooth;">
 <head>
     <link rel="icon" href="资料库.png">
-    <!-- 前端预连接、预加载，纯代码提速，无需配置文件 -->
     <link rel="preconnect" href="https://yuhuazhe.github.io" crossorigin>
     <link rel="dns-prefetch" href="https://yuhuazhe.github.io">
     <link rel="preload" href="zhanshi/1.0.jpg" as="image" type="image/jpeg">
@@ -83,20 +82,6 @@
             color: #ddd;
             line-height: 1.5;
         }
-        .log-btn {
-            margin-top: 10px;
-            padding: 8px 16px;
-            background: transparent !important;
-            border: 1px solid rgba(183, 110, 216, 0.04) !important;
-            color: #f8f8f8;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 15px;
-        }
-        .log-btn:hover {
-            background: rgba(183, 110, 216, 0.02) !important;
-        }
-        /* 醒目跳转按钮样式 */
         .jump-btn-group {
             margin-top: 14px;
             display: flex;
@@ -128,47 +113,228 @@
             transform: translateY(0) scale(1.02);
             box-shadow: 0 0 12px rgba(199, 140, 223, 0.45);
         }
-        /* 弹窗遮罩 弱化透明度，不刺眼 */
+        .notice-btn {
+            margin-top: 12px;
+            padding: 10px 26px;
+            font-size: 15px;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 10px;
+            border: 1px solid rgba(199, 140, 223, 0.5);
+            background: rgba(183, 110, 216, 0.25);
+            transition: background 0.2s ease;
+        }
+        .notice-btn:hover {
+            background: rgba(183, 110, 216, 0.45);
+        }
+
+        /* ==================== 公告弹窗：纯净磨砂玻璃 ==================== */
         .modal-mask {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.25);
+            background: rgba(12, 6, 20, 0.28);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
             z-index: 9998;
-            display: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.28s ease, visibility 0.28s ease;
         }
-        /* 使用指南小弹窗 缩小尺寸、弱化边框模糊 */
-        #logBox {
+        .modal-mask.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #noticeBox {
             position: fixed;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%);
-            width: 340px;
-            max-width: 90vw;
-            max-height: 60vh;
-            overflow-y: auto;
-            padding: 18px;
-            line-height: 1.7;
-            color: #ff1010;
+            width: 480px;
+            max-width: 92vw;
+            max-height: 82vh;
+            display: flex;
+            flex-direction: column;
+            border-radius: 22px;
+            overflow: hidden;
             z-index: 9999;
-            display: none;
-            /* 弱化玻璃效果，看着不突兀 */
-            backdrop-filter: blur(6px) saturate(140%) !important;
-            -webkit-backdrop-filter: blur(6px) saturate(140%) !important;
-            border: 1px solid rgba(17, 24, 24, 0.003) !important;
-            border-radius: 12px;
+
+            /* 玻璃核心 */
+            background: rgba(255, 255, 255, 0.09);
+            backdrop-filter: blur(30px) saturate(170%) brightness(1.06);
+            -webkit-backdrop-filter: blur(30px) saturate(170%) brightness(1.06);
+
+            /* 统一无色的半透明边框 */
+            border: 1px solid rgba(255, 255, 255, 0.16);
+
+            box-shadow:
+                0 24px 70px rgba(0, 0, 0, 0.42),
+                inset 0 1px 0 rgba(255, 255, 255, 0.28),
+                inset 0 0 60px rgba(255, 255, 255, 0.03);
+
+            color: #fff;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translate(-50%, -47%) scale(0.96);
+            transition: opacity 0.28s ease,
+                        transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+                        visibility 0.28s;
         }
-        /* 关闭按钮淡化 */
+        #noticeBox.show {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        /* 标题栏 */
+        .notice-header {
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 22px 26px 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .notice-title {
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            color: #fff;
+            margin: 0;
+        }
         .modal-close {
-            position: absolute;
-            top: 8px;
-            right: 12px;
-            font-size: 20px;
-            color: rgba(255,255,255,0.4);
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 50%;
+            background: transparent;
+            font-family: inherit;
+            font-size: 18px;
+            font-weight: 300;
+            line-height: 1;
+            color: rgba(255, 255, 255, 0.7);
             cursor: pointer;
+            user-select: none;
         }
-        .modal-close:hover {
-            color: rgba(255,255,255,0.8);
+
+        /* 内容滚动区 */
+        .notice-body {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 8px 26px 12px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
         }
+        .notice-body::-webkit-scrollbar {
+            display: block !important;
+            width: 4px;
+        }
+        .notice-body::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .notice-body::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.22);
+            border-radius: 2px;
+        }
+
+        /* 单条公告 */
+        .notice-item {
+            display: flex;
+            gap: 15px;
+            padding: 12px 0;
+        }
+        .notice-item + .notice-item {
+            border-top: 1px solid rgba(255, 255, 255, 0.07);
+        }
+        .notice-idx {
+            flex: 0 0 auto;
+            width: 22px;
+            padding-top: 2px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.42);
+            font-variant-numeric: tabular-nums;
+            font-family: ui-monospace, monospace;
+        }
+        .notice-item-main {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+        .notice-item-main > p {
+            margin: 0;
+            font-size: 13.5px;
+            line-height: 1.9;
+            color: rgba(255, 255, 255, 0.88);
+        }
+        .notice-item-main .hl {
+            color: #f0d3ff;
+            font-weight: 600;
+        }
+
+        /* 板块介绍列表 */
+        .section-list {
+            list-style: none;
+            margin: 10px 0 2px;
+            padding: 0;
+            display: grid;
+            gap: 5px;
+        }
+        .section-list li {
+            display: flex;
+            align-items: baseline;
+            gap: 14px;
+            padding: 7px 12px;
+            font-size: 12.5px;
+            line-height: 1.65;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+        }
+        .sec-tag {
+            flex: 0 0 auto;
+            width: 78px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.4px;
+            color: #e6c6fb;
+        }
+        .sec-desc {
+            flex: 1 1 auto;
+            color: rgba(255, 255, 255, 0.78);
+        }
+
+        /* 底部链接 */
+        .notice-footer {
+            flex: 0 0 auto;
+            padding: 16px 26px 22px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .notice-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 9px;
+        }
+        .notice-link-btn {
+            padding: 11px 12px;
+            font-size: 12.5px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            text-align: center;
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 11px;
+        }
+
         .card-container {
             display: flex;
             justify-content: center;
@@ -177,7 +343,6 @@
             margin-top: 30px;
             margin-bottom: 200px;
         }
-        /* 修改：长条磨砂卡片，取消图片 */
         .char-card {
             width: 260px;
             height: 80px;
@@ -252,7 +417,6 @@
             background: rgba(183, 110, 216, 0.08);
             transform: translateY(-4px);
         }
-        /* 手机端背景适配：完整显示图片，人物水平居中不裁切 */
         @media (max-width: 600px) {
             body {
                 background-color: #0a060f;
@@ -278,8 +442,50 @@
                 right: 20px;
                 line-height: 40px;
             }
-            #logBox {
-                width: 90vw;
+            #noticeBox {
+                width: 92vw;
+                max-height: 84vh;
+                border-radius: 18px;
+                backdrop-filter: blur(22px) saturate(170%) brightness(1.06);
+                -webkit-backdrop-filter: blur(22px) saturate(170%) brightness(1.06);
+            }
+            .notice-header {
+                padding: 18px 20px 12px;
+            }
+            .notice-title {
+                font-size: 14px;
+                letter-spacing: 2px;
+            }
+            .notice-body {
+                padding: 6px 20px 10px;
+            }
+            .notice-item {
+                gap: 11px;
+                padding: 10px 0;
+            }
+            .notice-item-main > p {
+                font-size: 13px;
+            }
+            .section-list li {
+                gap: 10px;
+                padding: 6px 10px;
+            }
+            .sec-tag {
+                width: 68px;
+                font-size: 11.5px;
+            }
+            .sec-desc {
+                font-size: 12px;
+            }
+            .notice-footer {
+                padding: 13px 20px 18px;
+            }
+            .notice-links {
+                gap: 8px;
+            }
+            .notice-link-btn {
+                font-size: 12px;
+                padding: 10px 8px;
             }
             .jump-btn-group {
                 gap: 10px;
@@ -288,7 +494,6 @@
                 padding: 10px 20px;
                 font-size: 15px;
             }
-            /* 移动端长条卡片缩小尺寸 */
             .char-card {
                 width: 90vw;
                 height: 68px;
@@ -302,19 +507,18 @@
 <body id="pageTop">
     <div class="header-box glass-box">
         <h1 class="header-title">计算数据</h1>
-        <!-- 这里增加id用于JS填充时间，删除固定2026.7.27 -->
         <p class="header-subtitle">羽化哲 更新至7.2版本V2.1 最后更新日期：<span id="lastUpdateText">加载中...</span></p>
         <p class="header-note">所涉及的主C及副c均为30词条<br>最终数据请以正式服为准！！！</p>
         <a href="https://b23.tv/rDCFTFA" target="_blank" style="color:#c78cdf;">羽化哲主页</a>
-        
-        <!-- 醒目跳转按钮区域 -->
+
         <div class="jump-btn-group">
-            <a href="https://qm.qq.com/q/2FqRcewcXS" target="_blank" class="jump-btn">点击进入幼鹅园</a>
-          
+            <a href="https://qm.qq.com/q/2FqRcewcXS" target="_blank" class="jump-btn">点击进入交流群</a>
         </div>
-        <div align="center" style="margin:8px 0;">
-            <button class="log-btn" onclick="toggleLog()">快速查找指南</button>
+
+        <div align="center" style="margin:14px 0 4px;">
+            <button class="notice-btn" onclick="openNotice()">公告</button>
         </div>
+
         <h2 style="text-align:center;color:#c78cdf;font-size:24px;margin:10px 0 5px;">【B站账号被封禁】距离解封</h2>
         <div class="count-box">
             <div class="time-item glass-box">
@@ -336,76 +540,126 @@
         </div>
         <div class="tip" id="overTip">数据已更新！</div>
     </div>
-    <!-- 弹窗遮罩 -->
+
     <div class="modal-mask" id="mask"></div>
-    <!-- 使用指南小弹窗 -->
-    <div id="logBox">
-        <span class="modal-close" onclick="closeLog()">×</span>
-        <p>一.角色板块包含：<br>
-            <p>角色的计算数据，武器差距，角色机制（产球，附着等）</p>
-            <p>二.资料库板块包含：<br>
-                <p>原神版本的更新，前瞻直播，测试，创体时间</p>
-                 <p>三.公式板块包含：<br>
-                <p>原神的伤害计算公式等</p>
-                 <p>四.网页程序板块包含：<br>
-                <p>角色面板计算器，月感电计算器，星超导计算器，圣遗物词条计算器等</p>
-                <p>五.幽静危站/怪物机制板块包含：<br>
-                <p>版本的幽境怪物，以及幽境怪物的详细机制等</p>
-        </p>
+
+    <div id="noticeBox" role="dialog" aria-modal="true" aria-labelledby="noticeTitle">
+        <div class="notice-header">
+            <h3 class="notice-title" id="noticeTitle">站内公告</h3>
+            <button class="modal-close" onclick="closeNotice()" aria-label="关闭">×</button>
+        </div>
+
+        <div class="notice-body">
+            <div class="notice-item">
+                <span class="notice-idx">01</span>
+                <div class="notice-item-main">
+                    <p>网站于 <span class="hl">2026 年 6 月 1 日</span>建立；由“羽化哲”独立建立与维护。</p>
+                </div>
+            </div>
+
+            <div class="notice-item">
+                <span class="notice-idx">02</span>
+                <div class="notice-item-main">
+                    <p>板块介绍：</p>
+                    <ul class="section-list">
+                        <li><span class="sec-tag">角色</span><span class="sec-desc">可查看角色各版本的 DPS 数据</span></li>
+                        <li><span class="sec-tag">资料库</span><span class="sec-desc">可查看计算公式、原神时间表</span></li>
+                        <li><span class="sec-tag">DPS目录</span><span class="sec-desc">可查看各金数下的 DPS 以及对比</span></li>
+                        <li><span class="sec-tag">网页程序</span><span class="sec-desc">可使用排轴、充能计算等原神工具</span></li>
+                        <li><span class="sec-tag">软件下载exe</span><span class="sec-desc">可下载程序进行使用</span></li>
+                        <li><span class="sec-tag">幽境危战</span><span class="sec-desc">可查看每一期的幽境危战怪物和机制</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="notice-item">
+                <span class="notice-idx">03</span>
+                <div class="notice-item-main">
+                    <p>个人精力有限，会尽量做到相关程序以及内容的更新！</p>
+                </div>
+            </div>
+
+            <div class="notice-item">
+                <span class="notice-idx">04</span>
+                <div class="notice-item-main">
+                    <p>若发现网站内容错误或程序 bug 请及时反馈，感谢支持！</p>
+                </div>
+            </div>
+
+            <div class="notice-item">
+                <span class="notice-idx">05</span>
+                <div class="notice-item-main">
+                    <p>若对网站有更好的建议以及想法欢迎找我交流，<span class="hl">有偿</span>！</p>
+                </div>
+            </div>
+
+            <div class="notice-item">
+                <span class="notice-idx">06</span>
+                <div class="notice-item-main">
+                    <p>希望网站能够帮助到大家，这也是网站建设的初心！</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="notice-footer">
+            <div class="notice-links">
+                <a class="notice-link-btn" href="https://b23.tv/rDCFTFA" target="_blank" rel="noopener">羽化哲B站主页</a>
+                <a class="notice-link-btn" href="https://qm.qq.com/q/2FqRcewcXS" target="_blank" rel="noopener">加入交流Q群</a>
+                <a class="notice-link-btn" href="https://v.douyin.com/tI2qdSHc_dw/" target="_blank" rel="noopener">羽化哲抖音主页</a>
+                <a class="notice-link-btn" href="https://b23.tv/i6LV8qC" target="_blank" rel="noopener">B站小号主页</a>
+            </div>
+        </div>
     </div>
+
     <div class="card-container">
-        <!-- 移除所有img图片，仅保留文字长条磨砂卡片 -->
         <a href="js/zs.html" class="char-card glass-box">
             <div class="char-name">角色(优化上新）</div>
         </a>
         <a href="zlk/2.html" class="char-card glass-box">
-            <div class="char-name">资料库（优化上新）
-               
-            </div>
-            
+            <div class="char-name">资料库（优化上新）</div>
         </a>
         <a href="dps/dps.html" class="char-card glass-box">
             <div class="char-name">DPS目录（米v2上新）</div>
         </a>
-      
-        </a>
         <a href="wangyechengxu.html" class="char-card glass-box">
             <div class="char-name">网页程序（修复）</div>
         </a>
-         <a href="xz/download.html" class="char-card glass-box">
+        <a href="xz/download.html" class="char-card glass-box">
             <div class="char-name">软件下载exe</div>
         </a>
         <a href="lj/beijing/怪物解析/youjingweizhantiaozhuan.html" class="char-card glass-box">
             <div class="char-name">幽境危战（优化上新）</div>
         </a>
-
-
-       
-
-
-
     </div>
+
     <a href="#pageTop" id="backTop">↑</a>
-    <!-- defer 延迟JS，不阻塞页面渲染；删除无用fetch请求 -->
+
     <script defer>
         const mask = document.getElementById('mask');
-        const logBox = document.getElementById('logBox');
+        const noticeBox = document.getElementById('noticeBox');
+        const noticeBody = noticeBox.querySelector('.notice-body');
         const lastUpdateDom = document.getElementById('lastUpdateText');
-        // 格式化日期为 YYYY.M.D
+
+        function openNotice() {
+            mask.classList.add('show');
+            noticeBox.classList.add('show');
+            if (noticeBody) noticeBody.scrollTop = 0;
+        }
+        function closeNotice() {
+            mask.classList.remove('show');
+            noticeBox.classList.remove('show');
+        }
+        mask.addEventListener('click', closeNotice);
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeNotice();
+        });
+
         function formatDate(dateStr) {
             const d = new Date(dateStr);
-            const year = d.getFullYear();
-            const month = d.getMonth() + 1;
-            const day = d.getDate();
-            return `${year}.${month}.${day}`;
+            return `${d.getFullYear()}.${d.getMonth() + 1}.${d.getDate()}`;
         }
-        // 方式1：调用GitHub API获取本文件最新提交时间
         async function getGithubFileUpdateTime() {
-            // 仓库信息：owner/仓库名/文件路径
-            const owner = "yuhuazhe";
-            const repo = "yuhuazhe.github.io";
-            const filePath = "index.html";
-            const apiUrl = `https://api.github.com/repos/${owner}/${repo}/commits?path=${filePath}&per_page=1`;
+            const apiUrl = `https://api.github.com/repos/yuhuazhe/yuhuazhe.github.io/commits?path=index.html&per_page=1`;
             try {
                 const res = await fetch(apiUrl);
                 const data = await res.json();
@@ -414,49 +668,26 @@
                 }
                 return null;
             } catch (err) {
-                console.warn("GitHub API获取更新时间失败，使用本地文件时间兜底", err);
                 return null;
             }
         }
-        // 方式2：兜底：浏览器本地文件修改时间（GitHub Pages缓存时会不准）
-        function getLocalFileUpdateTime() {
-            return formatDate(document.lastModified);
-        }
-        // 初始化更新时间
         (async function initUpdateTime() {
             const gitTime = await getGithubFileUpdateTime();
-            if (gitTime) {
-                lastUpdateDom.innerText = gitTime;
-            } else {
-                lastUpdateDom.innerText = getLocalFileUpdateTime();
-            }
+            lastUpdateDom.innerText = gitTime || formatDate(document.lastModified);
         })();
-        // 打开弹窗
-        function toggleLog(){
-            mask.style.display = 'block';
-            logBox.style.display = 'block';
-        }
-        // 关闭弹窗
-        function closeLog(){
-            mask.style.display = 'none';
-            logBox.style.display = 'none';
-        }
-        // 点击遮罩关闭弹窗
-        mask.addEventListener('click', closeLog);
+
         const targetTime = new Date(2026, 9, 20, 18, 0, 0);
         function updateCountDown() {
-            const now = new Date().getTime();
-            const target = targetTime.getTime();
-            const diff = target - now;
+            const diff = targetTime.getTime() - Date.now();
             if (diff <= 0) {
                 document.getElementById("overTip").style.display = "block";
                 document.querySelectorAll(".num").forEach(el => el.innerText = "00");
                 return;
             }
-            const day = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const hour = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const min = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const sec = Math.floor((diff % (1000 * 60)) / 1000);
+            const day = Math.floor(diff / 86400000);
+            const hour = Math.floor((diff % 86400000) / 3600000);
+            const min = Math.floor((diff % 3600000) / 60000);
+            const sec = Math.floor((diff % 60000) / 1000);
             const format = n => n < 10 ? "0" + n : n;
             document.getElementById("day").innerText = format(day);
             document.getElementById("hour").innerText = format(hour);
@@ -465,6 +696,7 @@
         }
         updateCountDown();
         setInterval(updateCountDown, 1000);
+
         const backTopBtn = document.getElementById('backTop');
         window.addEventListener('scroll', () => {
             backTopBtn.style.display = window.scrollY > 300 ? 'block' : 'none';
