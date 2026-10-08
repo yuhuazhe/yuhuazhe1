@@ -386,6 +386,68 @@
             font-size: 0.95rem;
             color: #ddd;
         }
+
+        /* ==================== 滚动提示框：增强文字可见性 ==================== */
+        .notice-marquee {
+            width: 100%;
+            max-width: 620px;
+            margin: 18px auto 6px;
+            padding: 12px 0;
+            border-radius: 14px;
+            /* 加深背景，提高对比度 */
+            background: rgba(22, 12, 38, 0.62);
+            border: 1px solid rgba(199, 140, 223, 0.55);
+            backdrop-filter: blur(12px) saturate(200%);
+            -webkit-backdrop-filter: blur(12px) saturate(200%);
+            box-shadow: 
+                0 4px 18px rgba(0, 0, 0, 0.3),
+                inset 0 0 24px rgba(183, 110, 216, 0.12);
+            overflow: hidden;
+            position: relative;
+            /* 两侧渐变淡出 */
+            -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%);
+            mask-image: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%);
+        }
+        .marquee-track {
+            display: flex;
+            width: max-content;
+            will-change: transform;
+            animation: marqueeScroll 32s linear infinite; /* 放慢一点，便于阅读 */
+        }
+        /* 鼠标悬停暂停，方便阅读 */
+        .notice-marquee:hover .marquee-track {
+            animation-play-state: paused;
+        }
+        .marquee-group {
+            display: flex;
+            align-items: center;
+            flex: 0 0 auto;
+        }
+        .marquee-text {
+            font-size: 16px;               /* 加大字号 */
+            font-weight: 700;              /* 加粗 */
+            line-height: 1.6;
+            color: #ffffff;                /* 纯白 */
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            text-shadow: 
+                0 0 12px rgba(199, 140, 223, 0.9),
+                0 0 4px rgba(255, 255, 255, 0.6); /* 发光效果 */
+        }
+        .marquee-sep {
+            margin: 0 24px;
+            font-size: 11px;
+            color: #f0d3ff;
+            opacity: 1;
+            flex: 0 0 auto;
+            text-shadow: 0 0 10px rgba(199, 140, 223, 0.9);
+        }
+        @keyframes marqueeScroll {
+            from { transform: translateX(0); }
+            to   { transform: translateX(-50%); }
+        }
+        /* ==================== 滚动提示框结束 ==================== */
+
         .tip {
             text-align: center;
             font-size: 18px;
@@ -501,6 +563,20 @@
             .char-name {
                 font-size: 18px;
             }
+            /* 滚动提示框移动端适配 */
+            .notice-marquee {
+                max-width: 92vw;
+                padding: 10px 0;
+                border-radius: 12px;
+            }
+            .marquee-text {
+                font-size: 14px;       /* 移动端依然保持较大字号 */
+                font-weight: 700;
+            }
+            .marquee-sep {
+                margin: 0 16px;
+                font-size: 9px;
+            }
         }
     </style>
 </head>
@@ -538,6 +614,28 @@
                 <div class="label">秒</div>
             </div>
         </div>
+
+        <!-- ===== 倒计时下方的滚动提示框 ===== -->
+        <div class="notice-marquee">
+            <div class="marquee-track">
+                <!-- 第一组 -->
+                <div class="marquee-group">
+                    <span class="marquee-text">1.桑多涅计算器预计在7.2版本之前上线，敬请期待！</span>
+                    <span class="marquee-sep">◆</span>
+                    <span class="marquee-text">2.米提亚测试阶段将不在计算米提亚主C的DPS，见谅！</span>
+                    <span class="marquee-sep">◆</span>
+                </div>
+                <!-- 第二组（用于无缝循环，屏幕阅读器忽略） -->
+                <div class="marquee-group" aria-hidden="true">
+                    <span class="marquee-text">1.桑多涅计算器预计在7.2版本之前上线，敬请期待！</span>
+                    <span class="marquee-sep">◆</span>
+                    <span class="marquee-text">2.米提亚测试阶段将不在计算米提亚主C的DPS，见谅！</span>
+                    <span class="marquee-sep">◆</span>
+                </div>
+            </div>
+        </div>
+        <!-- ===== 滚动提示框结束 ===== -->
+
         <div class="tip" id="overTip">数据已更新！</div>
     </div>
 
@@ -613,22 +711,25 @@
 
     <div class="card-container">
         <a href="js/zs.html" class="char-card glass-box">
-            <div class="char-name">角色(优化上新）</div>
+            <div class="char-name">角色</div>
         </a>
         <a href="zlk/2.html" class="char-card glass-box">
-            <div class="char-name">资料库（优化上新）</div>
+            <div class="char-name">资料库</div>
         </a>
         <a href="dps/dps.html" class="char-card glass-box">
             <div class="char-name">DPS目录（米v2上新）</div>
         </a>
         <a href="wangyechengxu.html" class="char-card glass-box">
-            <div class="char-name">网页程序（修复）</div>
+            <div class="char-name">网页程序</div>
         </a>
         <a href="xz/download.html" class="char-card glass-box">
             <div class="char-name">软件下载exe</div>
         </a>
+         <a href="" class="char-card glass-box">
+            <div class="char-name">DPS计算器（预告）</div>
+        </a>
         <a href="lj/beijing/怪物解析/youjingweizhantiaozhuan.html" class="char-card glass-box">
-            <div class="char-name">幽境危战（优化上新）</div>
+            <div class="char-name">幽境危战</div>
         </a>
     </div>
 
