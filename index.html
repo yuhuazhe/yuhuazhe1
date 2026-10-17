@@ -29,58 +29,61 @@
             -ms-overflow-style: none;
         }
         body {
-            background: url("zhanshi/1.0.jpg") center center / cover no-repeat fixed;
+            background: url("背景2.jpg") center center / cover no-repeat fixed;
             color: #f8f8f8;
             font-family: sans-serif;
             padding: 20px;
             position: relative;
             min-height: 300vh;
         }
+        /* 极淡遮罩防局部过亮 */
         body::before {
             content: "";
             position: fixed;
             inset: 0;
-            background-color: rgba(0, 0, 0, 0.01);
+            background-color: rgba(0, 0, 0, 0.15);
             z-index: -1;
         }
+        
+        /* 全透明板块，边框提亮 */
         .glass-box {
             background: transparent !important;
-            backdrop-filter: blur(10px) saturate(220%) !important;
-            -webkit-backdrop-filter: blur(10px) saturate(220%) !important;
-            border: 1px solid rgba(255, 255, 255, 0.005) !important;
+            border: 1px solid rgba(255, 255, 255, 0.35) !important;
             border-radius: 16px;
             box-shadow: none !important;
             transition: all 0.3s ease;
         }
         .glass-box:hover {
             transform: translateY(-5px);
-            box-shadow: 0 4px 12px rgba(183, 110, 216, 0.02) !important;
-            border-color: rgba(183, 110, 216, 0.03) !important;
+            border-color: rgba(255, 255, 255, 0.65) !important;
         }
+        
         .header-box {
             padding: 20px;
             text-align: center;
             margin-bottom: 40px;
             background: transparent !important;
-            backdrop-filter: blur(10px) saturate(220%) !important;
-            -webkit-backdrop-filter: blur(10px) saturate(220%) !important;
-            border: 1px solid rgba(255, 255, 255, 0.005) !important;
+            border: 1px solid rgba(255, 255, 255, 0.35) !important;
+            border-radius: 16px;
         }
         .header-title {
             font-size: 40px;
             color: #c78cdf;
             font-weight: bold;
             margin: 0 0 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.9), 0 0 10px rgba(0,0,0,0.6);
         }
         .header-subtitle {
             font-size: 22px;
             color: #eee;
             margin: 0 0 10px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.6);
         }
         .header-note {
             font-size: 16px;
             color: #ddd;
             line-height: 1.5;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.6);
         }
         .jump-btn-group {
             margin-top: 14px;
@@ -89,262 +92,43 @@
             justify-content: center;
             flex-wrap: wrap;
         }
+        
+        /* 透明边框按钮 */
         .jump-btn {
             padding: 12px 28px;
-            background: linear-gradient(135deg, #a1a1a1, #cecece) !important;
-            border: 1px solid rgba(255, 255, 255, 0.15) !important;
-            color: #111 !important;
+            background: transparent !important;
+            border: 1px solid rgba(255, 255, 255, 0.35) !important;
+            color: #fff !important;
             border-radius: 12px;
             cursor: pointer;
             font-size: 16px;
             font-weight: bold;
             text-decoration: none;
-            box-shadow: 0 0 18px rgba(199, 140, 223, 0.5),
-                        0 0 34px rgba(183, 110, 216, 0.25);
+            box-shadow: none !important;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.9);
             transition: all 0.22s ease;
         }
         .jump-btn:hover {
             transform: translateY(-3px) scale(1.05);
-            background: linear-gradient(135deg, #d8a2ef, #c78cdf) !important;
-            box-shadow: 0 0 24px rgba(199, 140, 223, 0.7),
-                        0 0 45px rgba(183, 110, 216, 0.35);
+            background: rgba(255, 255, 255, 0.15) !important;
+            border-color: rgba(255, 255, 255, 0.65) !important;
         }
         .jump-btn:active {
             transform: translateY(0) scale(1.02);
-            box-shadow: 0 0 12px rgba(199, 140, 223, 0.45);
-        }
-        .notice-btn {
-            margin-top: 12px;
-            padding: 10px 26px;
-            font-size: 15px;
-            color: #fff;
-            cursor: pointer;
-            border-radius: 10px;
-            border: 1px solid rgba(199, 140, 223, 0.5);
-            background: rgba(183, 110, 216, 0.25);
-            transition: background 0.2s ease;
-        }
-        .notice-btn:hover {
-            background: rgba(183, 110, 216, 0.45);
         }
 
-        /* ==================== 公告弹窗：纯净磨砂玻璃 ==================== */
-        .modal-mask {
-            position: fixed;
-            inset: 0;
-            background: rgba(12, 6, 20, 0.28);
-            backdrop-filter: blur(3px);
-            -webkit-backdrop-filter: blur(3px);
-            z-index: 9998;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.28s ease, visibility 0.28s ease;
-        }
-        .modal-mask.show {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        #noticeBox {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            width: 480px;
-            max-width: 92vw;
-            max-height: 82vh;
-            display: flex;
-            flex-direction: column;
-            border-radius: 22px;
-            overflow: hidden;
-            z-index: 9999;
-
-            /* 玻璃核心 */
-            background: rgba(255, 255, 255, 0.09);
-            backdrop-filter: blur(30px) saturate(170%) brightness(1.06);
-            -webkit-backdrop-filter: blur(30px) saturate(170%) brightness(1.06);
-
-            /* 统一无色的半透明边框 */
-            border: 1px solid rgba(255, 255, 255, 0.16);
-
-            box-shadow:
-                0 24px 70px rgba(0, 0, 0, 0.42),
-                inset 0 1px 0 rgba(255, 255, 255, 0.28),
-                inset 0 0 60px rgba(255, 255, 255, 0.03);
-
-            color: #fff;
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-            transform: translate(-50%, -47%) scale(0.96);
-            transition: opacity 0.28s ease,
-                        transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
-                        visibility 0.28s;
-        }
-        #noticeBox.show {
-            opacity: 1;
-            visibility: visible;
-            pointer-events: auto;
-            transform: translate(-50%, -50%) scale(1);
-        }
-
-        /* 标题栏 */
-        .notice-header {
-            flex: 0 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 22px 26px 14px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .notice-title {
-            font-size: 15px;
-            font-weight: 600;
-            letter-spacing: 3px;
-            color: #fff;
-            margin: 0;
-        }
-        .modal-close {
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            border-radius: 50%;
-            background: transparent;
-            font-family: inherit;
-            font-size: 18px;
-            font-weight: 300;
-            line-height: 1;
-            color: rgba(255, 255, 255, 0.7);
-            cursor: pointer;
-            user-select: none;
-        }
-
-        /* 内容滚动区 */
-        .notice-body {
-            flex: 1 1 auto;
-            min-height: 0;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            padding: 8px 26px 12px;
-            scrollbar-width: thin;
-            scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
-        }
-        .notice-body::-webkit-scrollbar {
-            display: block !important;
-            width: 4px;
-        }
-        .notice-body::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .notice-body::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.22);
-            border-radius: 2px;
-        }
-
-        /* 单条公告 */
-        .notice-item {
-            display: flex;
-            gap: 15px;
-            padding: 12px 0;
-        }
-        .notice-item + .notice-item {
-            border-top: 1px solid rgba(255, 255, 255, 0.07);
-        }
-        .notice-idx {
-            flex: 0 0 auto;
-            width: 22px;
-            padding-top: 2px;
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            color: rgba(255, 255, 255, 0.42);
-            font-variant-numeric: tabular-nums;
-            font-family: ui-monospace, monospace;
-        }
-        .notice-item-main {
-            flex: 1 1 auto;
-            min-width: 0;
-        }
-        .notice-item-main > p {
-            margin: 0;
-            font-size: 13.5px;
-            line-height: 1.9;
-            color: rgba(255, 255, 255, 0.88);
-        }
-        .notice-item-main .hl {
-            color: #f0d3ff;
-            font-weight: 600;
-        }
-
-        /* 板块介绍列表 */
-        .section-list {
-            list-style: none;
-            margin: 10px 0 2px;
-            padding: 0;
-            display: grid;
-            gap: 5px;
-        }
-        .section-list li {
-            display: flex;
-            align-items: baseline;
-            gap: 14px;
-            padding: 7px 12px;
-            font-size: 12.5px;
-            line-height: 1.65;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.09);
-        }
-        .sec-tag {
-            flex: 0 0 auto;
-            width: 78px;
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: 0.4px;
-            color: #e6c6fb;
-        }
-        .sec-desc {
-            flex: 1 1 auto;
-            color: rgba(255, 255, 255, 0.78);
-        }
-
-        /* 底部链接 */
-        .notice-footer {
-            flex: 0 0 auto;
-            padding: 16px 26px 22px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .notice-links {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 9px;
-        }
-        .notice-link-btn {
-            padding: 11px 12px;
-            font-size: 12.5px;
-            font-weight: 500;
-            letter-spacing: 0.3px;
-            text-align: center;
-            text-decoration: none;
-            color: rgba(255, 255, 255, 0.9);
-            background: rgba(255, 255, 255, 0.07);
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            border-radius: 11px;
-        }
-
+        /* ==================== 网格布局 ==================== */
         .card-container {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
             gap: 24px;
-            margin-top: 30px;
-            margin-bottom: 200px;
+            max-width: 1120px;
+            margin: 30px auto 200px;
+            padding: 0 20px;
         }
+
         .char-card {
-            width: 260px;
+            width: 100%;
             height: 80px;
             overflow: hidden;
             text-align: center;
@@ -353,12 +137,22 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.5) !important;
         }
+
+        .char-card:hover {
+            border-color: #c78cdf !important;
+            transform: translateY(-3px);
+        }
+
         .char-name {
             font-size: 20px;
             color: #fff;
             font-weight: 500;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.9), 0 0 10px rgba(0,0,0,0.6);
         }
+
         .count-box {
             display: flex;
             gap: 12px;
@@ -371,82 +165,116 @@
             padding: 20px 8px;
             border-radius: 10px;
             background: transparent !important;
-            border: 1px solid rgba(183, 110, 216, 0.02) !important;
-            backdrop-filter: blur(10px) saturate(220%) !important;
-            -webkit-backdrop-filter: blur(10px) saturate(220%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
         }
         .num {
             font-size: 2.8rem;
             font-weight: bold;
             color: #decce6;
             line-height: 1;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.9), 0 0 10px rgba(0,0,0,0.6);
         }
         .label {
             margin-top: 10px;
             font-size: 0.95rem;
             color: #ddd;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.9);
         }
 
-        /* ==================== 滚动提示框：增强文字可见性 ==================== */
-        .notice-marquee {
+        /* ==================== 更新内容折叠框（文字全黑） ==================== */
+        .update-collapse {
             width: 100%;
             max-width: 620px;
             margin: 18px auto 6px;
-            padding: 12px 0;
+            background: transparent;
+            border: 1px solid rgba(0, 0, 0, 0.6); /* 边框改为半透明黑 */
             border-radius: 14px;
-            /* 加深背景，提高对比度 */
-            background: rgba(22, 12, 38, 0.62);
-            border: 1px solid rgba(199, 140, 223, 0.55);
-            backdrop-filter: blur(12px) saturate(200%);
-            -webkit-backdrop-filter: blur(12px) saturate(200%);
-            box-shadow: 
-                0 4px 18px rgba(0, 0, 0, 0.3),
-                inset 0 0 24px rgba(183, 110, 216, 0.12);
             overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .update-collapse:hover {
+            border-color: rgba(0, 0, 0, 0.9);
+        }
+
+        .update-collapse summary {
             position: relative;
-            /* 两侧渐变淡出 */
-            -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%);
-            mask-image: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%);
-        }
-        .marquee-track {
-            display: flex;
-            width: max-content;
-            will-change: transform;
-            animation: marqueeScroll 32s linear infinite; /* 放慢一点，便于阅读 */
-        }
-        /* 鼠标悬停暂停，方便阅读 */
-        .notice-marquee:hover .marquee-track {
-            animation-play-state: paused;
-        }
-        .marquee-group {
             display: flex;
             align-items: center;
-            flex: 0 0 auto;
+            justify-content: center; /* 居中对齐 */
+            padding: 14px 40px;
+            font-size: 15px;
+            font-weight: bold;
+            color: #000; /* 字体纯黑 */
+            cursor: pointer;
+            list-style: none;
+            user-select: none;
+            text-shadow: 0 0 5px rgba(255,255,255,0.95), 0 0 10px rgba(255,255,255,0.6); /* 用白光保证暗处清晰度 */
+            transition: background-color 0.2s;
         }
-        .marquee-text {
-            font-size: 16px;               /* 加大字号 */
-            font-weight: 700;              /* 加粗 */
-            line-height: 1.6;
-            color: #ffffff;                /* 纯白 */
-            letter-spacing: 0.5px;
-            white-space: nowrap;
-            text-shadow: 
-                0 0 12px rgba(199, 140, 223, 0.9),
-                0 0 4px rgba(255, 255, 255, 0.6); /* 发光效果 */
+        .update-collapse summary::-webkit-details-marker {
+            display: none;
         }
-        .marquee-sep {
-            margin: 0 24px;
-            font-size: 11px;
-            color: #f0d3ff;
-            opacity: 1;
-            flex: 0 0 auto;
-            text-shadow: 0 0 10px rgba(199, 140, 223, 0.9);
+        .update-collapse summary:hover {
+            background: rgba(255, 255, 255, 0.15);
         }
-        @keyframes marqueeScroll {
-            from { transform: translateX(0); }
-            to   { transform: translateX(-50%); }
+
+        /* 自定义展开/收起箭头（绝对定位在右侧） */
+        .update-collapse summary::after {
+            content: "▼";
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            color: #000; /* 箭头黑色 */
+            text-shadow: 0 0 4px rgba(255,255,255,0.8);
+            transition: transform 0.3s ease;
         }
-        /* ==================== 滚动提示框结束 ==================== */
+        .update-collapse[open] summary::after {
+            transform: translateY(-50%) rotate(-180deg);
+        }
+
+        /* 内部滑动区域 */
+        .update-content {
+            padding: 2px 20px 16px;
+            font-size: 14.5px;
+            color: #000; /* 描述文字纯黑 */
+            line-height: 1.8;
+            border-top: 1px solid rgba(0, 0, 0, 0.2); /* 分割线改黑 */
+            text-align: left; /* 强制内容靠左对齐 */
+            
+            /* 固定高度与滑动条相关 */
+            max-height: 220px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 0, 0, 0.4) transparent;
+        }
+
+        /* 美化滑动条 */
+        .update-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        .update-content::-webkit-scrollbar-track {
+            background: transparent;
+            margin: 4px 0;
+        }
+        .update-content::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+        .update-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        .update-content p {
+            margin-top: 10px;
+            text-shadow: 0 0 5px rgba(255,255,255,0.9), 0 0 10px rgba(255,255,255,0.5);
+        }
+        .update-content .highlight {
+            color: #000; /* 序号也改黑 */
+            font-weight: 900;
+        }
+        /* ==================== 更新内容折叠框结束 ==================== */
 
         .tip {
             text-align: center;
@@ -462,9 +290,8 @@
             width: 48px;
             height: 48px;
             border-radius: 50%;
-            background: rgba(183, 110, 216, 0.04);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(183, 110, 216, 0.1);
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.4);
             color: #c78cdf;
             font-size: 20px;
             cursor: pointer;
@@ -474,11 +301,21 @@
             text-align: center;
             line-height: 48px;
             text-decoration: none;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.9);
         }
         #backTop:hover {
-            background: rgba(183, 110, 216, 0.08);
+            background: rgba(255, 255, 255, 0.15);
             transform: translateY(-4px);
         }
+
+        /* ==================== 响应式调整 ==================== */
+        @media (max-width: 900px) {
+            .card-container {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
+        }
+        
         @media (max-width: 600px) {
             body {
                 background-color: #0a060f;
@@ -504,51 +341,6 @@
                 right: 20px;
                 line-height: 40px;
             }
-            #noticeBox {
-                width: 92vw;
-                max-height: 84vh;
-                border-radius: 18px;
-                backdrop-filter: blur(22px) saturate(170%) brightness(1.06);
-                -webkit-backdrop-filter: blur(22px) saturate(170%) brightness(1.06);
-            }
-            .notice-header {
-                padding: 18px 20px 12px;
-            }
-            .notice-title {
-                font-size: 14px;
-                letter-spacing: 2px;
-            }
-            .notice-body {
-                padding: 6px 20px 10px;
-            }
-            .notice-item {
-                gap: 11px;
-                padding: 10px 0;
-            }
-            .notice-item-main > p {
-                font-size: 13px;
-            }
-            .section-list li {
-                gap: 10px;
-                padding: 6px 10px;
-            }
-            .sec-tag {
-                width: 68px;
-                font-size: 11.5px;
-            }
-            .sec-desc {
-                font-size: 12px;
-            }
-            .notice-footer {
-                padding: 13px 20px 18px;
-            }
-            .notice-links {
-                gap: 8px;
-            }
-            .notice-link-btn {
-                font-size: 12px;
-                padding: 10px 8px;
-            }
             .jump-btn-group {
                 gap: 10px;
             }
@@ -556,26 +348,28 @@
                 padding: 10px 20px;
                 font-size: 15px;
             }
+            .card-container {
+                grid-template-columns: 1fr;
+                gap: 12px;
+                padding: 0 10px;
+            }
             .char-card {
-                width: 90vw;
                 height: 68px;
             }
             .char-name {
                 font-size: 18px;
             }
-            /* 滚动提示框移动端适配 */
-            .notice-marquee {
+            .update-collapse {
                 max-width: 92vw;
-                padding: 10px 0;
-                border-radius: 12px;
             }
-            .marquee-text {
-                font-size: 14px;       /* 移动端依然保持较大字号 */
-                font-weight: 700;
+            .update-collapse summary {
+                padding: 12px 30px;
+                font-size: 14px;
             }
-            .marquee-sep {
-                margin: 0 16px;
-                font-size: 9px;
+            .update-content {
+                padding: 2px 16px 12px;
+                font-size: 13.5px;
+                max-height: 180px; /* 移动端高度限制 */
             }
         }
     </style>
@@ -585,17 +379,13 @@
         <h1 class="header-title">计算数据</h1>
         <p class="header-subtitle">羽化哲 更新至7.2版本V2.1 最后更新日期：<span id="lastUpdateText">加载中...</span></p>
         <p class="header-note">所涉及的主C及副c均为30词条<br>最终数据请以正式服为准！！！</p>
-        <a href="https://b23.tv/rDCFTFA" target="_blank" style="color:#c78cdf;">羽化哲主页</a>
+        <a href="https://b23.tv/rDCFTFA" target="_blank" style="color:#c78cdf; text-shadow: 0 1px 3px rgba(0,0,0,0.9);">羽化哲主页</a>
 
         <div class="jump-btn-group">
             <a href="https://qm.qq.com/q/2FqRcewcXS" target="_blank" class="jump-btn">点击进入交流群</a>
         </div>
 
-        <div align="center" style="margin:14px 0 4px;">
-            <button class="notice-btn" onclick="openNotice()">公告</button>
-        </div>
-
-        <h2 style="text-align:center;color:#c78cdf;font-size:24px;margin:10px 0 5px;">【B站账号被封禁】距离解封</h2>
+        <h2 style="text-align:center;color:#c78cdf;font-size:24px;margin:20px 0 5px;text-shadow: 0 2px 4px rgba(0,0,0,0.9);">【B站账号被封禁】距离解封</h2>
         <div class="count-box">
             <div class="time-item glass-box">
                 <div class="num" id="day">00</div>
@@ -615,98 +405,21 @@
             </div>
         </div>
 
-        <!-- ===== 倒计时下方的滚动提示框 ===== -->
-        <div class="notice-marquee">
-            <div class="marquee-track">
-                <!-- 第一组 -->
-                <div class="marquee-group">
-                    <span class="marquee-text">1.桑多涅计算器预计在7.2版本之前上线，敬请期待！</span>
-                    <span class="marquee-sep">◆</span>
-                    <span class="marquee-text">2.米提亚测试阶段将不在计算米提亚主C的DPS，见谅！</span>
-                    <span class="marquee-sep">◆</span>
-                </div>
-                <!-- 第二组（用于无缝循环，屏幕阅读器忽略） -->
-                <div class="marquee-group" aria-hidden="true">
-                    <span class="marquee-text">1.桑多涅计算器预计在7.2版本之前上线，敬请期待！</span>
-                    <span class="marquee-sep">◆</span>
-                    <span class="marquee-text">2.米提亚测试阶段将不在计算米提亚主C的DPS，见谅！</span>
-                    <span class="marquee-sep">◆</span>
-                </div>
+        <!-- ==================== 更新内容折叠框 ==================== -->
+        <details class="update-collapse">
+            <summary>点击查看更新内容/预告</summary>
+            <div class="update-content">
+                 <p><span class="highlight">10月17日更新汇总：</span> </p>
+                <p><span class="highlight">1.</span> 桑多涅计算器预计在 7.2 版本之前上线，敬请期待！请关注网站，群内，动态更新状态</p>
+                <p><span class="highlight">2.</span> 米提亚测试阶段将不在计算米提亚主C的 DPS，见谅！</p>
+                <p><span class="highlight">3.</span> 已完成幽静危站战7.2版本的怪物机制更新</p>
+                <p><span class="highlight">4.</span> 即将发布视频米提亚武器选择攻略/米提亚抽取建议</p>
+                <p><span class="highlight">5.</span> 对网站进行了页面优化</p>
             </div>
-        </div>
-        <!-- ===== 滚动提示框结束 ===== -->
+        </details>
+        <!-- ==================== 更新内容折叠框结束 ==================== -->
 
         <div class="tip" id="overTip">数据已更新！</div>
-    </div>
-
-    <div class="modal-mask" id="mask"></div>
-
-    <div id="noticeBox" role="dialog" aria-modal="true" aria-labelledby="noticeTitle">
-        <div class="notice-header">
-            <h3 class="notice-title" id="noticeTitle">站内公告</h3>
-            <button class="modal-close" onclick="closeNotice()" aria-label="关闭">×</button>
-        </div>
-
-        <div class="notice-body">
-            <div class="notice-item">
-                <span class="notice-idx">01</span>
-                <div class="notice-item-main">
-                    <p>网站于 <span class="hl">2026 年 6 月 1 日</span>建立；由“羽化哲”独立建立与维护。</p>
-                </div>
-            </div>
-
-            <div class="notice-item">
-                <span class="notice-idx">02</span>
-                <div class="notice-item-main">
-                    <p>板块介绍：</p>
-                    <ul class="section-list">
-                        <li><span class="sec-tag">角色</span><span class="sec-desc">可查看角色各版本的 DPS 数据</span></li>
-                        <li><span class="sec-tag">资料库</span><span class="sec-desc">可查看计算公式、原神时间表</span></li>
-                        <li><span class="sec-tag">DPS目录</span><span class="sec-desc">可查看各金数下的 DPS 以及对比</span></li>
-                        <li><span class="sec-tag">网页程序</span><span class="sec-desc">可使用排轴、充能计算等原神工具</span></li>
-                        <li><span class="sec-tag">软件下载exe</span><span class="sec-desc">可下载程序进行使用</span></li>
-                        <li><span class="sec-tag">幽境危战</span><span class="sec-desc">可查看每一期的幽境危战怪物和机制</span></li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="notice-item">
-                <span class="notice-idx">03</span>
-                <div class="notice-item-main">
-                    <p>个人精力有限，会尽量做到相关程序以及内容的更新！</p>
-                </div>
-            </div>
-
-            <div class="notice-item">
-                <span class="notice-idx">04</span>
-                <div class="notice-item-main">
-                    <p>若发现网站内容错误或程序 bug 请及时反馈，感谢支持！</p>
-                </div>
-            </div>
-
-            <div class="notice-item">
-                <span class="notice-idx">05</span>
-                <div class="notice-item-main">
-                    <p>若对网站有更好的建议以及想法欢迎找我交流，<span class="hl">有偿</span>！</p>
-                </div>
-            </div>
-
-            <div class="notice-item">
-                <span class="notice-idx">06</span>
-                <div class="notice-item-main">
-                    <p>希望网站能够帮助到大家，这也是网站建设的初心！</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="notice-footer">
-            <div class="notice-links">
-                <a class="notice-link-btn" href="https://b23.tv/rDCFTFA" target="_blank" rel="noopener">羽化哲B站主页</a>
-                <a class="notice-link-btn" href="https://qm.qq.com/q/2FqRcewcXS" target="_blank" rel="noopener">加入交流Q群</a>
-                <a class="notice-link-btn" href="https://v.douyin.com/tI2qdSHc_dw/" target="_blank" rel="noopener">羽化哲抖音主页</a>
-                <a class="notice-link-btn" href="https://b23.tv/i6LV8qC" target="_blank" rel="noopener">B站小号主页</a>
-            </div>
-        </div>
     </div>
 
     <div class="card-container">
@@ -717,7 +430,7 @@
             <div class="char-name">资料库</div>
         </a>
         <a href="dps/dps.html" class="char-card glass-box">
-            <div class="char-name">DPS目录（米v2上新）</div>
+            <div class="char-name">DPS目录（米v2）</div>
         </a>
         <a href="wangyechengxu.html" class="char-card glass-box">
             <div class="char-name">网页程序</div>
@@ -726,7 +439,7 @@
             <div class="char-name">软件下载exe</div>
         </a>
          <a href="" class="char-card glass-box">
-            <div class="char-name">DPS计算器（预告）</div>
+            <div class="char-name">DPS计算器（即将上线）</div>
         </a>
         <a href="lj/beijing/怪物解析/youjingweizhantiaozhuan.html" class="char-card glass-box">
             <div class="char-name">幽境危战</div>
@@ -736,24 +449,7 @@
     <a href="#pageTop" id="backTop">↑</a>
 
     <script defer>
-        const mask = document.getElementById('mask');
-        const noticeBox = document.getElementById('noticeBox');
-        const noticeBody = noticeBox.querySelector('.notice-body');
         const lastUpdateDom = document.getElementById('lastUpdateText');
-
-        function openNotice() {
-            mask.classList.add('show');
-            noticeBox.classList.add('show');
-            if (noticeBody) noticeBody.scrollTop = 0;
-        }
-        function closeNotice() {
-            mask.classList.remove('show');
-            noticeBox.classList.remove('show');
-        }
-        mask.addEventListener('click', closeNotice);
-        document.addEventListener('keydown', e => {
-            if (e.key === 'Escape') closeNotice();
-        });
 
         function formatDate(dateStr) {
             const d = new Date(dateStr);
