@@ -24,7 +24,7 @@
             
             color:#f2f2f7;
             padding:0;
-            overflow:hidden; /* 防止页面级滚动，全部交由容器内部滚动 */
+            overflow:hidden;
         }
         body::before {
             content:"";
@@ -50,7 +50,7 @@
             text-align:center;
             margin-bottom:14px;
             font-size:clamp(20px,5vw,32px);
-            text-shadow: 0 2px 6px rgba(0,0,0,0.8);
+            text-shadow: 0 2px 6px rgba(0,0,0,0.9);
         }
         
         /* ===== 筛选框 ===== */
@@ -70,47 +70,72 @@
         }
         .filter-item label{
             font-size:13px;
-            color:#e2e8f0;
+            color:#ffffff;
+            font-weight: bold;
             display:block;
             margin-bottom:4px;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.9), 0 0 5px rgba(0,0,0,0.6);
         }
+        
+        /* 输入框、下拉框 - 增加深色毛玻璃底色 */
         .filter-item select,
         .filter-item input{
             width:100%;
             padding:9px;
-            background:transparent;
-            border:1px solid rgba(255,255,255,0.3);
-            color:#fff;
+            background:rgba(0, 0, 0, 0.45); /* 深色半透明底 */
+            border:1px solid rgba(255,255,255,0.25);
+            color:#ffffff;
             border-radius:8px;
             font-size:14px;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+            backdrop-filter:blur(4px);
+            -webkit-backdrop-filter:blur(4px);
+            outline: none;
+            transition: all 0.2s;
+        }
+        .filter-item input::placeholder {
+            color: rgba(255,255,255,0.6);
+            font-weight: normal;
+        }
+        .filter-item select:focus,
+        .filter-item input:focus {
+            background:rgba(0, 0, 0, 0.65); /* 聚焦时更深 */
+            border-color: #74aaff;
+            box-shadow: 0 0 8px rgba(116,170,255,0.4);
         }
         .filter-item select option{
-            color:#000000;
-            background:#151526;
+            color:#ffffff;
+            background:#1a1a2e;
         }
+        
+        /* 按钮 - 同样增加深色底 */
         .filter-item button{
             width:100%;
             padding:9px;
-            background:transparent;
-            border:1px solid rgba(255,255,255,0.3);
-            color:#fff;
+            background:rgba(0, 0, 0, 0.45);
+            border:1px solid rgba(255,255,255,0.25);
+            color:#ffffff;
+            font-weight: 600;
             border-radius:8px;
             font-size:14px;
             font-family:inherit;
             cursor:pointer;
             transition:0.2s ease;
             -webkit-tap-highlight-color:transparent;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+            backdrop-filter:blur(4px);
+            -webkit-backdrop-filter:blur(4px);
         }
         .filter-item button:hover{
-            background:rgba(255,255,255,0.1);
+            background:rgba(0,0,0,0.6);
+            border-color:rgba(255,255,255,0.4);
         }
         .filter-item button.active{
-            background:rgba(116,170,255,0.3);
-            border-color:rgba(116,170,255,0.85);
-            font-weight:bold;
+            background:rgba(116,170,255,0.4);
+            border-color:#74aaff;
+            color: #fff;
+            box-shadow: 0 0 10px rgba(116,170,255,0.4);
         }
         @media(min-width:680px){
             .filter-item--btn{
@@ -118,7 +143,7 @@
             }
         }
         
-        /* 滚动容器：统一管理横向和纵向滚动 */
+        /* 滚动容器 */
         .outer-scroll{
             flex: 1;
             overflow: auto; 
@@ -131,7 +156,6 @@
             display:none;
         }
         
-        /* 移除内部横向滚动，让宽度撑开外层，使 sticky 生效 */
         .x-scroll{
             min-width: min-content; 
             padding-bottom:4px;
@@ -150,8 +174,7 @@
         .grid-header{
             border-radius:12px;
             border:1px solid rgba(255,255,255,0.3);
-            /* 加入半透明黑底和毛玻璃，防止滚动时下方文字与表头重叠 */
-            background:rgba(10, 10, 15, 0.75);
+            background:rgba(10, 10, 15, 0.75); /* 表头加深 */
             backdrop-filter:blur(12px);
             -webkit-backdrop-filter:blur(12px);
             position: sticky;
@@ -218,7 +241,7 @@
                 display:none !important;
             }
             .x-scroll {
-                min-width: 0; /* 手机端不需撑开 */
+                min-width: 0; 
             }
             .mobile-card{
                 border:1px solid rgba(255,255,255,0.3);
@@ -267,7 +290,7 @@
         <div class="filter-box">
             <div class="filter-item">
                 <label>队伍名称</label>
-                <input id="inpTeam" placeholder="队伍名称">
+                <input id="inpTeam" placeholder="输入队伍名称...">
             </div>
             <div class="filter-item">
                 <label>金数选择</label>

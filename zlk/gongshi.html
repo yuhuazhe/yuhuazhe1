@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="paper">
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,81 +12,55 @@
 </script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <style>
-  /* ===== 主题变量 ===== */
-  html[data-theme="paper"] {
-    --bg: #f7f3ec;
-    --surface: #fffcf7;
-    --surface-2: #f2ece0;
-    --ink: #2a2520;
-    --ink-2: #7a6e5e;
-    --ink-3: #a89880;
-    --accent: #9a3412;
-    --rule: #e8dfd0;
-    --rule-2: #d9cdb8;
-    --zebra: #fdfaf5;
-    --hover: #fdf0e4;
+  /* ===== 固定配色（蓝色系，透明板块） ===== */
+  :root {
+    --ink: #e0f2fe; /* 亮蓝白文字 */
+    --ink-2: #93c5fd; /* 浅蓝色 */
+    --ink-3: #60a5fa; /* 亮蓝色 */
+    --accent: #38bdf8; /* 天蓝色强调 */
+    --rule: rgba(96, 165, 250, 0.3);
+    --rule-2: rgba(96, 165, 250, 0.5);
+    --hover: rgba(56, 189, 248, 0.15);
   }
-  html[data-theme="dark"] {
-    --bg: #16181d;
-    --surface: #1e2128;
-    --surface-2: #262a33;
-    --ink: #e8eaed;
-    --ink-2: #a5adba;
-    --ink-3: #6b7280;
-    --accent: #f0a05a;
-    --rule: #2d323c;
-    --rule-2: #3a4150;
-    --zebra: #21252c;
-    --hover: #2a2f3a;
-  }
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  /* 统一文字阴影，防止背景杂乱导致文字看不清 */
+  body, h1, h2, h3, p, span, div, dt, dd, table, th, td, button, a {
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9), 0 0 6px rgba(0, 0, 0, 0.6);
+  }
+
   body {
-    background: var(--bg);
+    /* ===== 底图与暗色遮罩 ===== */
+    background-color: #16181d;
+    background-image: 
+      linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)),
+      url("背景2.jpg");
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    
     color: var(--ink);
     font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
     font-size: 15px;
     line-height: 1.85;
     padding: 56px 24px 96px;
-    transition: background-color 0.25s, color 0.25s;
   }
-  .page { max-width: 860px; margin: 0 auto; }
+  
+  /* 强制 MathJax 公式颜色继承 / 转为浅蓝色 */
+  mjx-container, .MathJax, .MathJax_Display, .MathJax_CHTML {
+    color: var(--ink) !important;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9), 0 0 6px rgba(0, 0, 0, 0.6);
+  }
 
-  /* ===== 主题切换 ===== */
-  .theme-switch {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 100;
-    display: flex;
-    gap: 8px;
-    background: var(--surface);
-    border: 1px solid var(--rule-2);
-    border-radius: 999px;
-    padding: 6px 8px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-    transition: background-color 0.25s, border-color 0.25s;
-  }
-  .theme-btn {
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    border: 2px solid transparent;
-    cursor: pointer;
-    transition: transform 0.15s, border-color 0.15s;
-    padding: 0;
-    outline: none;
-  }
-  .theme-btn:hover { transform: scale(1.12); }
-  .theme-btn.active { border-color: var(--accent); }
-  .theme-btn[data-theme="paper"] { background: linear-gradient(135deg, #f7f3ec 50%, #d9cdb8 50%); }
-  .theme-btn[data-theme="dark"]  { background: linear-gradient(135deg, #1e2128 50%, #f0a05a 50%); }
+  .page { max-width: 860px; margin: 0 auto; }
 
   /* ===== 页头 & 更新日期 ===== */
   .page-header {
     margin-bottom: 56px;
     padding-bottom: 28px;
-    border-bottom: 2px solid var(--ink);
-    transition: border-color 0.25s;
+    border-bottom: 2px solid var(--rule-2);
   }
   .page-header-top {
     display: flex;
@@ -103,18 +77,18 @@
     letter-spacing: -0.5px;
     line-height: 1.2;
     margin: 0;
+    color: var(--accent);
   }
   .update-badge {
     font-size: 12px;
     font-weight: 600;
     color: var(--accent);
-    background: var(--surface-2);
+    background: transparent;
     border: 1px solid var(--rule-2);
     padding: 4px 12px;
     border-radius: 20px;
     letter-spacing: 0.5px;
     white-space: nowrap;
-    transition: background-color 0.25s, border-color 0.25s, color 0.25s;
   }
   .page-header .sub {
     font-size: 13px;
@@ -135,17 +109,15 @@
     margin-bottom: 24px;
     padding-bottom: 10px;
     border-bottom: 1px solid var(--rule);
-    transition: border-color 0.25s;
   }
   .sec-num {
     font-family: Georgia, "Times New Roman", serif;
     font-size: 42px;
     font-weight: 700;
-    color: var(--rule-2);
+    color: var(--ink-3);
     line-height: 1;
     flex: none;
     letter-spacing: -1px;
-    transition: color 0.25s;
   }
   .sec-title {
     font-family: Georgia, "Noto Serif SC", serif;
@@ -168,7 +140,6 @@
     margin-bottom: 48px;
     padding-left: 18px;
     border-left: 2px solid var(--rule-2);
-    transition: border-color 0.25s;
   }
   .part:last-child { margin-bottom: 0; }
   .part-head {
@@ -180,19 +151,18 @@
     display: flex;
     align-items: baseline;
     gap: 10px;
-    transition: color 0.25s;
   }
   .part-head .part-tag {
     font-family: "SF Mono", "Consolas", monospace;
     font-size: 11px;
-    color: #fff;
+    color: #16181d;
     background: var(--accent);
     padding: 2px 8px;
     border-radius: 4px;
     font-weight: 700;
     letter-spacing: 1px;
     vertical-align: 2px;
-    transition: background-color 0.25s;
+    text-shadow: none;
   }
   .part-head .part-en {
     font-size: 11px;
@@ -214,31 +184,22 @@
     vertical-align: 2px;
     white-space: nowrap;
     letter-spacing: 0.3px;
+    text-shadow: none; /* chip 本身有底色，可以去掉过重阴影 */
   }
-  .c-base    { background: #e6efff; color: #1e40af; border-color: #c7d9fb; }
-  .c-dmg     { background: #e6f7f0; color: #166534; border-color: #b3e4cb; }
-  .c-crit    { background: #ede9fe; color: #7c3aed; border-color: #d4cbf7; }
-  .c-res     { background: #ffedd5; color: #c2410c; border-color: #fdd7a3; }
-  .c-def     { background: #fee2e2; color: #b91c1c; border-color: #fbc4c4; }
-  .c-react   { background: #cffafe; color: #0e7490; border-color: #a5e4f0; }
-  .c-em      { background: #fef3c7; color: #92400e; border-color: #fde68a; }
-  .c-lunar   { background: #fae8ff; color: #86198f; border-color: #f0c2f8; }
-  .c-star    { background: #e0f2fe; color: #0369a1; border-color: #bae0fc; }
-  .c-extra   { background: #f1f5f9; color: #475569; border-color: #dbe1ea; }
-  html[data-theme="dark"] .c-base    { background: #1e2a4a; color: #93b4f7; border-color: #2c3d66; }
-  html[data-theme="dark"] .c-dmg     { background: #163326; color: #6ee7b7; border-color: #1f4a37; }
-  html[data-theme="dark"] .c-crit    { background: #2a1f4a; color: #c4b5fd; border-color: #3d2d66; }
-  html[data-theme="dark"] .c-res     { background: #3a2413; color: #fbbf72; border-color: #55381e; }
-  html[data-theme="dark"] .c-def     { background: #3a1a1a; color: #fca5a5; border-color: #552626; }
-  html[data-theme="dark"] .c-react   { background: #143741; color: #67e8f9; border-color: #1e505c; }
-  html[data-theme="dark"] .c-em      { background: #3a2d10; color: #fcd34d; border-color: #55411a; }
-  html[data-theme="dark"] .c-lunar   { background: #3a1a3d; color: #f0abfc; border-color: #55295a; }
-  html[data-theme="dark"] .c-star    { background: #132c42; color: #7dd3fc; border-color: #1d415e; }
-  html[data-theme="dark"] .c-extra   { background: #2a2f3a; color: #cbd5e1; border-color: #3b4250; }
+  .c-base    { background: #1e2a4a; color: #93b4f7; border-color: #2c3d66; }
+  .c-dmg     { background: #163326; color: #6ee7b7; border-color: #1f4a37; }
+  .c-crit    { background: #2a1f4a; color: #c4b5fd; border-color: #3d2d66; }
+  .c-res     { background: #3a2413; color: #fbbf72; border-color: #55381e; }
+  .c-def     { background: #3a1a1a; color: #fca5a5; border-color: #552626; }
+  .c-react   { background: #143741; color: #67e8f9; border-color: #1e505c; }
+  .c-em      { background: #3a2d10; color: #fcd34d; border-color: #55411a; }
+  .c-lunar   { background: #3a1a3d; color: #f0abfc; border-color: #55295a; }
+  .c-star    { background: #132c42; color: #7dd3fc; border-color: #1d415e; }
+  .c-extra   { background: #2a2f3a; color: #cbd5e1; border-color: #3b4250; }
 
-  /* ===== 结构公式 ===== */
+  /* ===== 结构公式（透明板块） ===== */
   .struct {
-    background: var(--surface);
+    background: transparent;
     border: 1px dashed var(--rule-2);
     border-radius: 10px;
     padding: 20px 22px;
@@ -247,7 +208,6 @@
     font-size: 15px;
     color: var(--ink);
     overflow-x: auto;
-    transition: background-color 0.25s, border-color 0.25s;
   }
   .struct .op {
     color: var(--ink-3);
@@ -260,22 +220,22 @@
     margin-right: 6px;
   }
 
-  /* ===== 逐项定义（横向醒目样式） ===== */
+  /* ===== 逐项定义折叠头（透明） ===== */
   .sub-head.toggle-defs {
     display: block;
     width: 100%;
     font-size: 14px;
     letter-spacing: 1px;
     color: var(--accent);
-    margin: 32px 0 0; /* 底部 margin 改为 0，与面板衔接 */
+    margin: 32px 0 0;
     font-weight: 700;
     cursor: pointer;
     user-select: none;
     padding: 10px 16px;
-    background: var(--surface-2);
+    background: transparent;
     border-left: 4px solid var(--accent);
     border-radius: 4px 4px 0 0;
-    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+    transition: background-color 0.2s;
   }
   .sub-head.toggle-defs:hover {
     background-color: var(--hover);
@@ -292,21 +252,19 @@
     transform: rotate(-90deg);
   }
 
-  /* ===== 定义面板（包裹全部下方内容） ===== */
+  /* ===== 定义面板（透明） ===== */
   .defs-panel {
     margin: 0 0 20px;
     padding: 12px 18px 16px 22px;
     border-left: 4px solid var(--accent);
-    background: var(--surface);
+    background: transparent;
     border-radius: 0 0 6px 6px;
-    transition: background-color 0.25s, border-color 0.25s;
-    box-shadow: inset 0 2px 6px rgba(0,0,0,0.02);
   }
   .defs-panel.hidden {
     display: none;
   }
   
-  /* 面板内部子标题样式覆盖，使其看起来像内部标题而非可点击标题 */
+  /* 面板内部子标题样式覆盖 */
   .defs-panel .sub-head {
     margin: 24px 0 12px;
     padding: 0 0 6px 0;
@@ -321,31 +279,16 @@
     font-family: inherit;
   }
   .defs-panel .sub-head::before {
-    content: none; /* 移除箭头 */
+    content: none;
   }
   .defs-panel .sub-head:hover {
     background: transparent;
-  }
-
-  /* 面板内部表格与注释样式微调 */
-  .defs-panel .table-wrap {
-    margin: 12px 0 16px;
-  }
-  .defs-panel .notes {
-    margin: 12px 0 8px;
-    padding-left: 14px;
-  }
-  .defs-panel .defs {
-    margin-top: 8px;
   }
 
   /* ===== 定义列表 ===== */
   .defs {
     margin: 8px 0 20px;
     padding: 0;
-  }
-  .defs.hidden {
-    display: none;
   }
   .def-row {
     display: grid;
@@ -354,7 +297,6 @@
     align-items: start;
     padding: 12px 0;
     border-bottom: 1px solid var(--rule);
-    transition: border-color 0.25s;
   }
   .def-row:last-child { border-bottom: none; }
   .def-row dt { padding-top: 2px; }
@@ -375,7 +317,6 @@
     font-size: 13px;
     color: var(--ink-2);
     line-height: 1.85;
-    transition: border-color 0.25s;
   }
   .notes p { margin: 5px 0; }
   .notes p::before {
@@ -385,22 +326,22 @@
   }
   .notes strong { color: var(--ink); }
 
-  /* ===== 表格 ===== */
+  /* ===== 表格（透明） ===== */
   .table-wrap {
     margin: 14px 0;
     overflow-x: auto;
     border: 1px solid var(--rule-2);
     border-radius: 6px;
-    transition: border-color 0.25s;
   }
   table {
     width: 100%;
     border-collapse: collapse;
     font-size: 13.5px;
     min-width: 300px;
+    background: transparent;
   }
   thead th {
-    background: var(--surface-2);
+    background: transparent;
     color: var(--ink);
     font-weight: 700;
     text-align: left;
@@ -409,17 +350,16 @@
     white-space: nowrap;
     font-family: Georgia, "Noto Serif SC", serif;
     font-size: 13px;
-    transition: background-color 0.25s, border-color 0.25s;
   }
   tbody td {
     padding: 9px 16px;
     border-bottom: 1px solid var(--rule);
     color: var(--ink);
-    transition: background-color 0.25s, border-color 0.25s;
+    background: transparent;
   }
   tbody tr:last-child td { border-bottom: none; }
-  tbody tr:nth-child(even) { background: var(--zebra); }
-  tbody tr:hover { background: var(--hover); }
+  tbody tr:hover { background: var(--hover); } /* 悬停时微弱高亮 */
+  
   .level-table { max-width: 380px; }
   .level-table td {
     font-family: "SF Mono", "Consolas", monospace;
@@ -430,6 +370,7 @@
     color: var(--accent);
     font-family: Georgia, serif;
   }
+  
   /* ===== 横向 Excel 表 ===== */
   .matrix-table {
     min-width: 720px;
@@ -446,7 +387,8 @@
     padding-left: 16px;
     position: sticky;
     left: 0;
-    background: var(--surface-2);
+    background: rgba(22, 24, 29, 0.8); /* 留一点底色防止横滑时穿透叠字 */
+    backdrop-filter: blur(4px);
     z-index: 2;
     border-right: 1px solid var(--rule-2);
     min-width: 120px;
@@ -465,16 +407,11 @@
     color: var(--accent);
     position: sticky;
     left: 0;
-    background: var(--surface);
+    background: rgba(22, 24, 29, 0.8);
+    backdrop-filter: blur(4px);
     z-index: 1;
     border-right: 1px solid var(--rule-2);
     white-space: nowrap;
-  }
-  .matrix-table tbody tr:nth-child(even) td:first-child {
-    background: var(--zebra);
-  }
-  .matrix-table tbody tr:hover td:first-child {
-    background: var(--hover);
   }
 
   /* ===== 响应式适配 ===== */
@@ -497,9 +434,7 @@
     .matrix-table { min-width: 100%; }
   }
   @media (max-width: 480px) {
-    body { padding: 72px 12px 48px; font-size: 14px; }
-    .theme-switch { top: 12px; right: 12px; padding: 4px 6px; }
-    .theme-btn { width: 22px; height: 22px; }
+    body { padding: 40px 12px 48px; font-size: 14px; }
     .struct { padding: 12px 10px; font-size: 13px; line-height: 2.4; }
     .sub-head.toggle-defs { font-size: 13px; padding: 8px 12px; }
     .defs-panel { padding: 6px 10px 2px 14px; }
@@ -507,19 +442,15 @@
 </style>
 </head>
 <body>
-<!-- 主题切换 -->
-<div class="theme-switch" role="group" aria-label="背景配色">
-  <button class="theme-btn active" data-theme="paper" title="暖色纸张（原色）" aria-label="暖色纸张"></button>
-  <button class="theme-btn" data-theme="dark" title="暗色模式（黑色）" aria-label="暗色模式"></button>
-</div>
 <div class="page">
   <header class="page-header">
     <div class="page-header-top">
       <h1>公式与算法</h1>
-      <div class="update-badge">更新于 2026-09-27</div>
+      <div class="update-badge">更新于 2026-10-19</div>
     </div>
     <p class="sub">计算公式源于网络收集！验证后及修改后上传！若发现错误请及时与我联系！</p>
   </header>
+  
   <!-- ============ 01 角色等级系数 ============ -->
   <section class="section">
     <div class="sec-head">
@@ -540,6 +471,7 @@
       <p>若角色为 100 级，将公式中的 1446.85 替换为 1674.81</p>
     </div>
   </section>
+  
   <!-- ============ 02 普通直伤 ============ -->
   <section class="section">
     <div class="sec-head">
@@ -606,6 +538,7 @@
       <p>来自角色的减防不能超过 90%，无视防御不能超过 100%</p>
     </div>
   </section>
+  
   <!-- ============ 03 增幅反应 ============ -->
   <section class="section">
     <div class="sec-head">
@@ -671,6 +604,7 @@
       <p>增幅反应包括：蒸发、融化。触发增幅反应时，会为本次伤害附加蒸发融化系数（完整公式见【常规伤害】章节）。若攻击没有出现伤害数字（例如命中护盾），则本次伤害不会计算蒸发融化系数</p>
     </div>
   </section>
+  
   <!-- ============ 04 激化反应 ============ -->
   <section class="section">
     <div class="sec-head">
@@ -721,6 +655,7 @@
       <p>当附着雷/草元素的攻击命中具有原激化的目标时，将分别引发超激化/蔓激化反应，不消耗任何元素，但为本次伤害贡献激化值（完整公式见【常规伤害】章节）</p>
     </div>
   </section>
+  
   <!-- ============ 05 剧变伤害 ============ -->
   <section class="section">
     <div class="sec-head">
@@ -779,6 +714,7 @@
       <p>触发剧变反应没有冷却，但剧变反应的伤害有冷却：每 0.5s 最多 1 次：超载；每 0.5s 最多 2 次：超导、碎冰、扩散、绽放、烈绽放</p>
     </div>
   </section>
+  
   <!-- ============ 07 月曜直伤 ============ -->
   <section class="section">
     <div class="sec-head">
@@ -821,6 +757,7 @@
       <p><strong>月绽放额外提升：</strong>菈乌玛元素爆发等</p>
     </div>
   </section>
+  
   <!-- ============ 06 月曜反应伤害计算 ============ -->
   <section class="section">
     <div class="sec-head">
@@ -874,9 +811,9 @@
       <p>特定情况下，雷触及水时，会生成一片不可移动的雷暴云，持续 6s。雷暴云：每 2s 攻击一次附近所有同时具有雷和水的目标，并消耗 0.4 元素量的雷和水（破盾效率极低）。触发月感电时，若附近已有雷暴云，则会刷新持续时间。月感电的倍率为 1.8，基础伤害为 1446.85 × 1.8 = 2604.33</p>
       <p>月感电造成伤害时，所有参与反应的角色都会提供伤害值，但除伤害最高的角色外，其余角色的提供的伤害值会降低</p>
       <p>若原本伤害最高的角色没有暴击，则有可能另一名暴击的角色成为最高</p>
-     
     </div>
   </section>
+  
   <!-- ============ 08 星烁反应 ============ -->
   <section class="section">
     <div class="sec-head">
@@ -1031,6 +968,7 @@
       </div>
     </div>
   </section>
+  
   <!-- ============ 09 抗打断系数 ============ -->
   <section class="section">
     <div class="sec-head">
@@ -1066,28 +1004,8 @@
   </section>
 </div>
 <script>
-/* ========== 主题切换 ========== */
+/* ========== 为“逐项定义”添加范围面板，包含下方全部内容 ========== */
 document.addEventListener('DOMContentLoaded', function(){
-  const html = document.documentElement;
-  const buttons = document.querySelectorAll('.theme-btn');
-  const saved = localStorage.getItem('gensri-theme');
-  
-  // 只保留 paper 和 dark 两个主题
-  if (saved && ['paper', 'dark'].includes(saved)) {
-    html.setAttribute('data-theme', saved);
-    buttons.forEach(b => b.classList.toggle('active', b.dataset.theme === saved));
-  }
-  
-  buttons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const theme = btn.dataset.theme;
-      html.setAttribute('data-theme', theme);
-      buttons.forEach(b => b.classList.toggle('active', b === btn));
-      try { localStorage.setItem('gensri-theme', theme); } catch (e) {}
-    });
-  });
-
-  /* ========== 为“逐项定义”添加范围面板，包含下方全部内容 ========== */
   function wrapDefsPanels() {
     document.querySelectorAll('.toggle-defs').forEach(title => {
       // 防止重复包裹

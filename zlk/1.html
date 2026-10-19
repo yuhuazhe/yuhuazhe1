@@ -1,121 +1,99 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="paper">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>原神时间表</title>
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <style>
-        /* ===== 主题变量（与公式页面一致） ===== */
-        html[data-theme="paper"] {
-            --bg: #f7f3ec;
-            --surface: #fffcf7;
-            --surface-2: #f2ece0;
-            --ink: #2a2520;
-            --ink-2: #7a6e5e;
-            --ink-3: #a89880;
-            --accent: #9a3412;
-            --rule: #e8dfd0;
-            --rule-2: #d9cdb8;
-            --zebra: #fdfaf5;
-            --hover: #fdf0e4;
-            --shadow: rgba(0,0,0,0.06);
-        }
-        html[data-theme="dark"] {
-            --bg: #16181d;
-            --surface: #1e2128;
-            --surface-2: #262a33;
-            --ink: #e8eaed;
-            --ink-2: #a5adba;
-            --ink-3: #6b7280;
-            --accent: #f0a05a;
-            --rule: #2d323c;
-            --rule-2: #3a4150;
-            --zebra: #21252c;
-            --hover: #2a2f3a;
-            --shadow: rgba(0,0,0,0.35);
-        }
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
         }
-        body {
-            background: var(--bg);
-            color: var(--ink);
-            min-height: 100vh;
-            padding: 56px 24px 96px;
-            transition: background-color 0.25s, color 0.25s;
+        
+        html, body {
+            height: 100%;
+            margin: 0;
+            overflow: hidden; /* 禁止整页滚动 */
         }
-        /* ===== 主题切换 ===== */
-        .theme-switch {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 100;
-            display: flex;
-            gap: 8px;
-            background: var(--surface);
-            border: 1px solid var(--rule-2);
-            border-radius: 999px;
-            padding: 6px 8px;
-            box-shadow: 0 4px 16px var(--shadow);
-            transition: background-color 0.25s, border-color 0.25s;
-        }
-        .theme-btn {
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-            border: 2px solid transparent;
-            cursor: pointer;
-            transition: transform 0.15s, border-color 0.15s;
-            padding: 0;
-            outline: none;
-        }
-        .theme-btn:hover { transform: scale(1.12); }
-        .theme-btn.active { border-color: var(--accent); }
-        .theme-btn[data-theme="paper"] { background: linear-gradient(135deg, #f7f3ec 50%, #d9cdb8 50%); }
-        .theme-btn[data-theme="dark"]  { background: linear-gradient(135deg, #1e2128 50%, #f0a05a 50%); }
 
-        /* ===== 页面标题 ===== */
+        body {
+            /* ===== 底图（叠加 35% 黑色遮罩，让背景稍稍变暗） ===== */
+            background-color: #16181d;
+            background-image: 
+                linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
+                url("背景2.jpg");
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            height: 100vh;
+            height: 100dvh;
+        }
+
+        /* 全局文字阴影，防止亮色背景下看不清 */
+        h1, p, div, button, a, span {
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9), 0 0 6px rgba(0, 0, 0, 0.6);
+        }
+
+        /* ===== 布局容器 ===== */
+        .layout-wrapper {
+            width: 100%;
+            max-width: 680px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 30px 24px 30px 24px;
+        }
+
+        /* ===== 页面标题（固定） ===== */
         .main-title {
             text-align: center;
             font-family: Georgia, "Noto Serif SC", "Songti SC", serif;
             font-size: clamp(28px, 5vw, 42px);
             font-weight: 700;
-            color: var(--ink);
-            margin-bottom: 32px;
+            color: #60a5fa; /* 亮蓝色 */
+            margin-bottom: 20px;
             letter-spacing: 3px;
-            transition: color 0.25s;
+            flex-shrink: 0;
         }
 
-        /* ===== 主体容器 ===== */
+        /* ===== 主体容器（全透明框架，内部包含固定区和滑动区） ===== */
         .time-axis-wrap {
-            max-width: 680px;
-            margin: 0 auto;
-            background: var(--surface);
-            padding: 30px;
+            flex: 1;
+            min-height: 0; /* 关键：允许 flex 子项缩小以触发滚动 */
+            display: flex;
+            flex-direction: column;
+            background: transparent;
+            padding: 20px;
             border-radius: 16px;
-            border: 1px solid var(--rule-2);
-            box-shadow: 0 8px 30px var(--shadow);
-            transition: background-color 0.25s, border-color 0.25s, box-shadow 0.25s;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        /* ===== 贡献者区域 ===== */
+        /* ===== 图一部分：固定区 ===== */
+        .fixed-top-part {
+            flex-shrink: 0; /* 不参与压缩 */
+        }
+
+        /* 贡献者区域 */
         .contributor-block {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 14px;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             width: 100%;
         }
         .contributor-label {
             font-size: 18px;
-            color: var(--ink-2);
+            color: #93c5fd;
             text-align: center;
-            transition: color 0.25s;
         }
         .contributor-row {
             display: flex;
@@ -132,113 +110,118 @@
             width: 42px;
             height: 42px;
             border-radius: 50%;
-            border: 1px solid var(--rule-2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             object-fit: cover;
-            background: var(--surface-2);
-            transition: border-color 0.25s, background-color 0.25s;
+            background: transparent;
         }
         .person-name {
             font-size: 17px;
-            color: var(--ink);
+            color: #e2e8f0;
             text-align: center;
-            transition: color 0.25s;
         }
         .person-name span {
-            color: var(--accent);
-            transition: color 0.25s;
+            color: #60a5fa;
+            font-weight: bold;
         }
 
-        /* ===== 按钮组 ===== */
+        /* 按钮组 */
         .btn-group {
             display: flex;
             gap: 12px;
             justify-content: center;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
         .btn-desc {
             padding: 8px 22px;
-            background: var(--surface-2);
-            border: 1px solid var(--rule-2);
+            background: transparent;
+            border: 1px solid rgba(96, 165, 250, 0.6);
             border-radius: 8px;
-            color: var(--accent);
+            color: #60a5fa;
             cursor: pointer;
             font-size: 15px;
             font-weight: 600;
-            transition: background-color 0.2s, border-color 0.2s, color 0.2s, opacity 0.2s;
+            transition: all 0.2s;
         }
         .btn-desc:hover {
-            background: var(--hover);
+            background: rgba(96, 165, 250, 0.15);
+            border-color: #60a5fa;
         }
         .btn-desc:disabled {
-            opacity: 0.45;
+            opacity: 0.5;
             cursor: not-allowed;
         }
 
-        /* ===== 倒计时 ===== */
+        /* 倒计时 */
         .countdown-box {
             text-align: center;
             padding: 16px;
-            background: var(--surface-2);
-            border: 1px solid var(--rule);
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 10px;
-            margin-bottom: 28px;
-            transition: background-color 0.25s, border-color 0.25s;
+            margin-bottom: 20px;
         }
         .countdown-title {
             font-size: 16px;
             margin-bottom: 10px;
-            color: var(--ink-2);
-            transition: color 0.25s;
+            color: #93c5fd;
         }
         .countdown-text {
             font-size: 24px;
-            color: var(--accent);
+            color: #38bdf8;
             letter-spacing: 2px;
             font-weight: 700;
-            transition: color 0.25s;
         }
 
-        /* ===== 时间轴列表 ===== */
+        /* ===== 图二部分：内部滑动区 ===== */
         .timeline-list {
+            flex: 1; /* 占满剩余高度 */
+            min-height: 0;
+            overflow-y: auto; /* 开启内部滑动 */
             display: flex;
             flex-direction: column;
             gap: 10px;
+            padding-right: 5px; /* 滚动条留白 */
+            
+            /* 隐藏滚动条 */
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
+        .timeline-list::-webkit-scrollbar {
+            display: none;
+        }
+
         .timeline-item {
+            flex-shrink: 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 12px 16px;
-            background: var(--surface-2);
+            background: transparent;
             border-radius: 8px;
-            border: 1px solid var(--rule);
-            border-left: 3px solid var(--accent);
-            box-shadow: 0 2px 6px var(--shadow);
-            transition: background-color 0.25s, border-color 0.25s, opacity 0.25s, box-shadow 0.25s;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-left: 3px solid #60a5fa;
+            transition: all 0.25s;
         }
         .timeline-item.passed {
-            border-left: 3px solid var(--rule-2);
-            opacity: 0.7;
-            box-shadow: none;
+            border-left: 3px solid rgba(255, 255, 255, 0.2);
+            opacity: 0.6;
         }
         .timeline-name {
             font-size: 15px;
-            color: var(--ink);
-            transition: color 0.25s;
+            color: #e2e8f0;
         }
         .timeline-date {
             font-size: 15px;
-            color: var(--ink-2);
-            transition: color 0.25s;
+            color: #60a5fa;
+            font-weight: 600;
         }
         .empty-tip {
             text-align: center;
             padding: 20px;
-            color: var(--ink-3);
-            transition: color 0.25s;
+            color: #93c5fd;
         }
 
-        /* ===== 弹窗 ===== */
+        /* ===== 弹窗（深色半透明保护阅读） ===== */
         .modal-mask {
             position: fixed;
             top: 0;
@@ -250,54 +233,53 @@
             align-items: center;
             justify-content: center;
             z-index: 999;
+            backdrop-filter: blur(4px);
         }
         .modal-box {
             width: 90%;
             max-width: 520px;
-            background: var(--surface);
+            background: rgba(18, 20, 26, 0.85);
             padding: 26px;
             border-radius: 12px;
-            border: 1px solid var(--rule-2);
-            box-shadow: 0 12px 40px var(--shadow);
-            transition: background-color 0.25s, border-color 0.25s;
+            border: 1px solid rgba(96, 165, 250, 0.3);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
         }
         .modal-title {
             font-size: 18px;
             margin-bottom: 16px;
-            color: var(--accent);
-            transition: color 0.25s;
+            color: #38bdf8;
         }
         .modal-content {
             font-size: 15px;
             line-height: 1.7;
-            color: var(--ink);
-            transition: color 0.25s;
+            color: #e2e8f0;
         }
         .modal-close {
             margin-top: 20px;
             padding: 7px 20px;
-            background: var(--surface-2);
-            border: 1px solid var(--rule-2);
+            background: transparent;
+            border: 1px solid #60a5fa;
             border-radius: 6px;
-            color: var(--ink);
+            color: #60a5fa;
             cursor: pointer;
-            transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+            font-weight: 600;
+            transition: all 0.2s;
         }
         .modal-close:hover {
-            background: var(--hover);
+            background: rgba(96, 165, 250, 0.15);
         }
 
         /* ===== 移动端适配 ===== */
         @media screen and (max-width: 600px) {
-            body {
-                padding: 72px 12px 48px;
+            .layout-wrapper {
+                padding: 20px 12px 20px 12px;
             }
             .main-title {
                 font-size: 24px;
-                margin-bottom: 16px;
+                margin-bottom: 14px;
             }
             .time-axis-wrap {
-                padding: 20px 14px;
+                padding: 15px;
             }
             .avatar {
                 width: 36px;
@@ -314,6 +296,9 @@
             }
             .btn-group {
                 flex-wrap: wrap;
+            }
+            .countdown-box {
+                padding: 12px;
             }
             .countdown-title {
                 font-size: 14px;
@@ -333,44 +318,48 @@
             .modal-box {
                 padding: 18px;
             }
-            .theme-switch { top: 12px; right: 12px; padding: 4px 6px; }
-            .theme-btn { width: 22px; height: 22px; }
         }
     </style>
 </head>
 <body>
-    <!-- 主题切换按钮 -->
-    <div class="theme-switch" role="group" aria-label="背景配色">
-        <button class="theme-btn active" data-theme="paper" title="暖色纸张（原色）" aria-label="暖色纸张"></button>
-        <button class="theme-btn" data-theme="dark" title="暗色模式（黑色）" aria-label="暗色模式"></button>
-    </div>
-
-    <h1 class="main-title">原神时间表</h1>
-    <div class="time-axis-wrap" id="captureWrap">
-        <!-- 贡献者区域 -->
-        <div class="contributor-block">
-            <div class="contributor-label">贡献者</div>
-            <div class="contributor-row">
-                <div class="person-card">
-                    <img class="avatar" src="zj.png" alt="班长头像">
-                    <div class="person-name"><span>幼儿园大班班长</span></div>
+    <div class="layout-wrapper">
+        <h1 class="main-title">原神时间表</h1>
+        
+        <!-- 核心框体：内部包含固定区和滑动区 -->
+        <div class="time-axis-wrap" id="captureWrap">
+            
+            <!-- 图一部分：固定区 -->
+            <div class="fixed-top-part">
+                <!-- 贡献者区域 -->
+                <div class="contributor-block">
+                    <div class="contributor-label">贡献者</div>
+                    <div class="contributor-row">
+                        <div class="person-card">
+                            <img class="avatar" src="zj.png" alt="班长头像" onerror="this.style.display='none'">
+                            <div class="person-name"><span>幼儿园大班班长</span></div>
+                        </div>
+                        <div class="person-card">
+                            <img class="avatar" src="jy.png" alt="金鱼头像" onerror="this.style.display='none'">
+                            <div class="person-name"><span>金鱼</span></div>
+                        </div>
+                    </div>
                 </div>
-                <div class="person-card">
-                    <img class="avatar" src="jy.png" alt="金鱼头像">
-                    <div class="person-name"><span>金鱼</span></div>
+                <div class="btn-group">
+                    <button class="btn-desc" id="openModalBtn">查看说明</button>
+                    <button class="btn-desc" id="downloadImgBtn">下载时间点图片</button>
+                </div>
+                <div class="countdown-box">
+                    <div class="countdown-title">距离下一版本时间点倒计时</div>
+                    <div class="countdown-text" id="countdownDom">加载中...</div>
                 </div>
             </div>
+
+            <!-- 图二部分：内部滑动区 -->
+            <div class="timeline-list" id="timelineList"></div>
+            
         </div>
-        <div class="btn-group">
-            <button class="btn-desc" id="openModalBtn">查看说明</button>
-            <button class="btn-desc" id="downloadImgBtn">下载时间点图片</button>
-        </div>
-        <div class="countdown-box">
-            <div class="countdown-title">距离下一版本时间点倒计时</div>
-            <div class="countdown-text" id="countdownDom">加载中...</div>
-        </div>
-        <div class="timeline-list" id="timelineList"></div>
     </div>
+    
     <!-- 说明弹窗 -->
     <div class="modal-mask" id="descModal">
         <div class="modal-box">
@@ -388,36 +377,9 @@
     </div>
 
     <script>
-    // ============ 全部逻辑包在 DOMContentLoaded 内，确保 DOM 就绪 ============
     document.addEventListener('DOMContentLoaded', function () {
 
-        /* ---------- 1. 主题切换 ---------- */
-        (function initTheme() {
-            var html = document.documentElement;
-            var buttons = document.querySelectorAll('.theme-btn');
-            var saved = null;
-            try { saved = localStorage.getItem('gensri-theme'); } catch (e) { saved = null; }
-            if (saved && ['paper', 'dark'].indexOf(saved) !== -1) {
-                html.setAttribute('data-theme', saved);
-                for (var i = 0; i < buttons.length; i++) {
-                    buttons[i].classList.toggle('active', buttons[i].dataset.theme === saved);
-                }
-            }
-            for (var j = 0; j < buttons.length; j++) {
-                (function (btn) {
-                    btn.addEventListener('click', function () {
-                        var theme = btn.dataset.theme;
-                        html.setAttribute('data-theme', theme);
-                        for (var k = 0; k < buttons.length; k++) {
-                            buttons[k].classList.toggle('active', buttons[k] === btn);
-                        }
-                        try { localStorage.setItem('gensri-theme', theme); } catch (e) {}
-                    });
-                })(buttons[j]);
-            }
-        })();
-
-        /* ---------- 2. 时间节点数据 ---------- */
+        /* ---------- 1. 时间节点数据 ---------- */
         var timeNodeList = [
             {name:"7.0版本前瞻", date:"2026-07-31"},
             {name:"7.0版本创体", date:"2026-08-07"},
@@ -497,7 +459,7 @@
         var openModalBtn = document.getElementById("openModalBtn");
         var closeModalBtn = document.getElementById("closeModalBtn");
 
-        /* ---------- 3. 渲染时间轴 ---------- */
+        /* ---------- 2. 渲染时间轴 ---------- */
         function renderTimeline() {
             if (!timelineWrap) return;
             var nowTime = new Date().getTime();
@@ -523,7 +485,7 @@
             timelineWrap.innerHTML = htmlStr;
         }
 
-        /* ---------- 4. 倒计时 ---------- */
+        /* ---------- 3. 倒计时 ---------- */
         function getNextTargetTime() {
             var nowTime = new Date().getTime();
             var futureNodes = timeNodeList.filter(function (item) {
@@ -555,7 +517,7 @@
             countdownDom.innerText = targetNode.name + ' | ' + day + '天 ' + hour + '时 ' + minute + '分 ' + second + '秒';
         }
 
-        /* ---------- 5. 下载图片 ---------- */
+        /* ---------- 4. 下载图片（智能展开列表防截断） ---------- */
         if (downloadBtn) {
             downloadBtn.addEventListener('click', function () {
                 if (typeof html2canvas !== 'function') {
@@ -564,25 +526,46 @@
                 }
                 downloadBtn.disabled = true;
                 downloadBtn.innerText = "生成中…";
-                html2canvas(captureWrap, {
-                    useCORS: true,
-                    backgroundColor: null,
-                    scale: 2
-                }).then(function (canvas) {
-                    var link = document.createElement('a');
-                    link.download = "原神时间表.png";
-                    link.href = canvas.toDataURL("image/png");
-                    link.click();
-                }).catch(function (e) {
-                    alert("图片生成失败：" + e.message);
-                }).then(function () {
-                    downloadBtn.disabled = false;
-                    downloadBtn.innerText = "下载时间点图片";
-                });
+
+                // 1. 备份并临时移除高度限制，让列表完全展开
+                var origWrapStyle = captureWrap.style.cssText;
+                var origListStyle = timelineWrap.style.cssText;
+                
+                captureWrap.style.height = 'auto';
+                captureWrap.style.maxHeight = 'none';
+                captureWrap.style.overflow = 'visible';
+                
+                timelineWrap.style.height = 'auto';
+                timelineWrap.style.maxHeight = 'none';
+                timelineWrap.style.overflow = 'visible';
+                timelineWrap.style.paddingRight = '0';
+
+                // 2. 延迟一小段时间确保DOM渲染完成
+                setTimeout(function() {
+                    html2canvas(captureWrap, {
+                        useCORS: true,
+                        backgroundColor: '#16181d', 
+                        scale: 2
+                    }).then(function (canvas) {
+                        var link = document.createElement('a');
+                        link.download = "原神时间表.png";
+                        link.href = canvas.toDataURL("image/png");
+                        link.click();
+                    }).catch(function (e) {
+                        alert("图片生成失败：" + e.message);
+                    }).then(function () {
+                        // 3. 恢复原样，恢复内部滑动
+                        captureWrap.style.cssText = origWrapStyle;
+                        timelineWrap.style.cssText = origListStyle;
+                        
+                        downloadBtn.disabled = false;
+                        downloadBtn.innerText = "下载时间点图片";
+                    });
+                }, 100);
             });
         }
 
-        /* ---------- 6. 弹窗 ---------- */
+        /* ---------- 5. 弹窗 ---------- */
         if (openModalBtn && modal) {
             openModalBtn.addEventListener('click', function () {
                 modal.style.display = "flex";
@@ -599,7 +582,7 @@
             });
         }
 
-        /* ---------- 7. 启动 ---------- */
+        /* ---------- 6. 启动 ---------- */
         updateCountdown();
         setInterval(updateCountdown, 1000);
     });

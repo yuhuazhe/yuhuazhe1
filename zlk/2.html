@@ -1,36 +1,10 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="paper">
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>羽化哲</title>
 <style>
-  /* ===== 主题变量 ===== */
-  html[data-theme="paper"] {
-    --bg-mask: rgba(247, 243, 236, 0.86);
-    --surface: rgba(255, 252, 247, 0.82);
-    --surface-2: rgba(242, 236, 224, 0.88);
-    --ink: #2a2520;
-    --ink-2: #6b6053;
-    --ink-3: #968872;
-    --accent: #9a3412;
-    --rule: rgba(180, 168, 148, 0.42);
-    --rule-2: rgba(160, 146, 124, 0.55);
-    --hover: rgba(253, 240, 228, 0.9);
-  }
-  html[data-theme="dark"] {
-    --bg-mask: rgba(16, 18, 23, 0.82);
-    --surface: rgba(30, 33, 40, 0.72);
-    --surface-2: rgba(38, 42, 51, 0.8);
-    --ink: #e8eaed;
-    --ink-2: #a5adba;
-    --ink-3: #6b7280;
-    --accent: #f0a05a;
-    --rule: rgba(90, 100, 118, 0.42);
-    --rule-2: rgba(110, 122, 142, 0.52);
-    --hover: rgba(42, 47, 58, 0.85);
-  }
-
   * {
     margin: 0;
     padding: 0;
@@ -39,61 +13,20 @@
   }
 
   body {
-    /* 固定背景图，与公式页面一致；可替换为你自己的图片 */
+    /* ===== 底图（叠加 35% 黑色遮罩，让背景稍稍变暗） ===== */
     background-color: #16181d;
-    background-image: url("");
+    background-image: 
+        linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
+        url("背景2.jpg");
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
-    color: var(--ink);
+    
+    color: #ffffff;
     min-height: 100vh;
     padding: 56px 24px 96px;
-    transition: color 0.25s;
   }
-
-  /* 主题遮罩层 */
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    background: var(--bg-mask);
-    transition: background-color 0.35s ease;
-    pointer-events: none;
-  }
-
-  /* ===== 主题切换按钮 ===== */
-  .theme-switch {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 100;
-    display: flex;
-    gap: 8px;
-    background: var(--surface);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--rule-2);
-    border-radius: 999px;
-    padding: 6px 8px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
-    transition: background-color 0.25s, border-color 0.25s;
-  }
-  .theme-btn {
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    border: 2px solid transparent;
-    cursor: pointer;
-    transition: transform 0.15s, border-color 0.15s;
-    padding: 0;
-    outline: none;
-  }
-  .theme-btn:hover { transform: scale(1.12); }
-  .theme-btn.active { border-color: var(--accent); }
-  .theme-btn[data-theme="paper"] { background: linear-gradient(135deg, #f7f3ec 50%, #d9cdb8 50%); }
-  .theme-btn[data-theme="dark"]  { background: linear-gradient(135deg, #1e2128 50%, #f0a05a 50%); }
 
   /* ===== 主容器 ===== */
   .wrap {
@@ -106,54 +39,52 @@
     gap: 18px;
   }
 
-  /* ===== 导航卡片 ===== */
+  /* ===== 导航卡片（全透明） ===== */
   .version-box {
-    background: var(--surface);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--rule-2);
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 14px;
     padding: 22px 20px;
     text-align: center;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
-    transition: background-color 0.25s, border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+    transition: all 0.25s ease;
+    box-shadow: none;
   }
+  
   .version-box:hover {
-    border-color: var(--accent);
-    box-shadow: 0 0 14px rgba(154, 52, 18, 0.12), 0 6px 20px rgba(0, 0, 0, 0.12);
+    border-color: rgba(96, 165, 250, 0.45); /* 悬停时边框泛蓝 */
     transform: translateY(-2px);
-    background: var(--hover);
-  }
-  html[data-theme="dark"] .version-box:hover {
-    box-shadow: 0 0 14px rgba(240, 160, 90, 0.18), 0 6px 20px rgba(0, 0, 0, 0.4);
+    background: transparent;
   }
 
   .version-box a {
     font-size: 20px;
-    color: var(--accent);
+    color: #60a5fa; /* 亮蓝色 */
     text-decoration: none;
-    transition: color 0.2s, text-shadow 0.2s;
+    transition: 0.2s;
     display: block;
     margin-bottom: 6px;
     font-weight: 700;
     letter-spacing: 0.5px;
+    /* 增强文字阴影，防止亮色背景下看不清 */
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9), 0 0 6px rgba(0, 0, 0, 0.6);
   }
+  
   .version-box a:hover {
-    color: var(--ink);
-    text-shadow: 0 0 8px var(--accent);
+    color: #38bdf8; /* 悬停时变成天蓝色 */
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9), 0 0 10px rgba(56, 189, 248, 0.6);
   }
 
   .version-box p {
     font-size: 14px;
-    color: var(--ink-2);
+    color: #93c5fd; /* 浅蓝色 */
     line-height: 1.5;
-    transition: color 0.25s;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9), 0 0 5px rgba(0, 0, 0, 0.5);
   }
 
   /* ===== 移动端适配 ===== */
   @media (max-width: 600px) {
     body {
-      padding: 72px 12px 48px;
+      padding: 40px 12px 48px;
     }
     .wrap {
       gap: 14px;
@@ -168,66 +99,23 @@
     .version-box p {
       font-size: 13px;
     }
-    .theme-switch {
-      top: 12px;
-      right: 12px;
-      padding: 4px 6px;
-    }
-    .theme-btn {
-      width: 22px;
-      height: 22px;
-    }
   }
 </style>
 </head>
 <body>
-  <!-- 主题切换按钮 -->
-  <div class="theme-switch" role="group" aria-label="背景配色">
-    <button class="theme-btn active" data-theme="paper" title="暖色纸张（原色）" aria-label="暖色纸张"></button>
-    <button class="theme-btn" data-theme="dark" title="暗色模式（黑色）" aria-label="暗色模式"></button>
-  </div>
 
   <div class="wrap">
     <div class="version-box">
       <a href="gongshi.html">计算公式</a>
       <p>计算公式 / 等级系数</p>
-       <p>重磅更新：9.27</p>
+      <p>重磅更新：9.27</p>
     </div>
     <div class="version-box">
       <a href="1.html">原神时间表</a>
       <p>记录版本时间，ct，cs，前瞻时间</p>
-        <p>重磅更新：9.27</p>
+      <p>重磅更新：9.27</p>
     </div>
-   
+  </div>
 
-  <script>
-    // ===== 主题切换逻辑 =====
-    (function () {
-      var html = document.documentElement;
-      var buttons = document.querySelectorAll('.theme-btn');
-      var saved = null;
-      try { saved = localStorage.getItem('gensri-theme'); } catch (e) { saved = null; }
-
-      if (saved && ['paper', 'dark'].indexOf(saved) !== -1) {
-        html.setAttribute('data-theme', saved);
-        for (var i = 0; i < buttons.length; i++) {
-          buttons[i].classList.toggle('active', buttons[i].dataset.theme === saved);
-        }
-      }
-
-      for (var j = 0; j < buttons.length; j++) {
-        (function (btn) {
-          btn.addEventListener('click', function () {
-            var theme = btn.dataset.theme;
-            html.setAttribute('data-theme', theme);
-            for (var k = 0; k < buttons.length; k++) {
-              buttons[k].classList.toggle('active', buttons[k] === btn);
-            }
-            try { localStorage.setItem('gensri-theme', theme); } catch (e) {}
-          });
-        })(buttons[j]);
-      }
-    })();
-  </script>
 </body>
 </html>
