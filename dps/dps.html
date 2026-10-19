@@ -15,16 +15,22 @@
         }
         body {
             min-height: 100vh;
-            background:#08080c url("1.1.webp") center/cover no-repeat fixed;
+            background-color: #08080c;
+            background-image: url("背景2.jpg");
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            
             color:#f2f2f7;
             padding:0;
-            overflow:hidden;
+            overflow:hidden; /* 防止页面级滚动，全部交由容器内部滚动 */
         }
-        body::before{
+        body::before {
             content:"";
             position:fixed;
             inset:0;
-            background:rgba(0,0,0,0.6);
+            background:rgba(0,0,0,0.5);
             z-index:-1;
         }
         .wrap{
@@ -44,12 +50,13 @@
             text-align:center;
             margin-bottom:14px;
             font-size:clamp(20px,5vw,32px);
+            text-shadow: 0 2px 6px rgba(0,0,0,0.8);
         }
+        
+        /* ===== 筛选框 ===== */
         .filter-box{
-            background:rgba(255,255,255,0.06);
-            backdrop-filter:blur(12px);
-            -webkit-backdrop-filter:blur(12px);
-            border:1px solid rgba(255,255,255,0.12);
+            background:transparent;
+            border:1px solid rgba(255,255,255,0.3);
             border-radius:14px;
             padding:12px;
             margin-bottom:12px;
@@ -63,28 +70,31 @@
         }
         .filter-item label{
             font-size:13px;
-            color:#ccc;
+            color:#e2e8f0;
             display:block;
             margin-bottom:4px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
         }
         .filter-item select,
         .filter-item input{
             width:100%;
             padding:9px;
-            background:rgba(255,255,255,0.07);
-            border:1px solid rgba(255,255,255,0.14);
+            background:transparent;
+            border:1px solid rgba(255,255,255,0.3);
             color:#fff;
             border-radius:8px;
             font-size:14px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
         }
         .filter-item select option{
             color:#000000;
+            background:#151526;
         }
         .filter-item button{
             width:100%;
             padding:9px;
-            background:rgba(255,255,255,0.07);
-            border:1px solid rgba(255,255,255,0.14);
+            background:transparent;
+            border:1px solid rgba(255,255,255,0.3);
             color:#fff;
             border-radius:8px;
             font-size:14px;
@@ -92,12 +102,13 @@
             cursor:pointer;
             transition:0.2s ease;
             -webkit-tap-highlight-color:transparent;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
         }
         .filter-item button:hover{
-            background:rgba(255,255,255,0.15);
+            background:rgba(255,255,255,0.1);
         }
         .filter-item button.active{
-            background:rgba(116,170,255,0.32);
+            background:rgba(116,170,255,0.3);
             border-color:rgba(116,170,255,0.85);
             font-weight:bold;
         }
@@ -106,9 +117,11 @@
                 align-self:end;
             }
         }
+        
+        /* 滚动容器：统一管理横向和纵向滚动 */
         .outer-scroll{
             flex: 1;
-            overflow-y: auto;
+            overflow: auto; 
             padding:0 8px 12px 8px;
             min-width:0;
             -ms-overflow-style: none;
@@ -117,18 +130,13 @@
         .outer-scroll::-webkit-scrollbar{
             display:none;
         }
+        
+        /* 移除内部横向滚动，让宽度撑开外层，使 sticky 生效 */
         .x-scroll{
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
+            min-width: min-content; 
             padding-bottom:4px;
         }
-        .x-scroll::-webkit-scrollbar{
-            height:4px;
-        }
-        .x-scroll::-webkit-scrollbar-thumb{
-            background:rgba(255,255,255,0.25);
-            border-radius:4px;
-        }
+        
         .grid-row{
             display: grid;
             grid-template-columns: 220px 140px 160px 80px 130px 100px 110px 180px;
@@ -137,34 +145,38 @@
             min-width: 1028px;
             padding:10px 12px;
         }
+        
+        /* ===== 固定表头 ===== */
         .grid-header{
             border-radius:12px;
-            backdrop-filter:blur(16px);
-            -webkit-backdrop-filter:blur(16px);
-            border:1px solid rgba(255,255,255,0.12);
-            background:rgba(255,255,255,0.09);
+            border:1px solid rgba(255,255,255,0.3);
+            /* 加入半透明黑底和毛玻璃，防止滚动时下方文字与表头重叠 */
+            background:rgba(10, 10, 15, 0.75);
+            backdrop-filter:blur(12px);
+            -webkit-backdrop-filter:blur(12px);
             position: sticky;
-            top:0;
+            top: 0;
             z-index: 10;
         }
+        
+        /* ===== 表格行 ===== */
         .grid-item{
             border-radius:12px;
-            backdrop-filter:blur(16px);
-            -webkit-backdrop-filter:blur(16px);
-            border:1px solid rgba(255,255,255,0.12);
-            background:rgba(255,255,255,0.04);
+            border:1px solid rgba(255,255,255,0.15);
+            background:transparent;
             margin-bottom:8px;
             transition:0.2s ease;
         }
         .grid-item:hover{
-            background:rgba(255,255,255,0.08);
-            border-color:rgba(255,255,255,0.2);
+            background:rgba(255,255,255,0.1);
+            border-color:rgba(255,255,255,0.3);
         }
         .cell{
             font-size:13px;
             overflow:hidden;
             text-overflow:ellipsis;
             white-space:nowrap;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
         }
         .cell-header{
             color:#b4c8ff;
@@ -178,9 +190,9 @@
             width:48px;
             height:48px;
             border-radius:50%;
-            border:2px solid rgba(255,255,255,0.22);
+            border:2px solid rgba(255,255,255,0.4);
             overflow:hidden;
-            background:rgba(0,0,0,0.35);
+            background:rgba(0,0,0,0.3);
             flex-shrink:0;
             display:flex;
             align-items:center;
@@ -192,24 +204,26 @@
             width:auto;
             height:auto;
             object-fit:contain;
-            decoding:"async";
-            loading="lazy";
         }
         a{
             color:#74aaff;
             text-decoration:none;
             font-size:12px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
         }
+        
+        /* ===== 手机端 ===== */
         @media (max-width:679px){
             .grid-row{
                 display:none !important;
             }
+            .x-scroll {
+                min-width: 0; /* 手机端不需撑开 */
+            }
             .mobile-card{
-                backdrop-filter:blur(16px);
-                -webkit-backdrop-filter:blur(16px);
-                border:1px solid rgba(255,255,255,0.12);
+                border:1px solid rgba(255,255,255,0.3);
                 border-radius:14px;
-                background:rgba(255,255,255,0.04);
+                background:transparent;
                 padding:14px;
                 margin-bottom:10px;
             }
@@ -227,10 +241,12 @@
                 color:#b4c8ff;
                 flex:0 0 75px;
                 font-weight:bold;
+                text-shadow: 0 1px 3px rgba(0,0,0,0.8);
             }
             .mobile-card__value{
                 flex:1;
                 word-break:break-all;
+                text-shadow: 0 1px 3px rgba(0,0,0,0.8);
             }
             .avatar-circle{
                 width:42px;
@@ -342,7 +358,7 @@ const teamMeta = {
 };
 
 let dataList = [
-    // ====================== 星扩散【完全原始，一行未改动】 ======================
+    // ====================== 星扩散 ======================
     {team:"星扩散队",config:"01薇00沃00奥6珐",gold:4,dps:215085.15,fullEnergy:"是",configInfo:"v6.1"},
     {team:"星扩散队",config:"01薇01沃00奥6珐",gold:5,dps:240619.5592,fullEnergy:"是",configInfo:"v6.1"},
     {team:"星扩散队",config:"00薇00沃00奥6珐",gold:3,dps:177457.18,fullEnergy:"是",configInfo:"v6.1"},
@@ -401,7 +417,7 @@ let dataList = [
     {team:"星扩散队",config:"61薇21沃20奥6珐",gold:15,dps:840411.3,fullEnergy:"是",configInfo:"v6.1"},
     {team:"星扩散队",config:"61薇61沃20奥6珐",gold:19,dps:1051740.75,fullEnergy:"是",configInfo:"v6.1"},
 
-    // ====================== 桑奥米七 12条（DPS已按图二更新，版本号统一为 v7.2.2.1） ======================
+    // ====================== 桑奥米七 ======================
     {team:"桑奥米七",config:"01桑00奥00米七",gold:4,dps:246200,fullEnergy:"是",configInfo:"v7.2.2.1"},
     {team:"桑奥米七",config:"01桑00奥10米七",gold:5,dps:283300,fullEnergy:"是",configInfo:"v7.2.2.1"},
     {team:"桑奥米七",config:"01桑00奥20米七",gold:6,dps:348600,fullEnergy:"是",configInfo:"v7.2.2.1"},
@@ -426,7 +442,6 @@ const listMobile = document.getElementById("listMobile");
 
 let onlyTopPerGold = false;
 
-/* 角色筛选：下拉值 -> 队伍名/配置串中的关键字 */
 const charKeyword = {
     "桑多涅": "桑",
     "薇斯纳": "薇"
@@ -484,7 +499,6 @@ function render(){
     const g = selGold.value;
     if(g !== "all") arr = arr.filter(x=>x.gold===Number(g));
 
-    // 角色筛选
     const ch = selChar.value;
     if(ch !== "all"){
         const ck = charKeyword[ch] || ch;
