@@ -1,890 +1,810 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>羽化哲</title>
-    <style>
-        body {
-            background: url('1.1.webp') no-repeat center center fixed;
-            background-size: cover;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            font-family: "Microsoft YaHei", -apple-system, sans-serif;
-            color: #ecf0f1;
-            box-sizing: border-box;
-        }
-        .calculator-container {
-            width: 100%;
-            max-width: 100%;
-            background: rgba(18, 26, 42, 0.6);
-            backdrop-filter: blur(20px) saturate(150%);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
-            box-sizing: border-box;
-        }
-        .panel {
-            background: rgba(0, 0, 0, 0.15);
-            border-radius: 12px;
-            padding: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        .panel-header {
-            font-size: 16px;
-            font-weight: bold;
-            color: #8cb8e6;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .btn-group {
-            display: flex;
-            gap: 10px;
-        }
-        .reset-btn, .help-btn, .timeline-btn,.note-btn {
-            background: transparent;
-            color: #b0c4de;
-            border: 1px solid #444;
-            padding: 4px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: 0.2s;
-        }
-        .reset-btn:hover, .help-btn:hover { background: rgba(255,255,255,0.1); }
-        .help-btn { border-color: #6688bb; color: #8cb8e6; }
-        .timeline-btn { border-color: #aa66bb; color: #d4b0e6; }
-        .timeline-btn:hover { background: rgba(170, 102, 187, 0.2); }
-        .note-btn {border-color:#33bb99;color:#74e2c8;}
-        .note-btn:hover{background:rgba(51,187,153,0.2);}
-        
-        .particle-table-wrapper {
-            width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            padding-bottom: 4px;
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        .particle-table-wrapper::-webkit-scrollbar { display: none; }
-        .grid-row {
-            display: grid;
-            grid-template-columns: 90px repeat(6, 1fr);
-            gap: 12px;
-            align-items: center;
-            margin-bottom: 12px;
-            min-width: 650px;
-        }
-        .grid-row:last-child { margin-bottom: 0; }
-        .grid-row.header {
-            color: #b9cef0;
-            font-size: 14px;
-            margin-bottom: 14px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            font-weight: bold;
-        }
-        .label-text { color: #d1d8e0; font-size: 15px; text-align: left; }
-        .number-control {
-            display: flex;
-            align-items: center;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 6px;
-            border: 1px solid #445566;
-            overflow: hidden;
-            width: 100%;
-            height: 34px;
-        }
-        .number-control button {
-            background: #2a3a4a; border: none; color: #ecf0f1; width: 30px;
-            height: 100%; cursor: pointer; font-size: 16px; transition: 0.2s;
-            touch-action: manipulation;
-        }
-        .number-control button:active { background: #4a5a6a; }
-        .number-control input {
-            background: transparent; border: none; color: #ecf0f1;
-            width: 100%; text-align: center; height: 100%; font-size: 15px;
-            outline: none; appearance: textfield;
-        }
-        .number-control input::-webkit-outer-spin-button,
-        .number-control input::-webkit-inner-spin-button {
-            -webkit-appearance: none; margin: 0;
-        }
-        @media (max-width: 1023px) {
-            .grid-row { grid-template-columns: 75px repeat(6, 1fr); min-width: 580px; gap: 8px; }
-            .grid-row.header { font-size: 12px; }
-            .label-text { font-size: 14px; }
-            .number-control { height: 30px; }
-            .number-control button { width: 26px; }
-        }
-        @media (max-width: 480px) {
-            .grid-row { grid-template-columns: 65px repeat(6, 1fr); min-width: 520px; gap: 6px; }
-            .label-text { font-size: 12px; }
-            .grid-row.header { font-size: 11px; }
-            .number-control { height: 28px; }
-            .number-control button { width: 24px; font-size: 14px; }
-            .number-control input { font-size: 13px; }
-        }
-        .settings-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
-        .setting-item {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .setting-item label { font-size: 14px; color: #b0c4de; }
-        .setting-item select, .setting-item .number-control { width: 100%; }
-        .result-status {
-            padding: 12px; border-radius: 8px; text-align: center; margin-bottom: 16px;
-            display: flex; justify-content: center; align-items: center; gap: 8px; font-weight: bold;
-        }
-        .result-status.calc-trigger {
-            background: rgba(58, 82, 122, 0.4);
-            border: 1px solid #4a6a9a;
-            color: #fff;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .result-status.calc-trigger:hover { background: rgba(74, 106, 154, 0.6); }
-        .result-status.calc-trigger:active { transform: scale(0.99); }
-        .result-status.fail { background: rgba(220, 50, 50, 0.4); border: 1px solid #aa3333; color: #ffaaaa; }
-        .result-status.success { background: rgba(50, 220, 50, 0.4); border: 1px solid #33aa33; color: #aaffaa; }
-        .result-row {
-            display: flex; justify-content: space-between; padding: 10px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05); color: #aab5c9; font-size: 14px;
-        }
-        .result-row:last-child { border-bottom: none; }
-        .result-row .value { color: #ecf0f1; font-weight: bold; }
-        .result-row .value.infinity { color: #ff8888; font-size: 20px; }
-        .modal-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px);
-            justify-content: center; align-items: center; z-index: 1000;
-        }
-        .modal-content {
-            background: rgba(18, 26, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px; padding: 24px; max-width: 720px; width: 92%;
-            max-height: 82vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.8); position: relative;
-        }
-        .modal-content h3 { color: #8cb8e6; margin-top: 0; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
-        .modal-content ul { padding-left: 20px; line-height: 1.8; font-size: 14px; color: #d1d8e0; }
-        .modal-content ul li { margin-bottom: 8px; }
-        .modal-content .close-btn {
-            position: absolute; top: 15px; right: 15px; background: none; border: none;
-            color: #aab5c9; font-size: 20px; cursor: pointer;
-        }
-        .modal-content .close-btn:hover { color: #fff; }
-        .highlight-code { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-family: monospace; color: #ffd700; }
-        .team-bar{
-            display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.1);
-        }
-        .team-bar select{
-            background:rgba(0,0,0,0.35);
-            color:#ecf0f1;
-            border:1px solid #445566;
-            border-radius:4px;
-            padding:4px 8px;
-        }
-        .team-btn{
-            font-size:12px;padding:3px 8px;border-radius:4px;border:1px solid #557799;background:rgba(40,60,90,0.35);color:#c0d8f0;cursor:pointer;
-        }
-        .team-btn.del{border-color:#995555;color:#ffbbbb;}
-        .note-item{
-            border:1px solid rgba(255,255,255,0.12);
-            border-radius:10px;
-            padding:14px;
-            margin-bottom:12px;
-            background:rgba(0,0,0,0.2);
-        }
-        .note-block-title{
-            color:#8cb8e6;
-            margin:10px 0 6px 0;
-            font-size:14px;
-        }
-        .note-row{
-            display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px;
-        }
-        .note-name-input{
-            background:rgba(0,0,0,0.35);
-            border:1px solid #445566;
-            color:#ecf0f1;
-            border-radius:4px;
-            padding:5px 8px;
-            width:130px;
-            font-size:14px;
-        }
-        .note-num-input{
-            width:52px;
-            background:rgba(0,0,0,0.35);
-            border:1px solid #445566;
-            color:#ecf0f1;
-            border-radius:4px;
-            padding:3px;
-            text-align:center;
-        }
-        .timeline-content {
-            max-width: 1200px; width: 95vw; max-height: 90vh;
-        }
-        .timeline-header {
-            display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
-            background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; margin-bottom: 16px;
-        }
-        .timeline-header input, .timeline-header select, .timeline-header button {
-            background: rgba(0, 0, 0, 0.4); border: 1px solid #445566; border-radius: 6px;
-            color: #ecf0f1; padding: 6px 12px; font-size: 14px; outline: none;
-            height: 34px;
-        }
-        .timeline-header select option { background: #1a2a3a; }
-        .timeline-header input[type="number"] { width: 70px; }
-        .timeline-header input[type="text"] { width: 100px; }
-        .timeline-header input[type="color"] { width: 40px; padding: 2px; cursor: pointer; }
-        .timeline-header .btn-primary { background: #3a527a; border-color: #4a6a9a; cursor: pointer; transition: 0.2s; }
-        .timeline-header .btn-primary:hover { background: #4a6a9a; }
-        .timeline-header .btn-danger { background: #7a3a3a; border-color: #9a4a4a; cursor: pointer; transition: 0.2s; }
-        .timeline-header .btn-danger:hover { background: #9a4a4a; }
-        .timeline-ruler-wrapper { width: 100%; overflow-x: auto; padding-bottom: 4px; }
-        .timeline-ruler {
-            display: flex; justify-content: space-between; padding: 0 10px;
-            font-size: 10px; color: #aaa; height: 30px; align-items: flex-end; border-bottom: 1px solid #446;
-            position: relative; min-width: 600px;
-        }
-        .timeline-ruler span { position: relative; display: flex; flex-direction: column; align-items: center; flex: 1; }
-        .timeline-ruler span::after { content: ''; width: 1px; height: 10px; background: #446; margin-top: 4px; }
-        .timeline-ruler span.major::after { height: 16px; background: #668; }
-        .timeline-ruler span.major { font-weight: bold; color: #ccc; }
-        .timeline-grid {
-            width: 100%; overflow-x: auto; max-height: 400px; overflow-y: auto;
-            position: relative; margin-top: 10px;
-        }
-        .timeline-grid-inner { min-width: 600px; position: relative; }
-        .timeline-row {
-            height: 44px; border-bottom: 1px dashed rgba(255,255,255,0.1);
-            display: flex; align-items: center; position: relative;
-        }
-        .timeline-row .role-label {
-            width: 100px; flex-shrink: 0; color: #ddd; font-size: 14px; font-weight: bold;
-            padding-left: 10px; z-index: 2;
-        }
-        .timeline-row .role-slot {
-            flex: 1; height: 100%; position: relative; border-left: 1px solid rgba(255,255,255,0.05);
-        }
-        .timeline-buff {
-            position: absolute; height: 30px; border-radius: 4px; top: 7px;
-            display: flex; align-items: center; justify-content: center; color: #fff;
-            font-size: 11px; cursor: pointer; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
-            border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 2px 4px rgba(0,0,0,0.4);
-            transition: transform 0.1s; z-index: 10;
-        }
-        .timeline-buff:hover { transform: scaleY(1.1); z-index: 20; }
-        .timeline-buff .del-buff {
-            position: absolute; top: -8px; right: -8px; background: rgba(255,0,0,0.8);
-            border-radius: 50%; width: 16px; height: 16px; color: #fff; font-weight: bold;
-            display: none; align-items: center; justify-content: center; font-size: 10px;
-        }
-        .timeline-buff:hover .del-buff { display: flex; }
-        @media (min-width: 1024px) {
-            body { padding: 40px; }
-            .calculator-container { padding: 30px; gap: 24px; }
-            .panel { padding: 24px; }
-            .settings-grid { gap: 24px; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>充能计算</title>
+<!-- 标签页图标：与 sdnjsq.html 共用文件夹里的 sdn.png -->
+<link rel="icon" href="sdn.png">
+<link rel="shortcut icon" href="sdn.png">
+<link rel="apple-touch-icon" href="sdn.png">
+<!-- 本页由 sdnjsq.html 的「充能计算」板块独立而来；原 sdnjsq.html 未做任何修改。 -->
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  /* 让 hidden 属性始终生效，不被后续 display 规则盖掉 */
+  [hidden] {
+    display: none !important;
+  }
+
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    color-scheme: dark;
+    background-color: #000000;
+    /* 固定背景：背景2.jpg（与 sdnjsq.html 的 bg-2 同款压暗处理） */
+    background-image: linear-gradient(rgba(0, 0, 0, 0.62), rgba(0, 0, 0, 0.78)), url('背景2.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+  }
+
+  /* 包裹容器：撑满整页，滚动条放在内容区内部 */
+  .wrap {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  /* 分割线以上区域：主标题 + BUG 处理 + 分割线 */
+  .top {
+    flex: 0 0 auto;
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 32px 40px 0;
+  }
+
+  /* 页面主标题：与 sdnjsq.html 的页头同款字型与渐变 */
+  .main-title {
+    font-family: "Songti SC", "Noto Serif SC", "STSong", "SimSun", serif;
+    font-size: 28px;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    text-indent: 0.2em;
+    background: linear-gradient(180deg, #ffffff 0%, #d8d8d8 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    white-space: nowrap;
+    text-shadow: 0 0 12px rgba(255, 255, 255, 0.08);
+  }
+
+  .header .right-group {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 14px;
+  }
+
+  /* BUG 处理信息（带边框标签） */
+  .right {
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    color: rgba(168, 198, 230, 0.75);
+    white-space: nowrap;
+    border: 1px solid rgba(168, 198, 230, 0.3);
+    border-radius: 6px;
+    padding: 6px 14px;
+  }
+
+  .divider {
+    height: 1px;
+    margin-top: 20px;
+    background: rgba(255, 255, 255, 0.28);
+  }
+
+  /* 内容区：撑满剩余高度，内容多了在内部滚动 */
+  .content {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 0 40px 40px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(168, 198, 230, 0.32) transparent;
+  }
+
+  /* 第一块与分割线共用一条边线 */
+  .content .block:first-child {
+    border-top: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+
+  /* 独立区域：一道细边框把小标题和内容框在一起 */
+  .block {
+    padding: 16px 20px 18px;
+    border: 1px solid rgba(168, 198, 230, 0.16);
+    border-radius: 8px;
+    background: rgba(168, 198, 230, 0.03);
+  }
+
+  .block + .block {
+    margin-top: 16px;
+  }
+
+  /* 区域小标题：左侧一道短竖线 */
+  .block-title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 14px;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    color: rgba(178, 205, 232, 0.9);
+  }
+
+  .block-title::before {
+    content: "";
+    width: 2px;
+    height: 12px;
+    margin-right: 8px;
+    border-radius: 1px;
+    background: rgba(168, 198, 230, 0.55);
+  }
+
+  /* ===== 字段 ===== */
+  .field-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 320px));
+    gap: 14px 28px;
+  }
+
+  .field {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  /* 每个字段各自一个独立小框（队伍参数 / 计算结果用） */
+  .field-grid.boxed {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+  }
+
+  .field-grid.boxed .field {
+    padding: 10px 14px;
+    border: 1px solid rgba(168, 198, 230, 0.16);
+    border-radius: 6px;
+    background: rgba(168, 198, 230, 0.03);
+  }
+
+  .field .label {
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    color: rgba(255, 255, 255, 0.6);
+    white-space: nowrap;
+  }
+
+  .field input {
+    flex: 0 0 112px;
+    width: 112px;
+    padding: 6px 8px;
+    font-family: inherit;
+    font-size: 13px;
+    color: #e8f1fa;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(168, 198, 230, 0.25);
+    border-radius: 6px;
+    text-align: right;
+  }
+
+  .field input:focus {
+    outline: none;
+    border-color: rgba(168, 198, 230, 0.6);
+  }
+
+  /* 结果数值 */
+  .field .value {
+    font-size: 14px;
+    color: #d3e4f6;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  /* 充能计算：吸收表（2 行 × 6 列）＋ 步进输入 */
+  .energy-scroll {
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(168, 198, 230, 0.32) transparent;
+  }
+
+  .energy-grid {
+    display: grid;
+    grid-template-columns: 92px repeat(6, minmax(0, 1fr));
+    gap: 10px 12px;
+    align-items: center;
+    min-width: 800px;                /* 窄屏时表格内部横向滚动，不挤成一团 */
+  }
+
+  .energy-head {
+    font-size: 12px;
+    letter-spacing: 0.03em;
+    color: rgba(216, 230, 244, 0.72);
+    white-space: nowrap;
+  }
+
+  .energy-row-label {
+    font-size: 13px;
+    letter-spacing: 0.03em;
+    color: rgba(216, 230, 244, 0.88);
+    white-space: nowrap;
+  }
+
+  /* 产球记录：每个角色一个小节，前台/后台各一行 6 个输入 */
+  .energy-sub-title {
+    margin: 14px 0 6px;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    color: #e6f0fb;
+  }
+
+  .energy-sub-title:first-child {
+    margin-top: 0;
+  }
+
+  .energy-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 14px;
+    margin-bottom: 8px;
+  }
+
+  .energy-line-label {
+    flex: 0 0 auto;
+    font-size: 13px;
+    letter-spacing: 0.03em;
+    color: rgba(216, 230, 244, 0.88);
+    white-space: nowrap;
+  }
+
+  /* 六个「标签 + 输入框」等分整行宽度 */
+  .energy-mini {
+    display: inline-flex;
+    flex: 1 1 0;
+    min-width: 96px;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    letter-spacing: 0.03em;
+    color: rgba(216, 230, 244, 0.88);
+    white-space: nowrap;
+  }
+
+  .energy-mini > span {
+    flex: 0 0 auto;
+  }
+
+  .energy-mini input {
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+    padding: 4px 6px;
+    border: 1px solid rgba(168, 198, 230, 0.22);
+    border-radius: 6px;
+    background: rgba(168, 198, 230, 0.04);
+    color: #e8f1fa;
+    font-family: inherit;
+    font-size: 13px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .energy-mini input:focus {
+    outline: none;
+    border-color: rgba(168, 198, 230, 0.5);
+    background: rgba(168, 198, 230, 0.10);
+  }
+
+  .energy-mini input::-webkit-outer-spin-button,
+  .energy-mini input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* 队伍角色：四个名称输入框（只改产球记录的小节标题，不参与计算） */
+  .team-names {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .team-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .team-name > span {
+    flex: 0 0 auto;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: rgba(216, 230, 244, 0.6);
+    white-space: nowrap;
+  }
+
+  .team-name input {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: 100%;
+    padding: 5px 8px;
+    font-family: inherit;
+    font-size: 13px;
+    text-align: center;
+    color: #e8f1fa;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(168, 198, 230, 0.25);
+    border-radius: 6px;
+  }
+
+  .team-name input::placeholder {
+    color: rgba(220, 232, 244, 0.35);
+  }
+
+  .team-name input:focus {
+    outline: none;
+    border-color: rgba(168, 198, 230, 0.55);
+  }
+
+  /* − 数值 ＋ 的步进控件 */
+  .stepper {
+    display: flex;
+    align-items: stretch;
+    min-width: 0;
+    border: 1px solid rgba(168, 198, 230, 0.22);
+    border-radius: 6px;
+    background: rgba(168, 198, 230, 0.04);
+    overflow: hidden;
+  }
+
+  .stepper button {
+    flex: 0 0 auto;
+    width: 26px;
+    border: 0;
+    background: transparent;
+    color: rgba(216, 230, 244, 0.75);
+    font-family: inherit;
+    font-size: 15px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .stepper button:hover {
+    background: rgba(168, 198, 230, 0.14);
+    color: #fff;
+  }
+
+  .stepper input {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 5px 2px;
+    border: 0;
+    background: transparent;
+    color: #e8f1fa;
+    font-family: inherit;
+    font-size: 14px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stepper input:focus {
+    outline: none;
+    background: rgba(168, 198, 230, 0.08);
+  }
+
+  .stepper input::-webkit-outer-spin-button,
+  .stepper input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* 计算充能按钮 */
+  .energy-run {
+    display: block;
+    width: 100%;
+    margin-top: 12px;
+    padding: 10px;
+    border: 1px solid rgba(168, 198, 230, 0.28);
+    border-radius: 8px;
+    background: rgba(168, 198, 230, 0.10);
+    color: #e6f0fb;
+    font-family: inherit;
+    font-size: 14px;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+  }
+
+  .energy-run:hover {
+    background: rgba(168, 198, 230, 0.18);
+    border-color: rgba(168, 198, 230, 0.45);
+  }
+
+  /* 响应式：与 sdnjsq.html 的页头、字段保持一致 */
+  @media (max-width: 1100px) {
+    .team-names {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 900px) {
+    .header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 24px 20px 0;
+    }
+
+    .header .right-group {
+      justify-content: flex-start;
+    }
+
+    .content {
+      padding: 0 20px 24px;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .main-title {
+      font-size: 22px;
+      letter-spacing: 0.14em;
+      text-indent: 0.14em;
+    }
+
+    .team-names {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .field-grid.boxed {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .field input {
+      flex-basis: 96px;
+      width: 96px;
+    }
+  }
+</style>
 </head>
 <body>
-<div class="calculator-container">
-    <div class="panel">
-        <div class="panel-header">
-            <span>原神角色充能计算器</span>
-            <span>BUG急速处理渠道：Q群：1043873841</span>
-            <div class="btn-group">
-                <button class="note-btn" onclick="toggleNoteModal()">产球记录本</button>
-                <button class="timeline-btn" onclick="toggleTimeline()">时间轴功能</button>
-                <button class="help-btn" onclick="toggleHelp()">点击查看说明</button>
-                <button class="reset-btn" onclick="resetAll()">恢复按钮</button>
-            </div>
-        </div>
-        <div class="particle-table-wrapper">
-            <div class="grid-row header">
-                <div>吸收类型</div>
-                <div>同元素微粒</div>
-                <div>异元素微粒</div>
-                <div>无元素微粒</div>
-                <div>同元素晶球</div>
-                <div>异元素晶球</div>
-                <div>无元素晶球</div>
-            </div>
-            <div class="grid-row">
-                <div class="label-text">前台吸收</div>
-                <div class="number-control"><button onclick="changeVal('f_same_p', -1)">-</button><input type="number" id="f_same_p" value="0" min="0" title="前台 同元素微粒"><button onclick="changeVal('f_same_p', 1)">+</button></div>
-                <div class="number-control"><button onclick="changeVal('f_diff_p', -1)">-</button><input type="number" id="f_diff_p" value="0" min="0" title="前台 异元素微粒"><button onclick="changeVal('f_diff_p', 1)">+</button></div>
-                <div class="number-control"><button onclick="changeVal('f_none_p', -1)">-</button><input type="number" id="f_none_p" value="0" min="0" title="前台 无元素微粒"><button onclick="changeVal('f_none_p', 1)">+</button></div>
-                <div class="number-control"><button onclick="changeVal('f_same_o', -1)">-</button><input type="number" id="f_same_o" value="0" min="0" title="前台 同元素晶球"><button onclick="changeVal('f_same_o', 1)">+</button></div>
-                <div class="number-control"><button onclick="changeVal('f_diff_o', -1)">-</button><input type="number" id="f_diff_o" value="0" min="0" title="前台 异元素晶球"><button onclick="changeVal('f_diff_o', 1)">+</button></div>
-                <div class="number-control"><button onclick="changeVal('f_none_o', -1)">-</button><input type="number" id="f_none_o" value="0" min="0" title="前台 无元素晶球"><button onclick="changeVal('f_none_o', 1)">+</button></div>
-            </div>
-            <div class="grid-row">
-                <div class="label-text">后台吸收</div>
-                <div class="number-control"><button onclick="changeVal('b_same_p', -1)">-</button><input type="number" id="b_same_p" value="0" min="0" title="后台 同元素微粒"><button onclick="changeVal('b_same_p', 1)">+</button></div>
-                <div class="number-control"><button onclick="changeVal('b_diff_p', -1)">-</button><input type="number" id="b_diff_p" value="0" min="0" title="后台 异元素微粒"><button onclick="changeVal('b_diff_p', 1)">+</button></div>
-                <div class="number-control"><button onclick="changeVal('b_none_p', -1)">-</button><input type="number" id="b_none_p" value="0" min="0" title="后台 无元素微粒"><button onclick="changeVal('b_none_p', 1)">+</button></div>
-                <div class="number-control"><button onclick="changeVal('b_same_o', -1)">-</button><input type="number" id="b_same_o" value="0" min="0" title="后台 同元素晶球"><button onclick="changeVal('b_same_o', 1)">+</button></div>
-                <div class="number-control"><button onclick="changeVal('b_diff_o', -1)">-</button><input type="number" id="b_diff_o" value="0" min="0" title="后台 异元素晶球"><button onclick="changeVal('b_diff_o', 1)">+</button></div>
-                <div class="number-control"><button onclick="changeVal('b_none_o', -1)">-</button><input type="number" id="b_none_o" value="0" min="0" title="后台 无元素晶球"><button onclick="changeVal('b_none_o', 1)">+</button></div>
-            </div>
-        </div>
-    </div>
-    <div class="panel">
-        <div class="settings-grid">
-            <div class="setting-item">
-                <label>队伍人数</label>
-                <div class="number-control"><button onclick="changeVal('party_size', -1)">-</button><input type="number" id="party_size" value="4" min="1" max="4" title="队伍人数"><button onclick="changeVal('party_size', 1)">+</button></div>
-            </div>
-            <div class="setting-item">
-                <label>所需能量</label>
-                <div class="number-control"><button onclick="changeVal('req_energy', -5)">-</button><input type="number" id="req_energy" value="60" min="0" title="所需能量"><button onclick="changeVal('req_energy', 5)">+</button></div>
-            </div>
-            <div class="setting-item">
-                <label>固定恢复能量</label>
-                <div class="number-control"><button onclick="changeVal('fixed_recovery', -1)">-</button><input type="number" id="fixed_recovery" value="0" min="0" title="固定恢复能量 (如角色天赋直接回能，不受元素充能效率加成)"><button onclick="changeVal('fixed_recovery', 1)">+</button></div>
-            </div>
-            <div class="setting-item">
-                <label>元素充能效率</label>
-                <div class="number-control"><button onclick="changeVal('er_stat', -5)">-</button><input type="number" id="er_stat" value="100" min="0" title="元素充能效率"><button onclick="changeVal('er_stat', 5)">+</button></div>
-            </div>
-        </div>
-    </div>
-    <div class="panel">
-        <div class="panel-header">
-            <span>计算结果</span>
-        </div>
-        <div id="status_box" class="result-status calc-trigger" onclick="calculate()">
-            <span></span> 计算充能
-        </div>
-        <div class="result-row">
-            <span>最低充能需求</span>
-            <span id="min_er_needed" class="value">--</span>
-        </div>
-    </div>
-</div>
-<div id="noteModal" class="modal-overlay" onclick="toggleNoteModal(event)">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <button class="close-btn" onclick="toggleNoteModal()">✕</button>
-        <h3>产球记录本</h3>
-        <div class="team-bar">
-            <label>选择队伍:</label>
-            <select id="teamSelect" onchange="switchTeam()"></select>
-            <button class="team-btn" onclick="createNewTeam()">新建队伍</button>
-            <button class="team-btn" onclick="renameCurrentTeam()">重命名队伍</button>
-            <button class="team-btn del" onclick="deleteCurrentTeam()">删除队伍</button>
-        </div>
-        <div id="noteWrap"></div>
-    </div>
-</div>
-<div id="helpModal" class="modal-overlay" onclick="toggleHelp(event)">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <button class="close-btn" onclick="toggleHelp()">✕</button>
-        <h3>计算器使用说明</h3>
-        <ul>
-            <li><b>注意！！！：</b><br>
-                <span class="highlight-code">1.本程序为v3.1测试版，可能存在异常bug或异常显示问题，若发现问题请及时反馈，感谢使用！</span>
-                <br>
-                <span class="highlight-code">最后更新日期：2026.9.29----制作者：幼儿园大班班长</span><br>
-                2.十分感谢大家使用本程序，以及反馈错误
-                
-            </li>
-           
-          
-            <li><b>记忆功能：</b><br>
-                <span class="highlight-code">网页内置记忆代码，每个队伍独立保存计算器状态、时间轴，刷新或二次进入网站不会丢失</span>
-            </li>
-            <li><b>最低充能需求：</b><br>
-                是指在您当前设定的产球环境下，为了让大招刚好充满，角色面板上所需的最低充能效率数值。
-            </li>
-            <li><b>时间轴功能：</b><br>
-                1.由于部分角色或武器，存在触发产球或回能的时间限制，大家可通过时间轴添加对应的触发间隔，可快速得出规定时间内的回能次数，方便大家填入<br>
-                <span class="highlight-code">2.在输入的开始前，记得点击“清空数据”按钮；时间轴跟随队伍持久保存</span>
-            </li>
-            <li><b>产球记录本：</b><br>
-                1.主要方便大家记录队伍中其他角色的产球情况，以及产球数量<br>
-                2.在记录本切换队伍后，主页面的计算器也会发生变化，便于计算另一只队伍的充能情况<br>
-                3.当进行切换队伍后，原本队伍的主页面充能并不会消失，仅需重新切换回来即可<br>
-                <span class="highlight-code">4.记录本功能用于记录不同角色在前后台的产球情况；每个队伍拥有独立计算器存档与独立时间轴存档，切换队伍自动加载对应数据</span>
-            </li>
-            <li><b>恢复按钮：</b><br>
-                1.可以点击此按钮实现当前队伍计算器数值的快速清空<br>
-            </li>
-            <li><b>展示问题：</b><br>
-                1.现阶段更推荐使用电脑，手机端的整体体现并不理想<br>
-            <li><b>联系制作者：</b><br>
-                1.可通过b站私信/粉丝群联系up，并说明具体的情况<br>
-            </li>
-        </ul>
-    </div>
-</div>
-<div id="timelineModal" class="modal-overlay" onclick="toggleTimeline(event)">
-    <div class="modal-content timeline-content" onclick="event.stopPropagation()">
-        <button class="close-btn" onclick="toggleTimeline()">✕</button>
-        <div class="timeline-header">
-            <button class="btn-primary" onclick="addRole()">+ 添加角色</button>
-            <select id="tlm_role_select"><option>角色1</option></select>
-            <button class="btn-primary" onclick="addBuff()">+ 添加BUFF板块</button>
-            <label>起始时间(s):</label>
-            <input type="number" id="tlm_start" value="" step="0.1" min="0">
-            <label>持续时长(s):</label>
-            <input type="number" id="tlm_duration" value="" step="0.1" min="0.1">
-            <label>回能值:</label>
-            <input type="text" id="tlm_name" value="">
-            <label>颜色:</label>
-            <input type="color" id="tlm_color" value="#4a90e2">
-            <button class="btn-danger" onclick="clearTimeline()">清空全部数据</button>
-        </div>
-        <div class="timeline-ruler-wrapper">
-            <div class="timeline-ruler" id="timelineRuler"></div>
-        </div>
-        <div class="timeline-grid">
-            <div class="timeline-grid-inner" id="timelineGridInner"></div>
-        </div>
-    </div>
-</div>
-<script>
-    const ENERGY_VALUES = {
-        'f_same_p': 3.0, 'f_diff_p': 1.0, 'f_none_p': 2.0,
-        'f_same_o': 9.0, 'f_diff_o': 3.0, 'f_none_o': 6.0,
-        'b_same_p': 3.0, 'b_diff_p': 1.0, 'b_none_p': 2.0,
-        'b_same_o': 9.0, 'b_diff_o': 3.0, 'b_none_o': 6.0
-    };
-    const NOTE_STORAGE_KEY = "genshin_note_multi_team_v4";
-    const CALC_INPUT_IDS = [
-        'f_same_p','f_diff_p','f_none_p','f_same_o','f_diff_o','f_none_o',
-        'b_same_p','b_diff_p','b_none_p','b_same_o','b_diff_o','b_none_o',
-        'party_size','req_energy','fixed_recovery','er_stat'
-    ];
-    function getEmptyCalcState(){
-        return {
-            'f_same_p':0,'f_diff_p':0,'f_none_p':0,'f_same_o':0,'f_diff_o':0,'f_none_o':0,
-            'b_same_p':0,'b_diff_p':0,'b_none_p':0,'b_same_o':0,'b_diff_o':0,'b_none_o':0,
-            'party_size':4,'req_energy':60,'fixed_recovery':0,'er_stat':100
-        };
-    }
-    function getEmptyTimelineData(){
-        return {
-            roles: ['角色1', '角色2', '角色3'],
-            buffs: []
-        };
-    }
-    function getEmptyRole(){
-        return {
-            name:"新角色",
-            f_same_p:0, f_diff_p:0, f_none_p:0,
-            f_same_o:0, f_diff_o:0, f_none_o:0,
-            b_same_p:0, b_diff_p:0, b_none_p:0,
-            b_same_o:0, b_diff_o:0, b_none_o:0
-        };
-    }
-    function getEmptyTeam(name){
-        return {
-            teamName: name,
-            roles: [getEmptyRole(),getEmptyRole(),getEmptyRole(),getEmptyRole()],
-            calcState: getEmptyCalcState(),
-            timelineData: getEmptyTimelineData()
-        };
-    }
-    let teamList = [getEmptyTeam("队伍1")];
-    let currentTeamIndex = 0;
-    let timelineData = getEmptyTimelineData();
-    let buffIdCounter = 1;
 
-    function saveCalcToCurrentTeam(){
-        const t = teamList[currentTeamIndex];
-        const s = {};
-        CALC_INPUT_IDS.forEach(id=>{
-            const el = document.getElementById(id);
-            let v = el ? el.value : 0;
-            if(v === "" || v === null || v === undefined){
-                v = "0";
-            }
-            s[id] = v;
-        });
-        t.calcState = s;
-        t.timelineData = JSON.parse(JSON.stringify(timelineData));
-        saveNoteStorage();
-    }
-    function loadTeamAllState(teamObj){
-        const st = teamObj.calcState || getEmptyCalcState();
-        CALC_INPUT_IDS.forEach(id=>{
-            const el = document.getElementById(id);
-            if(el) el.value = st[id] ?? 0;
-        });
-        timelineData = (teamObj.timelineData) ? JSON.parse(JSON.stringify(teamObj.timelineData)) : getEmptyTimelineData();
-        const maxId = timelineData.buffs.length > 0 ? timelineData.buffs.reduce((m,b)=>Math.max(m,b.id),0) : 0;
-        buffIdCounter = maxId + 1;
+  <div class="wrap">
 
-        const statusBox = document.getElementById('status_box');
-        const minErSpan = document.getElementById('min_er_needed');
-        statusBox.className = 'result-status calc-trigger';
-        statusBox.innerHTML = '<span></span> 计算充能';
-        minErSpan.className = 'value';
-        minErSpan.innerText = '--';
+    <!-- 页头：主标题 + BUG 处理 + 分割线（仿 sdnjsq.html 的页头） -->
+    <div class="top">
+      <div class="header">
+        <h1 class="main-title">充能计算</h1>
 
-        renderTimeline();
-    }
+        <div class="right-group">
+          <div class="right">BUG急速处理：1127293128</div>
+        </div>
+      </div>
 
-    function saveNoteStorage(){
-        localStorage.setItem(NOTE_STORAGE_KEY,JSON.stringify({teamList,currentTeamIndex}));
-    }
-    function loadNoteStorage(){
-        const s = localStorage.getItem(NOTE_STORAGE_KEY);
-        if(!s) return;
-        try{
-            const obj = JSON.parse(s);
-            if(obj.teamList && Array.isArray(obj.teamList) && obj.teamList.length>0){
-                teamList = obj.teamList;
-                teamList.forEach(t=>{
-                    if(!t.calcState) t.calcState = getEmptyCalcState();
-                    if(!t.timelineData) t.timelineData = getEmptyTimelineData();
-                });
-                let idx = Number(obj.currentTeamIndex)||0;
-                if(idx>=teamList.length) idx=0;
-                currentTeamIndex = idx;
-            }
-        }catch(e){console.error(e);}
-    }
-    function createNewTeam(){
-        let maxNum = 0;
-        teamList.forEach(t=>{
-            const m = /队伍(\d+)/.exec(t.teamName);
-            if(m) maxNum = Math.max(maxNum,Number(m[1]));
-        });
-        const newTeam = getEmptyTeam(`队伍${maxNum+1}`);
-        teamList.push(newTeam);
-        currentTeamIndex = teamList.length-1;
-        saveNoteStorage();
-        renderNoteUi();
-        loadTeamAllState(newTeam);
-    }
-    function renameCurrentTeam(){
-        const t = teamList[currentTeamIndex];
-        const newName = prompt("输入队伍新名称",t.teamName);
-        if(newName && newName.trim()!==''){
-            t.teamName = newName.trim();
-            saveNoteStorage();
-            renderNoteUi();
-        }
-    }
-    function deleteCurrentTeam(){
-        if(teamList.length<=1){
-            alert("至少保留一个队伍，无法删除！");
-            return;
-        }
-        if(!confirm(`确定删除队伍【${teamList[currentTeamIndex].teamName}】，数据不可恢复？`)) return;
-        teamList.splice(currentTeamIndex,1);
-        if(currentTeamIndex >= teamList.length) currentTeamIndex = teamList.length-1;
-        saveNoteStorage();
-        renderNoteUi();
-        loadTeamAllState(teamList[currentTeamIndex]);
-    }
-    function switchTeam(){
-        saveCalcToCurrentTeam();
-        const sel = document.getElementById("teamSelect");
-        currentTeamIndex = Number(sel.value);
-        saveNoteStorage();
-        loadTeamAllState(teamList[currentTeamIndex]);
-        renderNoteUi();
-    }
-    function toggleNoteModal(event){
-        const modal = document.getElementById("noteModal");
-        if(event && event.target === modal){
-            modal.style.display = "none";
-            return;
-        }
-        if(modal.style.display !== "flex"){
-            renderNoteUi();
-        }
-        modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
-    }
-    function renderNoteUi(){
-        const sel = document.getElementById("teamSelect");
-        sel.innerHTML = "";
-        teamList.forEach((t,idx)=>{
-            const opt = document.createElement("option");
-            opt.value = idx;
-            opt.textContent = t.teamName;
-            if(idx === currentTeamIndex) opt.selected = true;
-            sel.appendChild(opt);
-        });
-        const wrap = document.getElementById("noteWrap");
-        wrap.innerHTML = "";
-        const curTeam = teamList[currentTeamIndex];
-        for(let i=0;i<4;i++){
-            const item = curTeam.roles[i];
-            const div = document.createElement("div");
-            div.className = "note-item";
-            div.innerHTML = `
-                <div>
-                    <label>角色名称：</label>
-                    <input class="note-name-input" value="${item.name}" oninput="noteChangeName(${i},this.value)">
-                </div>
-                <div class="note-block-title">【前台】</div>
-                <div class="note-row">
-                    <span>同微:</span>
-                    <input class="note-num-input" type="number" min="0" value="${item.f_same_p}" oninput="noteChange(${i},'f_same_p',this.value)">
-                    <span>异微:</span>
-                    <input class="note-num-input" type="number" min="0" value="${item.f_diff_p}" oninput="noteChange(${i},'f_diff_p',this.value)">
-                    <span>无微:</span>
-                    <input class="note-num-input" type="number" min="0" value="${item.f_none_p}" oninput="noteChange(${i},'f_none_p',this.value)">
-                    <span>同晶:</span>
-                    <input class="note-num-input" type="number" min="0" value="${item.f_same_o}" oninput="noteChange(${i},'f_same_o',this.value)">
-                    <span>异晶:</span>
-                    <input class="note-num-input" type="number" min="0" value="${item.f_diff_o}" oninput="noteChange(${i},'f_diff_o',this.value)">
-                    <span>无晶:</span>
-                    <input class="note-num-input" type="number" min="0" value="${item.f_none_o}" oninput="noteChange(${i},'f_none_o',this.value)">
-                </div>
-                <div class="note-block-title">【后台】</div>
-                <div class="note-row">
-                    <span>同微:</span>
-                    <input class="note-num-input" type="number" min="0" value="${item.b_same_p}" oninput="noteChange(${i},'b_same_p',this.value)">
-                    <span>异微:</span>
-                    <input class="note-num-input" type="number" min="0" value="${item.b_diff_p}" oninput="noteChange(${i},'b_diff_p',this.value)">
-                    <span>无微:</span>
-                    <input class="note-num-input" type="number" min="0" value="${item.b_none_p}" oninput="noteChange(${i},'b_none_p',this.value)">
-                    <span>同晶:</span>
-                    <input class="note-num-input" type="number" min="0" value="${item.b_same_o}" oninput="noteChange(${i},'b_same_o',this.value)">
-                    <span>异晶:</span>
-                    <input class="note-num-input" type="number" min="0" value="${item.b_diff_o}" oninput="noteChange(${i},'b_diff_o',this.value)">
-                    <span>无晶:</span>
-                    <input class="note-num-input" type="number" min="0" value="${item.b_none_o}" oninput="noteChange(${i},'b_none_o',this.value)">
-                </div>
-            `;
-            wrap.appendChild(div);
-        }
-    }
-    function noteChangeName(idx,val){
-        teamList[currentTeamIndex].roles[idx].name = val;
-        saveNoteStorage();
-    }
-    function noteChange(idx,key,val){
-        teamList[currentTeamIndex].roles[idx][key] = Number(val)||0;
-        saveNoteStorage();
-    }
-    function changeVal(id, delta) {
-        const input = document.getElementById(id);
-        if (!input) return;
-        let val = parseFloat(input.value || 0) + delta;
-        const min = parseFloat(input.min) || 0;
-        const max = parseFloat(input.max) || 999;
-        if (val < min) val = min;
-        if (val > max) val = max;
-        input.value = val;
-        saveCalcToCurrentTeam();
-        resetCalcButton();
-    }
-    function resetAll() {
-        CALC_INPUT_IDS.forEach(id=>{
-            const el = document.getElementById(id);
-            if(id === 'party_size') el.value = '4';
-            else if(id === 'req_energy') el.value = '60';
-            else if(id === 'er_stat') el.value = '100';
-            else el.value = '0';
-        });
-        saveCalcToCurrentTeam();
-        resetCalcButton();
-    }
-    function resetCalcButton() {
-        const statusBox = document.getElementById('status_box');
-        const minErSpan = document.getElementById('min_er_needed');
-        statusBox.className = 'result-status calc-trigger';
-        statusBox.innerHTML = '<span>⚡</span> 计算充能';
-        minErSpan.className = 'value';
-        minErSpan.innerText = '--';
-    }
-    function getBackMultiplier(partySize) {
-        if (partySize === 1) return 1.0;
-        if (partySize === 2) return 0.8;
-        if (partySize === 3) return 0.7;
+      <div class="divider"></div>
+    </div>
+
+    <!-- 内容区 -->
+    <div class="content" id="content">
+
+      <!-- 充能计算：元素微粒/晶体的吸收表 ＋ 队伍参数 -->
+      <div class="block" id="energy-block">
+        <h3 class="block-title">充能计算</h3>
+
+        <!-- 吸收表：两行（前台 / 后台）× 六列（同 / 异 / 无元素 的微粒 / 晶体） -->
+        <div class="energy-scroll">
+          <div class="energy-grid" id="energy-grid">
+            <div class="energy-head">吸收类型</div>
+            <div class="energy-head">同元素微粒</div>
+            <div class="energy-head">异元素微粒</div>
+            <div class="energy-head">无元素微粒</div>
+            <div class="energy-head">同元素晶体</div>
+            <div class="energy-head">异元素晶体</div>
+            <div class="energy-head">无元素晶体</div>
+            <!-- 12 个步进输入由脚本按 energyCoef 的表头顺序生成 -->
+          </div>
+        </div>
+
+        <div class="field-grid boxed" style="margin-top:16px">
+          <label class="field"><span class="label">队伍人数</span><input id="en-team" type="number" value="4" min="1" max="4" step="1"></label>
+          <label class="field"><span class="label">所需能量</span><input id="en-need" type="number" value="60" step="1"></label>
+          <label class="field"><span class="label">固定恢复能量</span><input id="en-flat" type="number" value="0" step="1"></label>
+          <label class="field"><span class="label">元素充能效率（%）</span><input id="en-er" type="number" value="100" step="1"></label>
+        </div>
+      </div>
+
+      <!-- 计算结果 -->
+      <div class="block" id="energy-result-block">
+        <h3 class="block-title">计算结果</h3>
+        <button class="energy-run" type="button" id="en-run">计算充能</button>
+        <div class="field-grid boxed" style="margin-top:12px">
+          <div class="field"><span class="label">本轮获得能量</span><span class="value" id="en-gain">—</span></div>
+          <div class="field"><span class="label">最低充能需求</span><span class="value" id="en-result">—</span></div>
+        </div>
+      </div>
+
+      <!-- 产球记录：四个角色各一个小节（前台 / 后台 × 同 / 异 / 无 微 / 晶） -->
+      <div class="block" id="energy-produce-block">
+        <h3 class="block-title">产球记录</h3>
+
+        <!-- 队伍角色名：只用于下面四个小节的标题，算法不会读取这些名字 -->
+        <div class="team-names">
+          <label class="team-name"><span>一号位</span><input class="team-name-input" id="team-c1" data-slot="c1" type="text" value="桑多涅" placeholder="角色名称" aria-label="一号位角色名称" title="修改后，下方对应小节标题会同步变化"></label>
+          <label class="team-name"><span>二号位</span><input class="team-name-input" id="team-c2" data-slot="c2" type="text" value="奥黛塔" placeholder="角色名称" aria-label="二号位角色名称" title="修改后，下方对应小节标题会同步变化"></label>
+          <label class="team-name"><span>三号位</span><input class="team-name-input" id="team-c3" data-slot="c3" type="text" value="米提亚" placeholder="角色名称" aria-label="三号位角色名称" title="修改后，下方对应小节标题会同步变化"></label>
+          <label class="team-name"><span>四号位</span><input class="team-name-input" id="team-c4" data-slot="c4" type="text" value="七七" placeholder="角色名称" aria-label="四号位角色名称" title="修改后，下方对应小节标题会同步变化"></label>
+        </div>
+
+        <div id="energy-produce-body">
+          <!-- 四个角色各一个小节（次标题跟着队友走），由脚本生成 -->
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      /* ============================================================
+         充能计算算法（照搬 sdnjsq.html 的充能计算板块）
+         ============================================================ */
+
+      var ENERGY_ROWS = ['前台吸收', '后台吸收'];
+      var ENERGY_PICK_LABELS = ['同微', '异微', '无微', '同晶', '异晶', '无晶'];
+
+      // 产球记录的四个位置（顺序与页面里四个名称输入框一致）
+      var TEAM_SLOTS = ['c1', 'c2', 'c3', 'c4'];
+
+      var STORE_KEY = 'sandrone-cnjs-v1';
+      var calcTimer = null;
+      var restoring = false;
+
+      var content = document.getElementById('content');
+
+      /* ---------- 基础小工具 ---------- */
+      function byId(id) {
+        return document.getElementById(id);
+      }
+
+      function setText(id, text) {
+        var el = byId(id);
+        if (el) el.textContent = text;
+      }
+
+      function num(id) {
+        var el = byId(id);
+        if (!el) return 0;                 // 字段被删掉或改名时按 0 处理，不会报错
+        var v = parseFloat(el.value);
+        return isNaN(v) ? 0 : v;
+      }
+
+      // 保留两位小数（带千分位），与 sdnjsq.html 的显示格式一致
+      function num2(n) {
+        var v = Math.round((isNaN(n) ? 0 : n) * 100) / 100;
+        return v.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+
+      /* ---------- 充能计算：微粒/晶体的吸收表 + 最低充能需求 ---------- */
+      // 数值取自官方机制（微粒 1 点、晶球 = 3 微粒；同元素×3、无元素×2、异元素×1；
+      // 后台系数随队伍人数变化：2 人 0.8、3 人 0.7、4 人 0.6）
+      function offFieldCoef() {
+        var n = Math.round(num('en-team'));
+        if (n <= 2) return 0.8;
+        if (n === 3) return 0.7;
         return 0.6;
-    }
-    function calculate() {
-        const partySize = Number(document.getElementById('party_size').value) || 4;
-        const requiredEnergy = Number(document.getElementById('req_energy').value) || 0;
-        const fixedRecovery = Number(document.getElementById('fixed_recovery').value) || 0;
-        const erStat = Number(document.getElementById('er_stat').value) || 100;
-        const backMultiplier = getBackMultiplier(partySize);
+      }
 
-        let particleEnergy = 0;
-        const ids = ['f_same_p', 'f_diff_p', 'f_none_p', 'f_same_o', 'f_diff_o', 'f_none_o',
-            'b_same_p', 'b_diff_p', 'b_none_p', 'b_same_o', 'b_diff_o', 'b_none_o'];
-        ids.forEach(id => {
-            const count = Number(document.getElementById(id).value) || 0;
-            const baseVal = ENERGY_VALUES[id];
-            const multiplier = id.startsWith('b_') ? backMultiplier : 1.0;
-            particleEnergy += count * baseVal * multiplier;
-        });
+      // row：0 前台 / 1 后台；col：0~2 微粒（同/异/无）、3~5 晶体（同/异/无）
+      function energyCoef(row, col) {
+        var base = col < 3 ? 1 : 3;                 // 微粒 1 点、晶体 3 点
+        var elem = [3, 1, 2][col % 3];              // 同元素 3、异元素 1、无元素 2
+        var pos = row === 0 ? 1 : offFieldCoef();   // 前台 1、后台随队伍人数
+        return base * elem * pos;
+      }
 
-        const actualRecovery = particleEnergy * (erStat / 100) + fixedRecovery;
+      // 生成 12 个步进输入（顺序与表头一致）
+      function buildEnergyGrid() {
+        var grid = document.getElementById('energy-grid');
+        if (!grid) return;
 
-        const statusBox = document.getElementById('status_box');
-        const minErSpan = document.getElementById('min_er_needed');
+        for (var row = 0; row < 2; row++) {
+          var lab = document.createElement('div');
+          lab.className = 'energy-row-label';
+          lab.textContent = ENERGY_ROWS[row];
+          grid.appendChild(lab);
 
-        if (actualRecovery >= requiredEnergy && requiredEnergy > 0) {
-            statusBox.className = 'result-status success';
-            statusBox.innerHTML = '<span>✔</span> 充能已达标';
-        } else {
-            statusBox.className = 'result-status fail';
-            statusBox.innerHTML = '<span>✖</span> 充能未达标';
+          for (var col = 0; col < 6; col++) {
+            var id = 'en-' + row + '-' + col;
+            var box = document.createElement('div');
+            box.className = 'stepper';
+            box.innerHTML =
+              '<button type="button" data-step="-1" data-for="' + id + '">−</button>' +
+              '<input id="' + id + '" type="number" value="0" step="1" min="0">' +
+              '<button type="button" data-step="1" data-for="' + id + '">＋</button>';
+            grid.appendChild(box);
+          }
         }
+      }
 
-        let minER = Infinity;
-        if (requiredEnergy > 0) {
-            const neededFromParticles = requiredEnergy - fixedRecovery;
-            if (neededFromParticles <= 0) {
-                minER = 0;
-            } else if (particleEnergy > 0) {
-                minER = (neededFromParticles / particleEnergy) * 100;
-            } else {
-                minER = Infinity;
+      /* ---------- 产球记录：每个角色一个小节（前台/后台 × 同/异/无 微/晶） ---------- */
+      function buildEnergyProduce() {
+        var body = document.getElementById('energy-produce-body');
+        if (!body || body.querySelector('input')) return;
+
+        for (var i = 0; i < TEAM_SLOTS.length; i++) {
+          var slot = TEAM_SLOTS[i];
+          var sn = slot.substring(1);
+
+          var title = document.createElement('h4');
+          title.className = 'energy-sub-title';
+          title.id = 'enp-title-' + sn;
+          title.textContent = '';          // 次标题在 calc() 里按名称输入框填
+          body.appendChild(title);
+
+          for (var row = 0; row < 2; row++) {
+            var line = document.createElement('div');
+            line.className = 'energy-line';
+
+            var lab = document.createElement('span');
+            lab.className = 'energy-line-label';
+            lab.textContent = row === 0 ? '【前台】' : '【后台】';
+            line.appendChild(lab);
+
+            for (var col = 0; col < 6; col++) {
+              var mini = document.createElement('label');
+              mini.className = 'energy-mini';
+              mini.innerHTML = '<span>' + ENERGY_PICK_LABELS[col] + ':</span>' +
+                               '<input id="enp-' + sn + '-' + row + '-' + col +
+                               '" type="number" value="0" step="1" min="0">';
+              line.appendChild(mini);
             }
+            body.appendChild(line);
+          }
+        }
+      }
+
+      // 小节标题跟着「队伍角色」的四个名称输入框刷新
+      function syncEnergyProduceTitles() {
+        for (var i = 0; i < TEAM_SLOTS.length; i++) {
+          var slot = TEAM_SLOTS[i];
+          var input = byId('team-' + slot);
+          var name = input ? String(input.value || '').trim() : '';
+          setText('enp-title-' + slot.substring(1), name || '未命名');
+        }
+      }
+
+      function calcEnergy() {
+        var gain = 0;                                        // 一轮里吃到的能量（不含充能效率）
+
+        for (var row = 0; row < 2; row++) {
+          for (var col = 0; col < 6; col++) {
+            gain += num('en-' + row + '-' + col) * energyCoef(row, col);
+          }
         }
 
-        if (!isFinite(minER)) {
-            minErSpan.className = 'value infinity';
-            minErSpan.innerText = '∞';
-        } else {
-            minErSpan.className = 'value';
-            minErSpan.innerText = minER.toFixed(1) + '%';
+        var need = num('en-need');
+        var flat = num('en-flat');
+        var er = num('en-er') / 100;
+        var have = gain * er + flat;                         // 本轮实际获得
+        var minEr = gain > 0 ? (need - flat) / gain : 0;      // 最低充能需求（倍率）
+
+        setText('en-gain', num2(have));
+        setText('en-result', gain > 0 ? (minEr * 100).toFixed(1) + '%' : '—');
+      }
+
+      function calc() {
+        syncEnergyProduceTitles();
+        calcEnergy();
+      }
+
+      // 连续敲输入框时合并重算，避免每敲一个字符都算一遍
+      function scheduleCalc() {
+        if (calcTimer) clearTimeout(calcTimer);
+        calcTimer = setTimeout(function () {
+          calcTimer = null;
+          calc();
+        }, 40);
+      }
+
+      /* ---------- 本地记忆：把填写内容存到浏览器里，刷新后保持 ---------- */
+      function saveState() {
+        if (restoring) return;
+
+        var fields = {};
+        var els = content.querySelectorAll('input:not([type="checkbox"])[id], select[id]');
+        for (var i = 0; i < els.length; i++) fields[els[i].id] = els[i].value;
+
+        try {
+          localStorage.setItem(STORE_KEY, JSON.stringify({ fields: fields }));
+        } catch (e) {
+          /* 浏览器禁用本地存储时静默跳过，功能不受影响 */
         }
-    }
-    function toggleHelp(event) {
-        const modal = document.getElementById('helpModal');
-        modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
-    }
-    function toggleTimeline(event) {
-        const modal = document.getElementById('timelineModal');
-        modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
-        renderTimeline();
-    }
-    function addRole() {
-        const name = `角色${timelineData.roles.length + 1}`;
-        timelineData.roles.push(name);
-        renderTimeline();
-        saveCalcToCurrentTeam();
-    }
-    function addBuff() {
-        const select = document.getElementById('tlm_role_select');
-        const roleName = select.value;
-        const start = parseFloat(document.getElementById('tlm_start').value) || 0;
-        const duration = parseFloat(document.getElementById('tlm_duration').value) || 8.0;
-        const name = document.getElementById('tlm_name').value || 'BUFF';
-        const color = document.getElementById('tlm_color').value;
-        if(!roleName) { alert('请先添加并选择一个角色！'); return; }
-        if(duration <= 0) { alert('时长必须大于0！'); return; }
-        timelineData.buffs.push({
-            id: ++buffIdCounter,
-            roleName: roleName,
-            start: start,
-            duration: duration,
-            name: name,
-            color: color
-        });
-        renderTimeline();
-        saveCalcToCurrentTeam();
-    }
-    function deleteBuff(id) {
-        timelineData.buffs = timelineData.buffs.filter(b => b.id !== id);
-        renderTimeline();
-        saveCalcToCurrentTeam();
-    }
-    function clearTimeline() {
-        if(confirm('确定要清空当前队伍全部时间轴数据吗？')) {
-            timelineData.roles = ['角色1'];
-            timelineData.buffs = [];
-            buffIdCounter = 1;
-            renderTimeline();
-            saveCalcToCurrentTeam();
+      }
+
+      function loadState() {
+        var data = {};
+        try {
+          data = JSON.parse(localStorage.getItem(STORE_KEY) || '{}') || {};
+        } catch (e) {
+          data = {};
         }
-    }
-    function renderTimeline() {
-        const select = document.getElementById('tlm_role_select');
-        const ruler = document.getElementById('timelineRuler');
-        const grid = document.getElementById('timelineGridInner');
-        const currentVal = select.value;
-        select.innerHTML = '';
-        timelineData.roles.forEach(r => {
-            const opt = document.createElement('option');
-            opt.value = r; opt.textContent = r;
-            if(r === currentVal) opt.selected = true;
-            select.appendChild(opt);
-        });
-        if(timelineData.roles.length === 0) {
-            select.innerHTML = '<option>请添加角色</option>';
+
+        restoring = true;
+
+        if (data.fields && typeof data.fields === 'object') {
+          for (var id in data.fields) {
+            if (!Object.prototype.hasOwnProperty.call(data.fields, id)) continue;
+            var el = byId(id);
+            if (el) el.value = data.fields[id];
+          }
         }
-        ruler.innerHTML = '';
-        for(let i = 0; i <= 30; i++) {
-            const span = document.createElement('span');
-            span.textContent = i + 's';
-            if(i % 5 === 0) span.className = 'major';
-            ruler.appendChild(span);
+
+        restoring = false;
+      }
+
+      /* ---------- 事件 ---------- */
+      function onContentEdit(ev) {
+        var el = ev.target;
+        if (!el || !el.tagName) return;
+        if (el.tagName !== 'INPUT' && el.tagName !== 'SELECT') return;
+
+        // 改队伍角色名：先同步小节标题
+        if (el.classList && el.classList.contains('team-name-input')) {
+          syncEnergyProduceTitles();
         }
-        grid.innerHTML = '';
-        timelineData.roles.forEach(roleName => {
-            const row = document.createElement('div');
-            row.className = 'timeline-row';
-            const label = document.createElement('div');
-            label.className = 'role-label';
-            label.textContent = roleName;
-            row.appendChild(label);
-            const slot = document.createElement('div');
-            slot.className = 'role-slot';
-            timelineData.buffs.forEach(buff => {
-                if(buff.roleName === roleName) {
-                    const block = document.createElement('div');
-                    block.className = 'timeline-buff';
-                    const leftPct = Math.max(0, (buff.start / 30) * 100);
-                    const widthPct = Math.min(30 - buff.start, buff.duration) / 30 * 100;
-                    block.style.left = leftPct + '%';
-                    block.style.width = widthPct + '%';
-                    block.style.backgroundColor = buff.color;
-                    block.title = `${buff.name}\n开始: ${buff.start}s\n持续: ${buff.duration}s`;
-                    block.innerHTML = `
-                        <span style="overflow:hidden;text-overflow:ellipsis;padding:0 5px;width:100%;text-align:center;">${buff.name}</span>
-                        <div class="del-buff" onclick="deleteBuff(${buff.id})">✕</div>
-                    `;
-                    slot.appendChild(block);
-                }
-            });
-            row.appendChild(slot);
-            grid.appendChild(row);
+
+        scheduleCalc();
+        saveState();
+      }
+
+      /* ---------- 初始化 ---------- */
+      buildEnergyGrid();
+      buildEnergyProduce();
+
+      // − / ＋ 按钮
+      var stepBtns = document.querySelectorAll('.stepper button[data-step]');
+      for (var sb = 0; sb < stepBtns.length; sb++) {
+        stepBtns[sb].addEventListener('click', function () {
+          var input = byId(this.getAttribute('data-for'));
+          if (!input) return;
+
+          var step = parseFloat(this.getAttribute('data-step')) || 0;
+          var v = parseFloat(input.value) || 0;
+          input.value = Math.max(0, v + step);               // 数量不为负
+          calcEnergy();
+          saveState();
         });
-    }
-    document.addEventListener('DOMContentLoaded', function() {
-        loadNoteStorage();
-        loadTeamAllState(teamList[currentTeamIndex]);
-        const inputs = document.querySelectorAll('.calculator-container input[type="number"]');
-        inputs.forEach(input => {
-            input.addEventListener('input', () => {
-                saveCalcToCurrentTeam();
-                resetCalcButton();
-            });
-            input.addEventListener('change', () => {
-                saveCalcToCurrentTeam();
-                resetCalcButton();
-            });
-        });
-    });
-</script>
+      }
+
+      // 计算充能按钮
+      var enRun = document.getElementById('en-run');
+      if (enRun) enRun.addEventListener('click', calcEnergy);
+
+      loadState();
+      calc();
+
+      if (content) {
+        content.addEventListener('input', onContentEdit);
+        content.addEventListener('change', onContentEdit);
+      }
+    })();
+  </script>
+
 </body>
 </html>

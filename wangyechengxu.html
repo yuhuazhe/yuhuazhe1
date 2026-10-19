@@ -11,49 +11,70 @@
     box-sizing:border-box;
     font-family:system-ui,"Microsoft YaHei",sans-serif;
 }
+
 body{
-    background:#090912;
+    /* ===== 底图（叠加 35% 黑色遮罩，让背景稍稍变暗） ===== */
+    background-color: #16181d;
+    background-image: 
+        linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
+        url("背景2.jpg");
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+
     padding:30px 14px;
-    color:#e6e6f2;
+    color:#ffffff;
+    min-height: 100vh;
 }
+
 .wrap{
-    max-width:680px; /* 缩小整体容器宽度，原来920 */
+    max-width:680px;
     margin:0 auto;
     display:flex;
     flex-direction:column;
     gap:18px;
 }
+
+/* ===== 全透明卡片 ===== */
 .version-box{
-    background:#151526;
-    border:1px solid #323255;
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius:14px;
-    padding:22px 20px; /* 缩小内边距 */
-    text-align:center; /* 强制居中 */
+    padding:22px 20px;
+    text-align:center;
     transition: all 0.25s ease;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+    box-shadow: none;
 }
 .version-box:hover{
-    border-color:#9157c2;
-    box-shadow: 0 0 14px rgba(145, 87, 194, 0.25), 0 4px 12px rgba(0,0,0,0.4);
+    border-color: rgba(96, 165, 250, 0.45);
     transform: translateY(-2px);
-    background:#18182c;
+    background: transparent;
 }
+
 .version-box a{
-    font-size:20px; /* 字号适当缩小 */
-    color:#e9ccff;
+    font-size:20px;
+    color:#60a5fa;
     text-decoration:none;
     transition:0.2s;
     display:block;
     margin-bottom:6px;
+    font-weight: 600;
+    /* 增强文字阴影，防止亮色背景下看不清 */
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9), 0 0 6px rgba(0, 0, 0, 0.6);
 }
 .version-box a:hover{
-    color:#ffd8ff;
-    text-shadow:0 0 8px #b378dd;
+    color:#38bdf8;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9), 0 0 10px rgba(56, 189, 248, 0.6);
 }
+
 .version-box p{
     font-size:14px;
-    color:#b8b8d8;
+    color:#93c5fd;
     line-height:1.5;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9), 0 0 5px rgba(0, 0, 0, 0.5);
 }
 
 /*手机适配*/
@@ -84,16 +105,13 @@ body{
         <p>版本：v2.1---2026.9.14重磅发布</p>
     </div>
     <div class="version-box">
-        <a href="网页自动化计算/cn.html">原神角色充能计算器</a>
-        <p>版本：v3.1---2026.9.29|修复固定回能BUG</p>
+        <a href="网页自动化计算/cn.html">角色充能计算器</a>
+        <p>版本：v4.1---2026.10.19|重做上新</p>
     </div>
+   
     <div class="version-box">
-        <a href="网页自动化计算/msjs.html">幽境通关成绩（秒数）计算器</a>
-        <p>作者：茜茜---版本：v1.2---2026.9.9发布</p>
-    </div>
-    <div class="version-box">
-        <a href="网页自动化计算/mb.html">角色面板计算</a>
-        <p>版本：v1.2---2026.8.31更新，优化布局，增加下载功能</p>
+        <a href="网页自动化计算/mb.html">自定义面板计算</a>
+        <p>版本：v2.1---2026.10.19|重做上新</p>
     </div>
     
     <div class="version-box">

@@ -1,26 +1,12 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="paper">
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>羽化哲</title>
 <style>
-  /* ===== 主题变量 ===== */
-  html[data-theme="paper"] {
-    --bg-mask: rgba(247, 243, 236, 0.86);
-    --surface: rgba(255, 252, 247, 0.82);
-    --surface-2: rgba(242, 236, 224, 0.88);
-    --ink: #2a2520;
-    --ink-2: #6b6053;
-    --ink-3: #968872;
-    --accent: #9a3412;
-    --rule: rgba(180, 168, 148, 0.42);
-    --rule-2: rgba(160, 146, 124, 0.55);
-    --hover: rgba(253, 240, 228, 0.9);
-    --highlight: #c2410c;
-    --shadow: rgba(0, 0, 0, 0.08);
-  }
-  html[data-theme="dark"] {
+  /* ===== 固定暗色主题变量 ===== */
+  :root {
     --bg-mask: rgba(16, 18, 23, 0.82);
     --surface: rgba(30, 33, 40, 0.72);
     --surface-2: rgba(38, 42, 51, 0.8);
@@ -53,51 +39,17 @@
     color: var(--ink);
     min-height: 100vh;
     padding: 56px 24px 96px;
-    transition: color 0.25s;
   }
 
-  /* 主题遮罩层 */
+  /* 固定黑色遮罩层 */
   body::before {
     content: "";
     position: fixed;
     inset: 0;
     z-index: 0;
     background: var(--bg-mask);
-    transition: background-color 0.35s ease;
     pointer-events: none;
   }
-
-  /* ===== 主题切换按钮 ===== */
-  .theme-switch {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 100;
-    display: flex;
-    gap: 8px;
-    background: var(--surface);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--rule-2);
-    border-radius: 999px;
-    padding: 6px 8px;
-    box-shadow: 0 4px 16px var(--shadow);
-    transition: background-color 0.25s, border-color 0.25s;
-  }
-  .theme-btn {
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    border: 2px solid transparent;
-    cursor: pointer;
-    transition: transform 0.15s, border-color 0.15s;
-    padding: 0;
-    outline: none;
-  }
-  .theme-btn:hover { transform: scale(1.12); }
-  .theme-btn.active { border-color: var(--accent); }
-  .theme-btn[data-theme="paper"] { background: linear-gradient(135deg, #f7f3ec 50%, #d9cdb8 50%); }
-  .theme-btn[data-theme="dark"]  { background: linear-gradient(135deg, #1e2128 50%, #f0a05a 50%); }
 
   /* ===== 主容器 ===== */
   .wrapper {
@@ -120,7 +72,6 @@
     color: var(--ink);
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
     margin-bottom: 14px;
-    transition: color 0.25s;
   }
   .download-btn {
     padding: 10px 22px;
@@ -186,7 +137,6 @@
     border: 1px dashed var(--rule-2);
     overflow: hidden;
     position: relative;
-    transition: background-color 0.25s, border-color 0.25s, color 0.25s;
   }
   .boss-img-box img {
     position: absolute;
@@ -211,13 +161,11 @@
     font-weight: 700;
     margin-bottom: 4px;
     color: var(--ink);
-    transition: color 0.25s;
   }
   .boss-sub {
     font-size: 13px;
     color: var(--ink-3);
     margin-bottom: 14px;
-    transition: color 0.25s;
   }
 
   /* ===== 血量独立框架 ===== */
@@ -227,14 +175,12 @@
     margin-bottom: 14px;
     background: var(--surface-2);
     border: 1px solid var(--rule);
-    transition: background-color 0.25s, border-color 0.25s;
   }
   .hp-title {
     font-size: 13px;
     font-weight: 700;
     color: var(--accent);
     margin-bottom: 8px;
-    transition: color 0.25s;
   }
   .hp-row {
     display: flex;
@@ -245,12 +191,10 @@
     line-height: 1.7;
     color: var(--ink);
     margin-bottom: 6px;
-    transition: color 0.25s;
   }
   .fit-row {
     font-size: 13px;
     color: var(--ink-2);
-    transition: color 0.25s;
   }
 
   /* ===== 重点高亮文字 ===== */
@@ -265,21 +209,18 @@
     padding: 14px;
     background: var(--surface-2);
     border: 1px solid var(--rule);
-    transition: background-color 0.25s, border-color 0.25s;
   }
   .mechanic-title {
     font-size: 14px;
     font-weight: 700;
     color: var(--accent);
     margin-bottom: 12px;
-    transition: color 0.25s;
   }
   .mechanic-content {
     font-size: 12.5px;
     line-height: 1.8;
     color: var(--ink-2);
     text-align: justify;
-    transition: color 0.25s;
   }
   .mechanic-content p {
     margin-bottom: 8px;
@@ -294,7 +235,6 @@
     margin-top: 24px;
     font-size: 12px;
     color: var(--ink-3);
-    transition: color 0.25s;
   }
 
   /* ===== 移动端适配 ===== */
@@ -302,25 +242,10 @@
     body {
       padding: 72px 12px 48px;
     }
-    .theme-switch {
-      top: 12px;
-      right: 12px;
-      padding: 4px 6px;
-    }
-    .theme-btn {
-      width: 22px;
-      height: 22px;
-    }
   }
 </style>
 </head>
 <body>
-<!-- 主题切换按钮 -->
-<div class="theme-switch" role="group" aria-label="背景配色">
-  <button class="theme-btn active" data-theme="paper" title="暖色纸张（原色）" aria-label="暖色纸张"></button>
-  <button class="theme-btn" data-theme="dark" title="暗色模式（黑色）" aria-label="暗色模式"></button>
-</div>
-
 <div class="wrapper" id="capture-area">
   <div class="header">
     <h1 class="main-title">7.2版本 幽境危战</h1>
@@ -348,9 +273,11 @@
       <div class="mechanic-block">
         <div class="mechanic-title">首领特性</div>
         <div class="mechanic-content">
-          <p><span class="text-highlight">克雷豪里·鲸饮：</span>受到深渊污染的影响，每隔一段时间，强敌会出现进行「鲸饮」，从而累积大量「豪饮值」。强敌在鲸饮时，若处于雷元素附着的情况下，其「豪饮值」的累积效率将降低；此外，强敌受到雷元素伤害时会累积「豪饮值」；如果受到的伤害为雷元素反应造成的雷元素伤害，则会大量削减其「豪饮值」。</p>
-          <p><span class="text-highlight">奋勇状态：</span>受到深渊污染的影响，强敌的「豪饮值」积满后，将进入「奋勇状态」：不仅攻击将更为狂暴，且将展开护盾并自身周围，极大提升除了雷元素以外的所有元素抗性与物理抗性，同时削减战斗中雷元素附着的攻击。处于此状态下，强敌的「豪饮值」将随时间降低，一旦结束时，强敌将受到「豪饮值」全部回馈的反噬伤害：受到的伤害会提高至原本的1.5倍，且受到的反噬伤害会随着「豪饮值」的降低而降低。</p>
-          <p><span class="text-highlight">魔物逸闻：</span>由于这头海龙因水元素的污染而狂乱，因雷元素的加入而产生畏怖。在鹤颈般的城堡下，其体内沉积的污垢致使其丧失了一切。只留下一种名为「怒火」的破坏冲动，将其一切毁灭殆尽。</p>
+          <p>· 强敌常态：+10% 雷抗，70% 水抗，10% 其他抗。</p>
+          <p>· 开局约 10s，以及后续每约 20s，会进行豪饮：该过程持续 2s，会为强敌积攒 600「豪饮值」，期间若受到「雷烁星烁」的影响，则会积攒 540「豪饮值」，且下一次豪饮有 50% 概率会被替换为小饮：仅积攒 189「豪饮值」。但不处于豪饮状态时，对其造成雷元素伤害会削减 1.5 元素量点「豪饮值」，最低削减量不会低于 0.6；对其造成雷元素星烁反应伤害会削减 6 点「豪饮值」。</p>
+          <p>· 「豪饮值」累积至 600 的上限时，会进入「奋勇状态·急袭」：此时强敌自身会每秒消耗 15「豪饮值」，并获得一个血量等同于自身最大生命值的屏障。期间强敌受到雷元素伤害、水元素抗性 130%，其余抗性 70%。在此状态期间，对强敌造成雷元素伤害或雷元素星烁反应伤害，可以以 8 倍效率削减「豪饮值」。</p>
+          <p>· 「豪饮值」被清零，或者屏障被打破时，强敌会退出「奋勇状态·急袭」，此时强敌会受到屏障破裂的 150% 星烁反应伤害 +60% 其他伤害的反噬伤害，不超过强敌最大生命值的 15%。全抗回到常态，之后会继续开始豪饮。</p>
+          <p>· 强敌在任何时候受到雷元素伤害时，还会积攒硬直进度，上限 450，积攒的方式、数值完全等同于强敌因此被消耗的「豪饮值」。「奋勇状态·急袭」下的最大进度上限会降低至 225，每次进入和退出该状态后，进度只会保留因此的最大上限的 60%。该进度被积满时，会打断强敌当前动作，并重置下次豪饮的倒计时。</p>
         </div>
       </div>
     </div>
@@ -375,10 +302,10 @@
       <div class="mechanic-block">
         <div class="mechanic-title">首领特性</div>
         <div class="mechanic-content">
-          <p><span class="text-highlight">熔火双角：</span>铁甲熔火帝皇身上散发的炽热焰火是其火元素的实体器官，使其能够进行更猛烈的元素攻击，并且拥有更强的防御能力。在进行部分攻击时，熔火双角会露出弱点，此时若使用与火元素反应相关的伤害攻击，会对熔火帝皇造成大量伤害。</p>
-          <p><span class="text-highlight">构造装甲：</span>受到酷热散发的铠甲，铁甲熔火帝皇拥有极高的火元素抗性与物理抗性，且持续为熔火双角补充火元素，但自身的火元素被消耗后将会被击破，被击破时会承受一次高额伤害。若短时间内不击破，则会恢复。</p>
-          <p><span class="text-highlight">爆炎加身：</span>受到酷热散发的铠甲，铁甲熔火帝皇会在战斗中进行「爆炎加身」：持续累积爆炎能量，消耗后造成大范围伤害，并增强其火元素抗性。此外，其会在一定时间间隔内释放火球攻击。</p>
-          <p><span class="text-highlight">魔物逸闻：</span>原本在很久以前的深海便存在的古老生物。尽管曾经是海中的霸主，但现在它只是在海底的无尽游荡。它既能喷射出高温的岩浆，又能凭借其庞大的身躯与坚硬的外壳，轻易地摧毁一切挡路的敌人。</p>
+          <p>· 具有 64U 火元素量，初始「熔火双角」，免疫由「散失反应」造成的伤害。存在期间防御力提升 150%，破坏后其 10% 生命值。</p>
+          <p>· 施放雷连技能时会召唤 3 个「坚盾重甲蟹」，若场上仍有存活的重甲蟹则只会补至数量为 3 只。其具有 120 火元素量，火元素被消耗时不会使「坚盾重甲蟹」损失 12U 火元素。</p>
+          <p>· 首领破盾时还会基于「坚盾重甲蟹」受到的伤害损失生命值，等同于其受到的 60% 水元素伤害 + 10% 非水元素伤害，不超过首领 15% 生命值。</p>
+          <p>· 「熔火双角」被破除后，强敌会瘫痪 12s，全抗性降低为 10%，火元素抗性 60%。</p>
         </div>
       </div>
     </div>
@@ -403,10 +330,10 @@
       <div class="mechanic-block">
         <div class="mechanic-title">首领特性</div>
         <div class="mechanic-content">
-          <p><span class="text-highlight">无停的震荡：</span>战斗开始后，强敌会拱起前肢，随后会经历几次强烈的无停震荡，这会对周围角色造成大量伤害。可以使用雷元素攻击来打断它，或者通过火元素/水元素反应来消除「无停震荡」提供的护盾，并使其陷入瘫痪状态，从而打断该技能。</p>
-          <p><span class="text-highlight">难破的岩壳：</span>受到地脉的影响，强敌的岩石外壳在战斗中会获得减伤效果，并免疫物理伤害。需要利用元素攻击破坏其外壳。若未能及时破坏，它将释放强大的攻击。</p>
-          <p><span class="text-highlight">蕴光之劫：</span>当全队角色拥有护盾时，蕴光月守宫会进入「蕴光之劫」状态，大幅提升自身的防御力和攻击力。此时需要迅速击破其护盾，并利用治疗角色保持队伍血量健康，否则将面临极大的生存压力。</p>
-          <p><span class="text-highlight">魔物逸闻：</span>岁月流转，古老生物在漫长岁月中吸取了岩元素的精华，最终形成了这种独特的生命体。它们以岩石为食，拥有极强的防御力，守护着地下的古老遗迹。</p>
+          <p>· 入战后，会展开 9 层岩元素护盾，每层 4U。在击穿一层岩元素护盾前，无法对下一层护盾造成损耗。全部护盾被击穿后，强敌会基于破盾期间受到的岩元素伤害的 70% 和其他伤害的 10% 受到一次高额伤害，不超过强敌最大生命值的 40%，并瘫痪 5s。</p>
+          <p>· 瘫痪结束后的 4s 后，强敌会为队伍中附近的所有角色施加「蕴光之茧」：使全部角色基于自身最大生命值的 15% 损失生命值，造成的伤害 50%，受到的伤害 40%，暴击率 -100%，同时首领获得额外的 60% 岩元素抗性。</p>
+          <p>· 为任意我方角色恢复生命值至上限可解除「蕴光之茧」，使其造成的伤害提高 50%，暴击率提升 15%，持续 15s，并使首领失去额外获得的岩元素抗性。</p>
+          <p>· 在破除全部岩元素护盾的 55s 后，强敌会重新展开护盾。</p>
         </div>
       </div>
     </div>
@@ -415,34 +342,6 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
-// ===== 主题切换逻辑 =====
-(function () {
-  var html = document.documentElement;
-  var buttons = document.querySelectorAll('.theme-btn');
-  var saved = null;
-  try { saved = localStorage.getItem('gensri-theme'); } catch (e) { saved = null; }
-
-  if (saved && ['paper', 'dark'].indexOf(saved) !== -1) {
-    html.setAttribute('data-theme', saved);
-    for (var i = 0; i < buttons.length; i++) {
-      buttons[i].classList.toggle('active', buttons[i].dataset.theme === saved);
-    }
-  }
-
-  for (var j = 0; j < buttons.length; j++) {
-    (function (btn) {
-      btn.addEventListener('click', function () {
-        var theme = btn.dataset.theme;
-        html.setAttribute('data-theme', theme);
-        for (var k = 0; k < buttons.length; k++) {
-          buttons[k].classList.toggle('active', buttons[k] === btn);
-        }
-        try { localStorage.setItem('gensri-theme', theme); } catch (e) {}
-      });
-    })(buttons[j]);
-  }
-})();
-
 // ===== 图片加载处理 =====
 function setupImage(imgEl, boxEl){
   if (!imgEl || !boxEl) return;
@@ -492,11 +391,8 @@ async function downloadImage(){
   try {
     const fullWidth = document.documentElement.scrollWidth;
     const fullHeight = document.documentElement.scrollHeight;
-    // 读取当前主题背景色作为截图底色
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    const bgColor = isDark ? '#16181d' : '#f7f3ec';
     const canvas = await html2canvas(document.body, {
-      backgroundColor: bgColor,
+      backgroundColor: '#16181d',
       useCORS: true,
       allowTaint: false,
       scale: window.devicePixelRatio >= 2 ? 2 : 1.5,

@@ -1,47 +1,22 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="paper" style="scroll-behavior: smooth;">
+<html lang="zh-CN" style="scroll-behavior: smooth;">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>羽化哲</title>
 <style>
-  /* ===== 主题变量 ===== */
-  html {
+  /* ===== 固定配色（透明板块 + 亮色文字） ===== */
+  :root {
     --mono: "SF Mono", "JetBrains Mono", "Fira Code", Consolas, "Courier New", monospace;
-  }
-  html[data-theme="paper"] {
-    --bg-mask: rgba(247, 243, 236, 0.86);
-    --surface: rgba(255, 252, 247, 0.82);
-    --surface-2: rgba(242, 236, 224, 0.88);
-    --ink: #2a2520;
-    --ink-2: #6b6053;
-    --ink-3: #968872;
-    --accent: #9a3412;
-    --accent-2: #c2410c;
-    --rule: rgba(180, 168, 148, 0.35);
-    --rule-2: rgba(160, 146, 124, 0.55);
-    --hover: rgba(253, 240, 228, 0.9);
-    --shadow: rgba(0, 0, 0, 0.08);
-    --shadow-strong: rgba(0, 0, 0, 0.14);
-    --hl-bg: rgba(154, 52, 18, 0.13);
-    --hl-bg-strong: rgba(154, 52, 18, 0.22);
-  }
-  html[data-theme="dark"] {
-    --bg-mask: rgba(16, 18, 23, 0.82);
-    --surface: rgba(30, 33, 40, 0.72);
-    --surface-2: rgba(38, 42, 51, 0.8);
-    --ink: #e8eaed;
-    --ink-2: #a5adba;
-    --ink-3: #6b7280;
+    --ink: #ffffff; /* 纯白字体增强对比 */
+    --ink-2: #e2e8f0;
+    --ink-3: #cbd5e1;
     --accent: #f0a05a;
     --accent-2: #ff7a8a;
-    --rule: rgba(90, 100, 118, 0.35);
-    --rule-2: rgba(110, 122, 142, 0.52);
-    --hover: rgba(42, 47, 58, 0.85);
-    --shadow: rgba(0, 0, 0, 0.4);
-    --shadow-strong: rgba(0, 0, 0, 0.55);
-    --hl-bg: rgba(240, 160, 90, 0.20);
-    --hl-bg-strong: rgba(240, 160, 90, 0.32);
+    --rule: rgba(255, 255, 255, 0.25);
+    --rule-2: rgba(255, 255, 255, 0.35);
+    --hl-bg: rgba(240, 160, 90, 0.3);
+    --hl-bg-strong: rgba(240, 160, 90, 0.6); /* 加深高亮底色 */
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -50,26 +25,20 @@
   html { scrollbar-width: none; -ms-overflow-style: none; }
 
   body {
+    /* ===== 底图 ===== */
     background-color: #16181d;
-    background-image: url("zhanshi/1.0.jpg");
+    background-image: url("背景2.jpg");
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
+
     color: var(--ink);
     font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
     font-size: 13px;
     min-height: 100vh;
     padding: 34px 16px 52px;
     position: relative;
-  }
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    background: var(--bg-mask);
-    pointer-events: none;
   }
 
   .page-container {
@@ -82,32 +51,10 @@
     gap: 18px;
   }
 
-  /* ===== 主题切换 ===== */
-  .theme-switch {
-    position: fixed;
-    top: 12px;
-    right: 14px;
-    z-index: 100;
-    display: flex;
-    gap: 6px;
-    background: var(--surface);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--rule-2);
-    border-radius: 999px;
-    padding: 4px 6px;
-    box-shadow: 0 3px 12px var(--shadow);
+  /* 全局增强文字阴影，防止在亮色背景上看不清 */
+  h1, p, span, div, button {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9), 0 0 6px rgba(0, 0, 0, 0.6);
   }
-  .theme-btn {
-    width: 20px; height: 20px;
-    border-radius: 50%;
-    border: 2px solid transparent;
-    cursor: pointer;
-    padding: 0; outline: none;
-  }
-  .theme-btn.active { border-color: var(--accent); }
-  .theme-btn[data-theme="paper"] { background: linear-gradient(135deg, #f7f3ec 50%, #d9cdb8 50%); }
-  .theme-btn[data-theme="dark"]  { background: linear-gradient(135deg, #1e2128 50%, #f0a05a 50%); }
 
   /* ===== 页头 ===== */
   .page-header {
@@ -122,10 +69,9 @@
     letter-spacing: 3px;
     line-height: 1.2;
     margin-bottom: 7px;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
   .page-header .subtitle {
-    font-size: 11.5px;
+    font-size: 12px;
     color: var(--ink-2);
     letter-spacing: 0.8px;
   }
@@ -133,23 +79,24 @@
   .page-header .subtitle::after {
     content: "—";
     margin: 0 8px;
-    color: var(--rule-2);
+    color: var(--ink-3);
   }
 
-  /* ===== 图表卡片 ===== */
+  /* ===== 图表列表 ===== */
   .chart-list {
     display: flex;
     flex-direction: column;
     gap: 18px;
   }
 
+  /* ===== 全透明图表卡片 ===== */
   .chart-card {
-    background: var(--surface);
-    backdrop-filter: blur(14px) saturate(180%);
-    -webkit-backdrop-filter: blur(14px) saturate(180%);
-    border: 1px solid var(--rule-2);
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 1px solid transparent;
     border-radius: 12px;
-    box-shadow: 0 6px 20px var(--shadow);
+    box-shadow: none;
     overflow: hidden;
   }
 
@@ -169,7 +116,7 @@
     min-width: 0;
   }
   .chart-title {
-    font-size: 13.5px;
+    font-size: 14px;
     font-weight: 700;
     color: var(--ink);
     letter-spacing: 0.4px;
@@ -183,25 +130,24 @@
     padding: 2px 8px;
     border-radius: 20px;
     letter-spacing: 0.4px;
+    text-shadow: none;
   }
   .chart-hint {
-    font-size: 10.5px;
+    font-size: 11px;
     color: var(--ink-3);
     white-space: nowrap;
   }
 
+  /* 图片区域：背景透明 */
   .chart-img-box {
     position: relative;
-    background: rgba(0, 0, 0, 0.18);
+    background: transparent;
     cursor: zoom-in;
     overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
     min-height: 130px;
-  }
-  html[data-theme="paper"] .chart-img-box {
-    background: rgba(120, 110, 96, 0.08);
   }
   .chart-img-box img {
     display: block;
@@ -220,7 +166,7 @@
   }
   .chart-img-box.error .fallback { display: flex; }
   .chart-img-box.error img { display: none; }
-  .fallback-icon { font-size: 26px; opacity: 0.4; }
+  .fallback-icon { font-size: 26px; opacity: 0.6; }
 
   .chart-foot {
     display: flex;
@@ -240,11 +186,11 @@
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    opacity: 0.85;
+    opacity: 0.9;
   }
 
   /* ============================================================
-     备注面板（只读高亮展示，无动态）
+     备注面板（透明框架，局部深色保护）
   ============================================================ */
   .note-panel {
     border-top: 1px solid var(--rule);
@@ -260,14 +206,13 @@
     border: none;
     cursor: pointer;
     font-family: inherit;
-    font-size: 12.5px;
+    font-size: 13px;
     font-weight: 600;
     color: var(--ink-2);
     letter-spacing: 0.4px;
     text-align: left;
   }
   .note-toggle:hover {
-    background: var(--hover);
     color: var(--accent);
   }
   .note-toggle .note-arrow {
@@ -283,7 +228,7 @@
   .note-toggle .note-label { flex: none; }
   .note-toggle .note-hint {
     flex: 1;
-    font-size: 10.5px;
+    font-size: 11px;
     font-weight: 400;
     color: var(--ink-3);
     letter-spacing: 0;
@@ -301,13 +246,21 @@
     z-index: 2;
   }
 
-  /* —— 高亮展示卡 —— */
+  /* —— 高亮展示卡：增加深色半透明遮罩，确保文字清晰 —— */
   .cfg-preview {
-    border: 1px solid var(--rule);
+    border: 1px solid var(--rule-2);
     border-radius: 9px;
-    background: var(--surface-2);
-    padding: 11px 13px;
+    background: rgba(18, 20, 26, 0.75); /* 增加深色半透明底色 */
+    backdrop-filter: blur(8px); /* 加入毛玻璃效果 */
+    -webkit-backdrop-filter: blur(8px);
+    padding: 14px 16px;
   }
+  
+  /* 内部文字不再需要极重的阴影，因为有了深色底 */
+  .cfg-preview * {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
   .cfg-empty {
     font-size: 12px;
     color: var(--ink-3);
@@ -320,14 +273,15 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 11px;
+    font-size: 11.5px;
     font-weight: 700;
     letter-spacing: 1px;
     color: #fff;
     background: var(--accent);
-    padding: 3px 10px 3px 8px;
+    padding: 3px 12px 3px 10px;
     border-radius: 999px;
-    margin-bottom: 9px;
+    margin-bottom: 12px;
+    text-shadow: none;
   }
   .cfg-sec-dot {
     width: 5px; height: 5px;
@@ -342,7 +296,7 @@
     display: flex;
     align-items: baseline;
     gap: 10px;
-    padding: 7px 0;
+    padding: 8px 0;
     border-bottom: 1px dashed var(--rule);
     flex-wrap: wrap;
   }
@@ -350,8 +304,8 @@
 
   .cfg-role {
     flex: none;
-    min-width: 60px;
-    font-size: 13.5px;
+    min-width: 65px;
+    font-size: 14px;
     font-weight: 800;
     color: var(--ink);
     letter-spacing: 0.8px;
@@ -361,30 +315,30 @@
   .cfg-role::before {
     content: "";
     width: 3px;
-    height: 13px;
+    height: 14px;
     border-radius: 2px;
     background: var(--accent);
-    margin-right: 7px;
+    margin-right: 8px;
     flex: none;
   }
 
   .cfg-gear {
     font-family: var(--mono);
-    font-size: 12.5px;
-    color: var(--ink); /* 改为主文本颜色，让装备文字更醒目 */
-    font-weight: 600;  /* 加粗，不再灰淡 */
+    font-size: 13px;
+    color: var(--ink);
+    font-weight: 600;
     line-height: 1.8;
     letter-spacing: 0.2px;
     word-break: break-word;
   }
 
-  /* 高亮：数字 / 词条 / 双爆 —— 加大、加粗、带底色块 */
+  /* 高亮：数字 / 词条 / 双爆 */
   .hl {
     font-family: inherit;
     font-style: normal;
     font-weight: 800;
-    color: var(--accent);
-    background: var(--hl-bg-strong); /* 使用更明显的背景色 */
+    color: #ffd8ba; /* 调亮的高亮字色 */
+    background: rgba(240, 160, 90, 0.4);
     padding: 1px 6px;
     border-radius: 4px;
     font-size: 1.08em;
@@ -392,7 +346,7 @@
     margin: 0 2px;
   }
 
-  /* 高亮：r1 / r5 —— 深色胶囊徽章 */
+  /* 高亮：r1 / r5 徽章 */
   .hl-badge {
     display: inline-block;
     font-family: var(--mono);
@@ -407,20 +361,21 @@
     background: var(--accent);
     letter-spacing: 0.4px;
     vertical-align: 1px;
+    text-shadow: none;
   }
 
   /* 结论强调条 */
   .cfg-summary {
-    margin-top: 10px;
-    padding: 9px 13px;
+    margin-top: 12px;
+    padding: 10px 14px;
     border-radius: 7px;
     border-left: 4px solid var(--accent);
-    background: var(--hl-bg-strong);
-    font-size: 12.5px;
+    background: rgba(0, 0, 0, 0.4);
+    font-size: 13px;
     line-height: 1.8;
     color: var(--ink);
     letter-spacing: 0.2px;
-    font-weight: 600; /* 让结论文字也更醒目 */
+    font-weight: 600;
   }
 
   /* ============================================================
@@ -483,7 +438,7 @@
   .page-footer {
     text-align: center;
     padding: 12px 0 0;
-    font-size: 11px;
+    font-size: 11.5px;
     color: var(--ink-3);
     line-height: 1.85;
   }
@@ -493,12 +448,12 @@
      响应式
   ============================================================ */
   @media (max-width: 720px) {
-    body { padding: 50px 11px 42px; font-size: 12.5px; }
+    body { padding: 50px 11px 42px; font-size: 13px; }
     .page-container { gap: 15px; }
     .chart-list { gap: 15px; }
 
     .page-header h1 { font-size: 18px; letter-spacing: 2px; margin-bottom: 5px; }
-    .page-header .subtitle { font-size: 10.5px; }
+    .page-header .subtitle { font-size: 11px; }
     .page-header .subtitle::before,
     .page-header .subtitle::after { margin: 0 5px; }
 
@@ -508,27 +463,24 @@
       align-items: flex-start;
       gap: 5px;
     }
-    .chart-title { font-size: 12.5px; }
+    .chart-title { font-size: 13px; }
     .chart-ver { font-size: 9.5px; padding: 2px 7px; }
-    .chart-hint { font-size: 10px; }
+    .chart-hint { font-size: 10.5px; }
 
-    .chart-foot { padding: 7px 12px; font-size: 10.5px; }
+    .chart-foot { padding: 7px 12px; font-size: 11px; }
     .zoom-tip { display: none; }
 
-    .note-toggle { padding: 9px 12px; font-size: 12px; }
+    .note-toggle { padding: 9px 12px; font-size: 12.5px; }
     .note-toggle .note-hint { display: none; }
     .note-content { padding: 0 12px 12px; }
 
-    .cfg-preview { padding: 10px 11px; }
-    .cfg-role { min-width: 52px; font-size: 13px; }
-    .cfg-gear { font-size: 12px; font-weight: 600; }
-    .cfg-row { gap: 7px; padding: 6px 0; }
-    .cfg-summary { font-size: 12px; padding: 8px 11px; font-weight: 600; }
-    .hl { padding: 1px 5px; font-size: 1.06em; }
+    .cfg-preview { padding: 12px 12px; }
+    .cfg-role { min-width: 55px; font-size: 13.5px; }
+    .cfg-gear { font-size: 12.5px; }
+    .cfg-row { gap: 8px; padding: 7px 0; }
+    .cfg-summary { font-size: 12.5px; padding: 9px 12px; }
+    .hl { padding: 1px 5px; font-size: 1.05em; }
     .hl-badge { padding: 0 8px; font-size: 10.5px; }
-
-    .theme-switch { top: 9px; right: 9px; padding: 3px 5px; }
-    .theme-btn { width: 18px; height: 18px; }
 
     .lightbox-close { top: 11px; right: 11px; width: 32px; height: 32px; font-size: 17px; }
     .lightbox-caption {
@@ -542,12 +494,6 @@
 </style>
 </head>
 <body>
-
-<!-- 主题切换 -->
-<div class="theme-switch" role="group" aria-label="背景配色">
-  <button class="theme-btn active" data-theme="paper" title="暖色纸张（原色）" aria-label="暖色纸张"></button>
-  <button class="theme-btn" data-theme="dark" title="暗色模式（黑色）" aria-label="暗色模式"></button>
-</div>
 
 <div class="page-container">
 
@@ -581,7 +527,6 @@
 
       <div class="chart-foot">
         <span class="meta">数据整理：<b>羽化哲</b> · 制图：<b>幼儿园大班班长</b></span>
-       
       </div>
 
       <!-- 备注面板 -->
@@ -659,35 +604,7 @@
 
 <script>
 /* ============================================================
-   1. 主题切换
-============================================================ */
-(function () {
-  var html = document.documentElement;
-  var buttons = document.querySelectorAll('.theme-btn');
-  var saved = null;
-  try { saved = localStorage.getItem('gensri-theme'); } catch (e) { saved = null; }
-
-  if (saved && ['paper', 'dark'].indexOf(saved) !== -1) {
-    html.setAttribute('data-theme', saved);
-    for (var i = 0; i < buttons.length; i++) {
-      buttons[i].classList.toggle('active', buttons[i].dataset.theme === saved);
-    }
-  }
-
-  Array.prototype.forEach.call(buttons, function (btn) {
-    btn.addEventListener('click', function () {
-      var theme = btn.dataset.theme;
-      html.setAttribute('data-theme', theme);
-      Array.prototype.forEach.call(buttons, function (b) {
-        b.classList.toggle('active', b === btn);
-      });
-      try { localStorage.setItem('gensri-theme', theme); } catch (e) {}
-    });
-  });
-})();
-
-/* ============================================================
-   2. 备注面板：折叠 / 高亮渲染
+   1. 备注面板：折叠 / 高亮渲染
 ============================================================ */
 function toggleNote(panelId) {
   var panel = document.getElementById(panelId);
@@ -770,7 +687,7 @@ function renderPreview(text, box) {
   box.innerHTML = html;
 }
 
-/* —— 初始化展示内容（原图二内容） —— */
+/* —— 初始化展示内容 —— */
 (function initPreviews() {
   var configText = [
     '武器/圣遗物：',
@@ -780,8 +697,7 @@ function renderPreview(text, box) {
     '七七：千岩，r5西风',
     '桑、奥、米均为30词，其中24为双爆！',
     '热启动',
-    '转载需标明出处！',
-    
+    '转载需标明出处！'
   ].join('\n');
 
   var p1 = document.getElementById('preview1');
@@ -791,7 +707,7 @@ function renderPreview(text, box) {
 })();
 
 /* ============================================================
-   3. 图片放大器
+   2. 图片放大器
 ============================================================ */
 var lightbox = document.getElementById('lightbox');
 var lightboxImg = document.getElementById('lightboxImg');
