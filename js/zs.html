@@ -198,8 +198,9 @@
            · 想在新标签页打开，给该角色加 newTab: true
 ============================================================ */
 var characters = [
-  { name: "桑多涅(老婆）)",         color: "#3b82f6", avatar: "sdn.png",  url: "sdn.html" },
-  { name: "薇斯纳", color: "#f59e0b", avatar: "wsn.webp", url: "" }
+  { name: "桑多涅(老婆）", color: "#3b82f6", avatar: "sdn.png",  url: "sdn.html" },
+  { name: "薇斯纳",       color: "#f59e0b", avatar: "wsn.webp", url: "" },
+  { name: "米提亚",       color: "#8b5cf6", avatar: "mty.png",  url: "mty.html" }
 ];
 
 /* 简单的 HTML 转义，防止名字里的特殊字符破坏结构 */
@@ -216,39 +217,56 @@ function esc(str) {
   var grid = document.getElementById('charGrid');
   if (!grid) return;
 
-  var html = '';
   characters.forEach(function (c) {
     var name = c.name || '';
     var firstChar = name ? name.charAt(0) : '?';
     var color = c.color || '#3b82f6';
-    var avatarStyle = 'background: linear-gradient(135deg, ' + color + ', ' + shadeColor(color, -30) + ');';
 
-    var avatarInner;
-    if (c.avatar) {
-      /* 图片加载失败时自动换成首字，避免出现空白圆圈 */
-      avatarInner =
-        '<img src="' + esc(c.avatar) + '" alt="' + esc(name) + '" ' +
-        'onerror="this.onerror=null;this.outerHTML=\'' + esc(firstChar) + '\';">';
-    } else {
-      avatarInner = esc(firstChar);
-    }
-
-    var inner =
-      '<div class="avatar" style="' + avatarStyle + '">' + avatarInner + '</div>' +
-      '<div class="char-name">' + esc(name) + '</div>';
-
+    /* 卡片容器：有 url 用 <a>，否则用 <div> */
+    var card;
     if (c.url) {
-      /* 有链接 → 渲染成 <a>，整张卡片都可点击 */
-      html +=
-        '<a class="char-card" href="' + esc(c.url) + '"' +
-        (c.newTab ? ' target="_blank" rel="noopener noreferrer"' : '') +
-        ' title="' + esc(name) + '">' + inner + '</a>';
+      card = document.createElement('a');
+      card.className = 'char-card';
+      card.href = c.url;
+      if (c.newTab) {
+        card.target = '_blank';
+        card.rel = 'noopener noreferrer';
+      }
     } else {
-      html += '<div class="char-card">' + inner + '</div>';
+      card = document.createElement('div');
+      card.className = 'char-card';
     }
-  });
+    card.title = name;
 
-  grid.innerHTML = html;
+    /* 头像 */
+    var avatar = document.createElement('div');
+    avatar.className = 'avatar';
+    avatar.style.background =
+      'linear-gradient(135deg, ' + color + ', ' + shadeColor(color, -30) + ')';
+
+    if (c.avatar) {
+      var img = document.createElement('img');
+      img.src = c.avatar;
+      img.alt = name;
+      /* 图片加载失败 → 换成角色名首字（用 textContent，安全） */
+      img.onerror = function () {
+        img.onerror = null;
+        avatar.textContent = firstChar;
+      };
+      avatar.appendChild(img);
+    } else {
+      avatar.textContent = firstChar;
+    }
+
+    /* 名字 */
+    var nameEl = document.createElement('div');
+    nameEl.className = 'char-name';
+    nameEl.textContent = name;
+
+    card.appendChild(avatar);
+    card.appendChild(nameEl);
+    grid.appendChild(card);
+  });
 })();
 
 /* 颜色加深工具：把十六进制颜色变暗 */
