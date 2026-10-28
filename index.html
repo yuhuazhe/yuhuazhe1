@@ -109,21 +109,21 @@
             transition: all 0.22s ease;
         }
         .jump-btn:hover {
-            transform: translateY(-3px) scale(1.05);
+            transform: translateY(-2px) scale(1.03);
             background: rgba(255, 255, 255, 0.15) !important;
             border-color: rgba(255, 255, 255, 0.65) !important;
         }
         .jump-btn:active {
-            transform: translateY(0) scale(1.02);
+            transform: translateY(0) scale(1.01);
         }
 
         /* ==================== 网格布局 ==================== */
         .card-container {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 24px;
-            max-width: 1120px;
-            margin: 30px auto 200px;
+            max-width: 960px;
+            margin: 30px auto 0;
             padding: 0 20px;
         }
 
@@ -151,6 +151,134 @@
             color: #fff;
             font-weight: 500;
             text-shadow: 0 2px 4px rgba(0,0,0,0.9), 0 0 10px rgba(0,0,0,0.6);
+        }
+
+        /* ==================== 板块功能介绍区域（轻盈通透版） ==================== */
+        .intro-section {
+            max-width: 960px;
+            margin: 60px auto 200px;
+            padding: 32px 30px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 16px;
+            transition: border-color 0.3s ease;
+        }
+        .intro-section:hover {
+            border-color: rgba(255, 255, 255, 0.45);
+        }
+        .intro-title {
+            text-align: center;
+            font-size: 24px;
+            color: #c78cdf;
+            font-weight: bold;
+            margin-bottom: 28px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.9), 0 0 10px rgba(0,0,0,0.6);
+            letter-spacing: 2px;
+        }
+        
+        /* 横向 3 列 */
+        .intro-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        
+        /* 每个板块的介绍卡片（背景调浅，保留一点毛玻璃防花） */
+        .intro-item {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px;
+            background: rgba(10, 10, 15, 0.25); /* 大幅降低背景黑度 */
+            backdrop-filter: blur(4px); /* 轻微模糊背景，不干扰文字 */
+            -webkit-backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .intro-item:hover {
+            background: rgba(30, 20, 40, 0.4);
+            border-color: rgba(199, 140, 223, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        /* 板块名称标题 */
+        .intro-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ffffff;
+            /* 强化黑边，确保高亮背景上也清晰 */
+            text-shadow: 0 1px 3px rgba(0,0,0,1), 0 0 6px rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .intro-name::before {
+            content: "";
+            display: block;
+            width: 4px;
+            height: 14px;
+            background: #c78cdf;
+            border-radius: 2px;
+            box-shadow: 0 0 6px rgba(199, 140, 223, 0.8);
+        }
+
+        /* 卡片内文本列表结构 */
+        .intro-body {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        /* 独立的一段描述 */
+        .intro-global-desc {
+            font-size: 13px;
+            color: #ffffff;
+            line-height: 1.5;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 12px;
+            border-radius: 6px;
+            border-left: 2px solid #c78cdf;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.9), 0 0 4px rgba(0,0,0,0.8);
+        }
+
+        /* 带序号的列表项 */
+        .intro-list-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        .list-num {
+            font-size: 13.5px;
+            font-weight: bold;
+            color: #e0b0f5; /* 亮紫色 */
+            line-height: 1.6;
+            text-shadow: 0 1px 3px rgba(0,0,0,1), 0 0 4px rgba(0,0,0,0.8);
+            flex-shrink: 0;
+        }
+        .list-text {
+            font-size: 13.5px;
+            color: #ffffff; /* 纯白正文 */
+            line-height: 1.6;
+            /* 强化投影 */
+            text-shadow: 0 1px 3px rgba(0,0,0,0.9), 0 0 5px rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        /* 子标题样式 */
+        .sub-title {
+            font-weight: bold;
+            color: #ffffff;
+            display: block;
+        }
+        .sub-desc {
+            color: #f0f0f0; /* 极浅灰，区分层级且保持清晰 */
+            font-size: 13px;
         }
 
         .count-box {
@@ -181,13 +309,13 @@
             text-shadow: 0 1px 3px rgba(0,0,0,0.9);
         }
 
-        /* ==================== 更新内容折叠框（文字全黑） ==================== */
+        /* ==================== 更新内容折叠框 ==================== */
         .update-collapse {
             width: 100%;
             max-width: 620px;
             margin: 18px auto 6px;
             background: transparent;
-            border: 1px solid rgba(0, 0, 0, 0.6); /* 边框改为半透明黑 */
+            border: 1px solid rgba(0, 0, 0, 0.6);
             border-radius: 14px;
             overflow: hidden;
             transition: all 0.3s ease;
@@ -200,15 +328,15 @@
             position: relative;
             display: flex;
             align-items: center;
-            justify-content: center; /* 居中对齐 */
+            justify-content: center;
             padding: 14px 40px;
             font-size: 15px;
             font-weight: bold;
-            color: #000; /* 字体纯黑 */
+            color: #000;
             cursor: pointer;
             list-style: none;
             user-select: none;
-            text-shadow: 0 0 5px rgba(255,255,255,0.95), 0 0 10px rgba(255,255,255,0.6); /* 用白光保证暗处清晰度 */
+            text-shadow: 0 0 5px rgba(255,255,255,0.95), 0 0 10px rgba(255,255,255,0.6);
             transition: background-color 0.2s;
         }
         .update-collapse summary::-webkit-details-marker {
@@ -218,7 +346,6 @@
             background: rgba(255, 255, 255, 0.15);
         }
 
-        /* 自定义展开/收起箭头（绝对定位在右侧） */
         .update-collapse summary::after {
             content: "▼";
             position: absolute;
@@ -226,7 +353,7 @@
             top: 50%;
             transform: translateY(-50%);
             font-size: 12px;
-            color: #000; /* 箭头黑色 */
+            color: #000;
             text-shadow: 0 0 4px rgba(255,255,255,0.8);
             transition: transform 0.3s ease;
         }
@@ -234,23 +361,19 @@
             transform: translateY(-50%) rotate(-180deg);
         }
 
-        /* 内部滑动区域 */
         .update-content {
             padding: 2px 20px 16px;
             font-size: 14.5px;
-            color: #000; /* 描述文字纯黑 */
+            color: #000;
             line-height: 1.8;
-            border-top: 1px solid rgba(0, 0, 0, 0.2); /* 分割线改黑 */
-            text-align: left; /* 强制内容靠左对齐 */
-            
-            /* 固定高度与滑动条相关 */
+            border-top: 1px solid rgba(0, 0, 0, 0.2);
+            text-align: left;
             max-height: 220px;
             overflow-y: auto;
             scrollbar-width: thin;
             scrollbar-color: rgba(0, 0, 0, 0.4) transparent;
         }
 
-        /* 美化滑动条 */
         .update-content::-webkit-scrollbar {
             width: 6px;
         }
@@ -271,7 +394,7 @@
             text-shadow: 0 0 5px rgba(255,255,255,0.9), 0 0 10px rgba(255,255,255,0.5);
         }
         .update-content .highlight {
-            color: #000; /* 序号也改黑 */
+            color: #000;
             font-weight: 900;
         }
         /* ==================== 更新内容折叠框结束 ==================== */
@@ -314,12 +437,19 @@
                 grid-template-columns: repeat(2, 1fr);
                 gap: 16px;
             }
+            .intro-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .intro-section {
+                margin-top: 40px;
+                padding: 24px 22px;
+            }
         }
         
         @media (max-width: 600px) {
             body {
                 background-color: #0a060f;
-                background: url("zhanshi/1.0.jpg") center top / contain no-repeat fixed #0a060f;
+                background: url("背景s.jpeg") center top / contain no-repeat fixed #0a060f;
             }
             .time-item {
                 width: 80px;
@@ -359,6 +489,21 @@
             .char-name {
                 font-size: 18px;
             }
+            .intro-section {
+                max-width: 92vw;
+                margin: 36px auto 160px;
+                padding: 20px 16px;
+            }
+            .intro-title {
+                font-size: 20px;
+                margin-bottom: 20px;
+            }
+            .intro-grid {
+                grid-template-columns: 1fr;
+            }
+            .intro-item {
+                padding: 16px;
+            }
             .update-collapse {
                 max-width: 92vw;
             }
@@ -369,7 +514,7 @@
             .update-content {
                 padding: 2px 16px 12px;
                 font-size: 13.5px;
-                max-height: 180px; /* 移动端高度限制 */
+                max-height: 180px;
             }
         }
     </style>
@@ -379,26 +524,31 @@
         <h1 class="header-title">计算数据</h1>
         <p class="header-subtitle">羽化哲 更新至7.2版本V2.1 最后更新日期：<span id="lastUpdateText">加载中...</span></p>
         <p class="header-note">所涉及的主C及副c均为30词条<br>最终数据请以正式服为准！！！</p>
-        <a href="https://b23.tv/rDCFTFA" target="_blank" style="color:#c78cdf; text-shadow: 0 1px 3px rgba(0,0,0,0.9);">羽化哲主页</a>
 
         <div class="jump-btn-group">
+            <a href="https://b23.tv/rDCFTFA" target="_blank" class="jump-btn">羽化哲主页</a>
             <a href="https://qm.qq.com/q/2FqRcewcXS" target="_blank" class="jump-btn">点击进入交流群</a>
         </div>
 
-        <!-- ==================== 更新内容折叠框 ==================== -->
         <details class="update-collapse">
             <summary>点击查看更新内容/预告</summary>
             <div class="update-content">
-                 <p><span class="highlight">10月21日更新汇总：</span> </p>
+                <p><span class="highlight">10月28日更新汇总：</span></p>
+                <p><span class="highlight">1.</span> 下架了程序下载板块</p>
+                <p><span class="highlight">2.</span> 调整布局优化以及手机端展示优化</p>
+                <p><span class="highlight">3.</span> 桑多涅计算器将于11月1日正式上线，并开启v1.1版本测试</p>
+
+                <p><span class="highlight">10月21日更新汇总：</span></p>
                 <p><span class="highlight">1.</span> 下架首页倒计时功能</p>
                 <p><span class="highlight">2.</span> 角色板块：更新了米提亚（辅助向）武器差距数值</p>
                 <p><span class="highlight">3.</span> 桑多涅计算器已经完工，即将上线</p>
 
-                 <p><span class="highlight">10月19日更新汇总：</span> </p>
+                <p><span class="highlight">10月19日更新汇总：</span></p>
                 <p><span class="highlight">1.</span> 网页程序板块：角色面板计算，充能计算器重做上新。下架模拟通关时间计算器</p>
                 <p><span class="highlight">2.</span> 幽境危战板块：修正了7.2版本怪物机制</p>
                 <p><span class="highlight">3.</span> 优化了整体布局</p>
-                 <p><span class="highlight">10月17日更新汇总：</span> </p>
+
+                <p><span class="highlight">10月17日更新汇总：</span></p>
                 <p><span class="highlight">1.</span> 桑多涅计算器预计在 7.2 版本之前上线，敬请期待！请关注网站，群内，动态更新状态</p>
                 <p><span class="highlight">2.</span> 米提亚测试阶段将不在计算米提亚主C的 DPS，见谅！</p>
                 <p><span class="highlight">3.</span> 已完成幽静危站战7.2版本的怪物机制更新</p>
@@ -406,8 +556,6 @@
                 <p><span class="highlight">5.</span> 对网站进行了页面优化</p>
             </div>
         </details>
-        <!-- ==================== 更新内容折叠框结束 ==================== -->
-
     </div>
 
     <div class="card-container">
@@ -418,21 +566,155 @@
             <div class="char-name">资料库</div>
         </a>
         <a href="dps/dps.html" class="char-card glass-box">
-            <div class="char-name">DPS目录（米v2）</div>
+            <div class="char-name">DPS目录</div>
         </a>
         <a href="wangyechengxu.html" class="char-card glass-box">
             <div class="char-name">网页程序</div>
         </a>
-        <a href="xz/download.html" class="char-card glass-box">
-            <div class="char-name">软件下载exe</div>
-        </a>
-         <a href="" class="char-card glass-box">
-            <div class="char-name">DPS计算器（即将上线）</div>
+        <a href="" class="char-card glass-box">
+            <div class="char-name">DPS计算器</div>
         </a>
         <a href="lj/beijing/怪物解析/youjingweizhantiaozhuan.html" class="char-card glass-box">
             <div class="char-name">幽境危战</div>
         </a>
     </div>
+
+    <!-- ==================== 板块功能介绍区域（轻盈通透版） ==================== -->
+    <section class="intro-section">
+        <h2 class="intro-title">板块功能介绍</h2>
+        <div class="intro-grid">
+            
+            <!-- 角色 -->
+            <div class="intro-item">
+                <div class="intro-name">角色</div>
+                <div class="intro-body">
+                    <div class="intro-list-item">
+                        <span class="list-num">1.</span>
+                        <div class="list-text">角色在不同配置下的理论DPS图表</div>
+                    </div>
+                    <div class="intro-list-item">
+                        <span class="list-num">2.</span>
+                        <div class="list-text">角色在选择不同下位武器时，武器差距数值</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 资料库 -->
+            <div class="intro-item">
+                <div class="intro-name">资料库</div>
+                <div class="intro-body">
+                    <div class="intro-list-item">
+                        <span class="list-num">1.</span>
+                        <div class="list-text">
+                            <span class="sub-title">计算公式：</span>
+                            <span class="sub-desc">可查询原神角色的伤害计算公式，公式以总分展开，更加容易了解与理解</span>
+                        </div>
+                    </div>
+                    <div class="intro-list-item">
+                        <span class="list-num">2.</span>
+                        <div class="list-text">
+                            <span class="sub-title">原神时间表：</span>
+                            <span class="sub-desc">可查询每个原神版本，创体服，测试服的开启时间以及测试时间</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DPS目录 -->
+            <div class="intro-item">
+                <div class="intro-name">DPS目录</div>
+                <div class="intro-body">
+                    <div class="intro-list-item">
+                        <span class="list-num">1.</span>
+                        <div class="list-text">将图表转化成金数划分的展示形式</div>
+                    </div>
+                    <div class="intro-list-item">
+                        <span class="list-num">2.</span>
+                        <div class="list-text">可筛选特定金数下的不同队伍的DPS数值</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 网页程序 -->
+            <div class="intro-item">
+                <div class="intro-name">网页程序</div>
+                <div class="intro-body">
+                    <div class="intro-global-desc">自主开发的利于玩家的伤害计算辅助程序</div>
+                    <div class="intro-list-item">
+                        <span class="list-num">1.</span>
+                        <div class="list-text">
+                            <span class="sub-title">原神BUFF排轴工具：</span>
+                            <span class="sub-desc">可用于模拟流程以及增益覆盖等计算所需要的信息</span>
+                        </div>
+                    </div>
+                    <div class="intro-list-item">
+                        <span class="list-num">2.</span>
+                        <div class="list-text">
+                            <span class="sub-title">角色充能计算器：</span>
+                            <span class="sub-desc">可用于计算目标角色的充能需求</span>
+                        </div>
+                    </div>
+                    <div class="intro-list-item">
+                        <span class="list-num">3.</span>
+                        <div class="list-text">
+                            <span class="sub-title">自定义面板计算：</span>
+                            <span class="sub-desc">可用于模拟不同词条下的双爆面板，以及高词条下的面板情况</span>
+                        </div>
+                    </div>
+                    <div class="intro-list-item">
+                        <span class="list-num">4.</span>
+                        <div class="list-text">
+                            <span class="sub-title">抗性/防御系数计算：</span>
+                            <span class="sub-desc">可用于计算不同抗性或某减防下的抗性系数以及防御系数</span>
+                        </div>
+                    </div>
+                    <div class="intro-list-item">
+                        <span class="list-num">5.</span>
+                        <div class="list-text">
+                            <span class="sub-title">记事本：</span>
+                            <span class="sub-desc">可用于记录角色信息</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DPS计算器 -->
+            <div class="intro-item">
+                <div class="intro-name">DPS计算器</div>
+                <div class="intro-body">
+                    <div class="intro-global-desc">自主开发的理论伤害计算模拟器</div>
+                    <div class="intro-list-item">
+                        <span class="list-num">1.</span>
+                        <div class="list-text">可计算不同角色的理论DPS数值</div>
+                    </div>
+                    <div class="intro-list-item">
+                        <span class="list-num">2.</span>
+                        <div class="list-text">支持自定义面板输入，计算独属于你的队伍理论数值</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 幽境危战 -->
+            <div class="intro-item">
+                <div class="intro-name">幽境危战</div>
+                <div class="intro-body">
+                    <div class="intro-list-item">
+                        <span class="list-num">1.</span>
+                        <div class="list-text">可查询全部的幽境危战怪物机制</div>
+                    </div>
+                    <div class="intro-list-item">
+                        <span class="list-num">2.</span>
+                        <div class="list-text">可查询特定版本的怪物机制</div>
+                    </div>
+                    <div class="intro-list-item">
+                        <span class="list-num">3.</span>
+                        <div class="list-text">支持下载怪物机制内容</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
 
     <a href="#pageTop" id="backTop">↑</a>
 
