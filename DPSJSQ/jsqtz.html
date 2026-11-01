@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#120c0b">
+<title>角色DPS计算器</title>
+<link rel="icon" href="sdn.png">
+<link rel="shortcut icon" href="sdn.png">
+<link rel="apple-touch-icon" href="sdn.png">
+<style>
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    overflow: hidden;
+    background: #120c0b url("背景2.jpg") center center / cover no-repeat;
+    font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  }
+
+  .page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    height: 100svh;
+    padding-top: clamp(24px, 4.5vh, 52px);
+  }
+
+  /* 顶部居中的蓝色标题 */
+  .title {
+    margin: 0;
+    font-family: "STZhongsong", "Songti SC", "Noto Serif SC", "STSong", "SimSun", serif;
+    font-size: clamp(30px, 3.8vw, 46px);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    color: #79ccff;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.55);
+    animation: title-in 0.7s ease-out both;
+  }
+
+  /* 标题下方偏左的角色入口 */
+  .character {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-self: flex-start;
+    gap: 11px;
+    margin-top: clamp(22px, 3.6vh, 34px);
+    margin-left: max(84px, 26vw);
+    color: inherit;
+    text-decoration: none;
+    transform: translateX(-50%);
+    animation: fade-in 0.8s 0.1s ease-out both;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* 简单的圆形头像框 */
+  .avatar {
+    display: block;
+    width: clamp(84px, 6vw, 100px);
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    border: 3px solid #79ccff;
+    border-radius: 50%;
+    background: #0b1118;
+    animation: avatar-float 4.6s 1s ease-in-out infinite;
+  }
+
+  .avatar img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 40%;
+    transform: scale(1.18);
+    transform-origin: center 36%;
+  }
+
+  .name {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.5;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    color: #79ccff;
+    text-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.9),
+      0 0 6px rgba(0, 0, 0, 0.35);
+  }
+
+  .character:hover .avatar {
+    border-color: #c9eeff;
+  }
+
+  .character:hover .name {
+    color: #bdeaff;
+  }
+
+  .character:focus-visible {
+    outline: none;
+  }
+
+  .character:focus-visible .avatar {
+    outline: 2px solid #ffffff;
+    outline-offset: 4px;
+  }
+
+  @keyframes title-in {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* 头像轻轻上浮，幅度很小 */
+  @keyframes avatar-float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-4px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .title,
+    .character,
+    .avatar {
+      animation: none;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <main class="page">
+    <h1 class="title">角色DPS计算器</h1>
+
+    <a class="character" href="sdnjsq.html">
+      <span class="avatar">
+        <img src="sdn.png" alt="桑多涅">
+      </span>
+      <span class="name">桑多涅(老婆)</span>
+    </a>
+  </main>
+
+</body>
+</html>
